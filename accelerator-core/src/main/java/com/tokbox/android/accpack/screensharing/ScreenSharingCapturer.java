@@ -1,4 +1,4 @@
-package com.tokbox.android.accpack;
+package com.tokbox.android.accpack.screensharing;
 
 import android.annotation.TargetApi;
 import android.content.Context;
