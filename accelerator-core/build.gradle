@@ -60,6 +60,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.opentok.android:opentok-solutions-logging:+'
     compile 'com.opentok.android:opentok-android-sdk:2.10.+'
+    testCompile 'junit:junit:4.12'
 }
 
 if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD")) {
