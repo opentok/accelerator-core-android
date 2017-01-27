@@ -96,9 +96,8 @@ public class OTConfig {
 
         public OTConfigBuilder(String sessionId, String token, String apikey) {
             if ( sessionId == null || token == null || apikey == null ) {
-                throw new RuntimeException("The credentials cannot be null"); //TODO MARINAS EMPTY CASE
+                throw new RuntimeException("The credentials cannot be null");
             }
-
             this.sessionId = sessionId;
             this.token = token;
             this.apiKey = apikey;
@@ -129,33 +128,28 @@ public class OTConfig {
 
         public OTConfig build() {
             OTConfig info = new OTConfig(this);
-
             boolean valid = validateInfoObject(info);
 
             if (!valid) {
                 return null;
             }
-
             return info;
         }
 
         private boolean validateInfoObject(OTConfig info) {
-
-            if (sessionId == null || sessionId.isEmpty()) {
+            if ( sessionId == null || sessionId.isEmpty() || sessionId.trim().length() == 0 ) {
                 Log.i(LOG_TAG, "SessionId cannot be null or empty");
                 return false;
             }
-            if ( token == null || token.isEmpty() ) {
+            if ( token == null || token.isEmpty() || token.trim().length() == 0 ) {
                 Log.i(LOG_TAG, "Token cannot be null or empty");
                 return false;
             }
-            if ( apiKey == null || apiKey.isEmpty() ) {
+            if ( apiKey == null || apiKey.isEmpty() || apiKey.trim().length() == 0 ) {
                 Log.i(LOG_TAG, "ApiKey cannot be null or empty");
                 return false;
             }
-
             return true;
-
         }
     }
 }

@@ -1372,9 +1372,12 @@ public class OTWrapper {
     }
 
     @Override
-    public void onError(String error) {
-      Log.i(LOG_TAG, "Error: Screensharing by default");
-      //TODO run basicListener callback ?
+    public void onError(String errorMsg) {
+      Log.i(LOG_TAG, "Error in Screensharing by default");
+      for (BasicListener listener : mBasicListeners) {
+        OpentokError error = new OpentokError(OpentokError.Domain.PublisherErrorDomain, OpentokError.ErrorCode.PublisherInternalError.getErrorCode(), errorMsg);
+        ((RetriableBasicListener) listener).onError(SELF, error);
+      }
     }
   };
 
