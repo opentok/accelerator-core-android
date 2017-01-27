@@ -57,10 +57,7 @@ public class ScreenSharingCapturer extends BaseVideoCapturer{
                         lastBmp.getPixels(frame, 0, width, 0, 0, width, height);
                         provideIntArrayFrame(frame, ARGB, width, height, 0, false);
                     }
-
                     mHandler.postDelayed(newFrame, 1000 / fps);
-
-
                 }
             }
         }
@@ -141,7 +138,6 @@ public class ScreenSharingCapturer extends BaseVideoCapturer{
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-
                 Image mImage = null;
                 FileOutputStream fos = null;
 
@@ -176,7 +172,6 @@ public class ScreenSharingCapturer extends BaseVideoCapturer{
                         mImage.close();
                     }
                 }
-
         }
     }
 }
