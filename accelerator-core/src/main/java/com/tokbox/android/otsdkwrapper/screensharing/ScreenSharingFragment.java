@@ -1,4 +1,4 @@
-package com.tokbox.android.accpack.screensharing;
+package com.tokbox.android.otsdkwrapper.screensharing;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -19,7 +19,9 @@ import android.util.Log;
 import android.view.Display;
 import android.view.ViewGroup;
 
-
+/**
+ * Represents a headless fragment to enable the screensharing by default
+ */
 public class ScreenSharingFragment extends Fragment {
 
     private static final String LOG_TAG = ScreenSharingFragment.class.getSimpleName();

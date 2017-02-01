@@ -1,4 +1,4 @@
-package com.tokbox.android.accpack;
+package com.tokbox.android.otsdkwrapper.wrapper;
 
 import android.content.Context;
 import android.util.Log;
@@ -17,7 +17,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-public class AccPackSession extends Session {
+/**
+ * Represents an OpenTok Session
+ */
+public class OTAcceleratorSession extends Session {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
 
@@ -34,10 +37,22 @@ public class AccPackSession extends Session {
     private SignalProcessorThread mInputSignalProcessor;
     private SignalProcessorThread mOutputSignalProcessor;
 
-    public AccPackSession(Context context, String apiKey, String sessionId) {
+    /**
+     * Creates an OTAcceleratorSession instance
+     * @param context
+     * @param apiKey
+     * @param sessionId
+     */
+    public OTAcceleratorSession(Context context, String apiKey, String sessionId) {
         super(context, apiKey, sessionId);
     }
 
+    /**
+     * Registers a signal listener for a given signal.
+     * @param signalName Name of the signal this listener will listen to. Pass "*" if the listener
+     *                   is to be invoked for all signals.
+     * @param listener Listener that will be invoked when a signal is received.
+     */
     public void addSignalListener(String signalName, com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
         Log.d(LOG_TAG, "Adding Signal Listener for: " + signalName);
         ArrayList<com.tokbox.android.otsdkwrapper.listeners.SignalListener> perNameListeners = mSignalListeners.get(signalName);
@@ -51,6 +66,13 @@ public class AccPackSession extends Session {
         }
     }
 
+    /**
+     * Removes an object as signal listener everywhere it's used. This is added to support the common
+     * cases where an activity (or some object that depends on an activity) is used as a listener
+     * but the activity can be destroyed at some points (which would cause the app to crash if the
+     * signal was delivered).
+     * @param listener Listener to be removed
+     */
     public void removeSignalListener(com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
         Enumeration<String> signalNames = mSignalListeners.keys();
         while (signalNames.hasMoreElements()) {
@@ -60,6 +82,12 @@ public class AccPackSession extends Session {
         }
     }
 
+    /**
+     * Removes a signal listener.
+     * @param signalName Name of the signal this listener will listen to. Pass "*" if the listener
+     *                   is to be invoked for all signals.
+     * @param listener Listener to be removed.
+     */
     public void removeSignalListener(String signalName, com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
         ArrayList<com.tokbox.android.otsdkwrapper.listeners.SignalListener> perNameListeners = mSignalListeners.get(signalName);
         if (perNameListeners == null) {
@@ -71,6 +99,11 @@ public class AccPackSession extends Session {
         }
     }
 
+    /**
+     * Sends a new signal
+     * @param signalInfo {@link SignalInfo} of the signal to be sent
+     * @param connection Destiantion connection. If null, the signal will be sent to all.
+     */
     public void sendSignal(SignalInfo signalInfo, Connection connection) {
         if (mOutputSignalProtocol != null) {
             mOutputSignalProtocol.write(signalInfo);
@@ -82,6 +115,11 @@ public class AccPackSession extends Session {
         }
     }
 
+    /**
+     * Internal method to sends a new signal. Called from {@link OTWrapper}
+     * @param signalInfo {@link SignalInfo} of the signal to be sent
+     * @param connection Destiantion connection. If null, the signal will be sent to all.
+     */
     public void internalSendSignal(SignalInfo signalInfo, Connection connection) {
         Log.d(LOG_TAG, "internalSendSignal: " + signalInfo.mSignalName);
         if (connection == null) {
@@ -92,11 +130,18 @@ public class AccPackSession extends Session {
         }
     }
 
+    /**
+     * Clean signals. Internal method calld from {@link OTWrapper}
+     */
     public void cleanUpSignals() {
         setInputSignalProtocol(null);
         setOutputSignalProtocol(null);
     }
 
+    /**
+     * Get the signal listener
+     * @return the signalListener
+     */
     public Session.SignalListener getSignalListener() {
         return mSignalListener;
     }
@@ -113,7 +158,7 @@ public class AccPackSession extends Session {
                     public void run() {
                         Log.d(LOG_TAG, "Dispatching signal: " + signalInfo.mSignalName + " on thread: " +
                                 this.getId());
-                        listener.onSignalReceived(signalInfo, AccPackSession.this.getConnection().getConnectionId().equals(signalInfo.mSrcConnId));
+                        listener.onSignalReceived(signalInfo, OTAcceleratorSession.this.getConnection().getConnectionId().equals(signalInfo.mSrcConnId));
                     }
                 }.start();
             }
@@ -185,7 +230,7 @@ public class AccPackSession extends Session {
         public void onSignalReceived(Session session, String signalName, String data,
                                      Connection connection) {
             String connId = connection != null ? connection.getConnectionId() : null;
-            SignalInfo inputSignal = new SignalInfo(connId, AccPackSession.this.getConnection().getConnectionId(), signalName, data);
+            SignalInfo inputSignal = new SignalInfo(connId, OTAcceleratorSession.this.getConnection().getConnectionId(), signalName, data);
             if (mInputSignalProtocol != null) {
                 mInputSignalProtocol.write(inputSignal);
             } else {
