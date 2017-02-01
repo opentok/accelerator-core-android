@@ -15,9 +15,8 @@ import com.opentok.android.Session;
 import com.opentok.android.Stream;
 import com.opentok.android.Subscriber;
 import com.opentok.android.SubscriberKit;
-import com.tokbox.android.accpack.AccPackSession;
-import com.tokbox.android.accpack.screensharing.ScreenSharingCapturer;
-import com.tokbox.android.accpack.screensharing.ScreenSharingFragment;
+import com.tokbox.android.otsdkwrapper.screensharing.ScreenSharingCapturer;
+import com.tokbox.android.otsdkwrapper.screensharing.ScreenSharingFragment;
 import com.tokbox.android.logging.OTKAnalytics;
 import com.tokbox.android.logging.OTKAnalyticsData;
 import com.tokbox.android.otsdkwrapper.listeners.AdvancedListener;
@@ -44,7 +43,7 @@ import java.util.UUID;
 
 /**
  * Represents an OpenTok object to enable a video communication.
- * The first step in using the SDK Wrapper is to initialize it by calling the constructor with the
+ * The first step in using the OTWrapper is to initialize it by calling the constructor with the
  * OpenTokConfig parameter.
  */
 public class OTWrapper {
@@ -54,7 +53,7 @@ public class OTWrapper {
   private Context mContext = null;
   private final OTWrapper SELF = this;
 
-  private AccPackSession mSession = null;
+  private OTAcceleratorSession mSession = null;
   private Connection mSessionConnection = null;
   private Publisher mPublisher = null;
   private Publisher mScreenPublisher = null;
@@ -86,9 +85,9 @@ public class OTWrapper {
   //Screensharing by default
   private ScreenSharingFragment mScreensharingFragment;
   private boolean isScreensharingByDefault = false;
-
   private Publisher.Builder mScreenPublisherBuilder;
-  //custom renderers
+
+  //Custom renderer
   private BaseVideoRenderer mVideoRemoteRenderer;
   private BaseVideoRenderer mScreenRemoteRenderer;
 
@@ -97,7 +96,7 @@ public class OTWrapper {
   private OTKAnalytics mAnalytics;
 
   /**
-   * Creates a OTWrapper instance.
+   * Creates an OTWrapper instance.
    *
    * @param context Activity context. Needed by the Opentok APIs
    * @param config  OTConfig: Information about the OpenTok session. This includes all the needed
@@ -157,7 +156,7 @@ public class OTWrapper {
    */
   public void connect() {
     addLogEvent(ClientLog.LOG_ACTION_CONNECT, ClientLog.LOG_VARIATION_ATTEMPT);
-    mSession = new AccPackSession(mContext, mOTConfig.getApiKey(), mOTConfig.getSessionId());
+    mSession = new OTAcceleratorSession(mContext, mOTConfig.getApiKey(), mOTConfig.getSessionId());
     mSession.setConnectionListener(mConnectionListener);
     mSession.setSessionListener(mSessionListener);
     mSession.setSignalListener(mSession.getSignalListener());
@@ -428,6 +427,11 @@ public class OTWrapper {
     return returnedValue;
   }
 
+  /**
+   * Susbscribe to a specific remote
+   *
+   * @param remoteId String to identify the remote
+   */
   public void addRemote(String remoteId) {
     Log.i(LOG_TAG, "Add remote with ID: " + remoteId);
     addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT);
@@ -457,6 +461,11 @@ public class OTWrapper {
     mSession.subscribe(sub);
   }
 
+  /**
+   * Unsusbscribe from a specific remote
+   *
+   * @param remoteId String to identify the remote
+   */
   public void removeRemote(String remoteId) {
     Log.i(LOG_TAG, "Remove remote with ID: " + remoteId);
     addLogEvent(ClientLog.LOG_ACTION_REMOVE_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT);
@@ -490,37 +499,6 @@ public class OTWrapper {
     return listener instanceof BasicListener ?
       new UnfailingBasicListener((BasicListener) listener) :
       new UnfailingAdvancedListener<>((AdvancedListener) listener);
-  }
-
-  private BaseOTListener addOTListener(BaseOTListener listener,
-                                       HashMap retriableMap,
-                                       ArrayList listenerList) {
-    boolean isWrapped = listener instanceof RetriableOTListener;
-    RetriableOTListener realListener = (RetriableOTListener) retriableMap.get(listener);
-    if (realListener == null) {
-      realListener =
-        (RetriableOTListener) (isWrapped ? listener : getUnfailingFromBaseListener(listener));
-      retriableMap.put(listener, (isWrapped ? listener : realListener));
-      listenerList.add(realListener);
-      refreshPeerList();
-    }
-    return (BaseOTListener) realListener;
-
-  }
-
-  private void removeOTListener(BaseOTListener listener, HashMap retriableMap,
-                                ArrayList listenerList) {
-    if (listener != null) {
-      BaseOTListener internalListener = listener instanceof RetriableOTListener ?
-        ((RetriableOTListener) listener).getInternalListener() :
-        listener;
-      RetriableOTListener realListener = (RetriableOTListener) retriableMap.get(internalListener);
-      listenerList.remove(realListener);
-      retriableMap.remove(internalListener);
-    } else {
-      listenerList.clear();
-      retriableMap.clear();
-    }
   }
 
   /**
@@ -692,7 +670,49 @@ public class OTWrapper {
     }
   }
 
-  public AccPackSession getSession(){
+  /**
+   * (Tries) to set the FPS of the shared video stream to the passed one. The FPS is rounded to
+   * the nearest supported one.
+   * @param FPS
+   */
+  public void setPublishingFPS(int FPS) {
+    Log.d(LOG_TAG, "setSharingFPS: " + mPublisher);
+    Publisher.CameraCaptureFrameRate frameRate = getFPS(FPS);
+    if (mPublisher != null) {
+      int currentCamera = mPublisher.getCameraId();
+      PreviewConfig newPreview;
+      if (mPreviewConfig != null) {
+        mPreviewConfig.setFrameRate(frameRate);
+      } else {
+        mPreviewConfig = new PreviewConfig.PreviewConfigBuilder().framerate(frameRate).build();
+      }
+      newPreview = mPreviewConfig;
+      boolean isPublishing = this.isPublishing;
+      boolean isPreviewing = this.isPreviewing;
+      if (isPublishing) {
+        stopPublishingMedia(false);
+      }
+      if (isPreviewing) {
+        stopPreview();
+      }
+      mPublisher = null;
+      if (isPreviewing) {
+        startPreview(newPreview);
+      }
+      if (isPublishing) {
+        startPublishingMedia(newPreview, false);
+      }
+      if (mPublisher != null) {
+        mPublisher.setCameraId(currentCamera);
+      }
+    }
+  }
+
+  /**
+   * Get the OTAcceleratorSession
+   * @return The session
+   */
+  public OTAcceleratorSession getSession(){
     return mSession;
   }
 
@@ -715,6 +735,36 @@ public class OTWrapper {
     mScreensharingFragment = null;
   }
 
+  private BaseOTListener addOTListener(BaseOTListener listener,
+                                       HashMap retriableMap,
+                                       ArrayList listenerList) {
+    boolean isWrapped = listener instanceof RetriableOTListener;
+    RetriableOTListener realListener = (RetriableOTListener) retriableMap.get(listener);
+    if (realListener == null) {
+      realListener =
+              (RetriableOTListener) (isWrapped ? listener : getUnfailingFromBaseListener(listener));
+      retriableMap.put(listener, (isWrapped ? listener : realListener));
+      listenerList.add(realListener);
+      refreshPeerList();
+    }
+    return (BaseOTListener) realListener;
+
+  }
+
+  private void removeOTListener(BaseOTListener listener, HashMap retriableMap,
+                                ArrayList listenerList) {
+    if (listener != null) {
+      BaseOTListener internalListener = listener instanceof RetriableOTListener ?
+              ((RetriableOTListener) listener).getInternalListener() :
+              listener;
+      RetriableOTListener realListener = (RetriableOTListener) retriableMap.get(internalListener);
+      listenerList.remove(realListener);
+      retriableMap.remove(internalListener);
+    } else {
+      listenerList.clear();
+      retriableMap.clear();
+    }
+  }
 
   private synchronized void publishIfReady() {
     Log.d(LOG_TAG, "publishIfReady: " + mSessionConnection + ", " + mPublisher + ", " +
@@ -854,44 +904,6 @@ public class OTWrapper {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_30;
     }
     return returnedValue;
-  }
-
-  /**
-   * (Tries) to set the FPS of the shared video stream to the passed one. The FPS is rounded to
-   * the nearest supported one.
-   * @param FPS
-   */
-  public void setPublishingFPS(int FPS) {
-    Log.d(LOG_TAG, "setSharingFPS: " + mPublisher);
-    Publisher.CameraCaptureFrameRate frameRate = getFPS(FPS);
-    if (mPublisher != null) {
-      int currentCamera = mPublisher.getCameraId();
-      PreviewConfig newPreview;
-      if (mPreviewConfig != null) {
-        mPreviewConfig.setFrameRate(frameRate);
-      } else {
-        mPreviewConfig = new PreviewConfig.PreviewConfigBuilder().framerate(frameRate).build();
-      }
-      newPreview = mPreviewConfig;
-      boolean isPublishing = this.isPublishing;
-      boolean isPreviewing = this.isPreviewing;
-      if (isPublishing) {
-        stopPublishingMedia(false);
-      }
-      if (isPreviewing) {
-        stopPreview();
-      }
-      mPublisher = null;
-      if (isPreviewing) {
-        startPreview(newPreview);
-      }
-      if (isPublishing) {
-        startPublishingMedia(newPreview, false);
-      }
-      if (mPublisher != null) {
-        mPublisher.setCameraId(currentCamera);
-      }
-    }
   }
 
   private void attachPublisherView() {

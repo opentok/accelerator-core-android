@@ -1,4 +1,4 @@
-package com.tokbox.android.accpack.screensharing;
+package com.tokbox.android.otsdkwrapper.screensharing;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -18,6 +18,9 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Represents a Custom Capturer to capture the full screen of the device
+ */
 public class ScreenSharingCapturer extends BaseVideoCapturer{
     private static final String LOG_TAG = ScreenSharingCapturer.class.getSimpleName();
     private Context mContext;

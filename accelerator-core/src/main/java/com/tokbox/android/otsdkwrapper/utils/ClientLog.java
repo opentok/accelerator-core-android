@@ -4,8 +4,8 @@ public class ClientLog {
 
     // For internal use only. Please do not modify or remove this code.
 
-    public static final String LOG_CLIENT_VERSION = "android-vsol-1.0.0";
-    public static final String LOG_COMPONENTID = "sdkWrapper";
+    public static final String LOG_CLIENT_VERSION = "android-vsol-2.0.0";
+    public static final String LOG_COMPONENTID = "acceleratorCore";
 
     public static final String LOG_ACTION_CONNECT = "Connect";
     public static final String LOG_ACTION_DISCONNECT = "Disconnect";
@@ -25,8 +25,6 @@ public class ClientLog {
     public static final String LOG_ACTION_REMOVE_REMOTE = "RemoveRemote";
     public static final String LOG_ACTION_CYCLE_CAMERA = "CycleCamera";
     public static final String LOG_ACTION_GET_OTCONFIG = "GetOTConfig";
-    public static final String LOG_ACTION_ADD_SIGNAL_LISTENER = "AddSignalListener";
-    public static final String LOG_ACTION_REMOVE_SIGNAL_LISTENER = "RemoveSignalListener";
     public static final String LOG_ACTION_ADD_BASIC_LISTENER = "AddBasicListener";
     public static final String LOG_ACTION_REMOVE_BASIC_LISTENER = "RemoveBasicListener";
     public static final String LOG_ACTION_ADD_ADVANCED_LISTENER = "AddAdvancedListener";
