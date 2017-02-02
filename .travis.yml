@@ -1,10 +1,8 @@
-{
-  "language": "java",
-  "before_install":[
-  "gradle wrapper"
-  ],
-  "script": [
-    "./gradlew build
-    ./gradlew test"
-  ]
-}
+language: android
+
+before_install:
+  - gradle wrapper
+
+script:
+  - ./gradlew build
+  - ./gradlew test
