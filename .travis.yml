@@ -6,19 +6,11 @@ android:
     - sys-img-armeabi-v7a-android-tv-l
     - add-on
     - extra
-env:
-  global:
-    - ALL_GRADLE_VERSIONS=2.14.1
-    - GRADLE_OPTS="-Xms128m"
-
-matrix:
-  include:
-    - jdk: oraclejdk8
-      env: GRADLE_VERSIONS=2.14.1
 
 before_install:
   - jdk_switcher use oraclejdk8
-  - gradle wrapper
+  - gradle check
+  #- gradle wrapper
 
 script:
   - jdk_switcher use oraclejdk8
