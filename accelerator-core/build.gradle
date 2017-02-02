@@ -8,9 +8,9 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
-        versionName "2.0"
+        versionName "1.0"
         project.archivesBaseName = "opentok-accelerator-core"
-        project.version = "2.0.0"
+        project.version = "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -75,7 +75,7 @@ if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD
                 pom.artifactId = "${ARTIFACT_ID}"
             }
         }
-    }
+   }
 }
 def checkMaven = task("checkUploadArchivesDeps") {
     doFirst {
