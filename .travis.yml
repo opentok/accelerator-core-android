@@ -7,8 +7,8 @@ android:
     - add-on
     - extra
 
-before_install:
-  - gradle wrapper
+#before_install:
+#  - gradle wrapper
 
 script:
   - ./gradlew build
