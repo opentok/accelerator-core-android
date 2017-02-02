@@ -1,7 +1,7 @@
 #Accelerator Core Android
 
 ##Quickstart
-The library `accelerator core android` gives you an easy way to integrate [OpenTok SDK](https://tokbox.com) to any Android applications. 
+The Accelerator Core Android library gives you an easy way to integrate [OpenTok SDK](https://tokbox.com) to any Android applications. 
 
 ##Installation
 There are 2 options for installing the library:
@@ -14,7 +14,7 @@ There are 2 options for installing the library:
 
 1. Clone the [accelerator core android repository](https://github.com/opentok/accelerator-core-android).
 2. Start Android Studio and create a new project.
-3. From the new project, right-click the app name and select New > Module > Impodt Gradle Project.
+3. From the new project, right-click the app name and select New > Module > Import Gradle Project.
 4. Navigate to the directory in which you cloned **OpenTok Accelerator Core Android**, select **accelerator-core**, and click **Finish**.
 4. Open the **build.gradle** file for the app and ensure the following lines have been added to the `dependencies` section:
 
@@ -47,7 +47,7 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 
 | Class        | Description  |
 | ------------- | ------------- |
-| `OTAcceleratorSession` | Manages the session, allows multiple listeners and implements a signaling protocol to facilitate the signal communication by implemting filtering by type. | 
+| `OTAcceleratorSession` | Manages the session, allows multiple listeners and implements a signaling protocol. | 
 | `OTWrapper` | Represents an OpenTok object to enable a video communication. |
 | `OTConfig`   | Defines the OpenTok Configuration to be used in the communication. It includes SessionId, Token and APIKey, and features like to subscribe automatically or subscribe to self. |
 | `PreviewConfig` | Defines the configuration of the local preview. |
@@ -57,13 +57,12 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 | `MediaType` | Defines the Audio and Video media type. |
 | `StreamStatus` | Defines the current status of the Stream properties. |
 | `VideoScale` | Defines the FIT and FILL modes setting for the renderer. |
-| `ScreenSharingCapturer` | Custom screen sharing capturer. In the absence of a selected or default camera capturer, `Core Android` will generate one using the full screen as the capturer. |
+| `ScreenSharingCapturer` | Custom screen sharing capturer. In the absence of a custom or default camera capturer, `Core Android` will generate one using the full screen as the capturer. |
 | `ScreenSharingFragment` | Headless fragment used to implement the screensharing feature by default. |
 
 ##Using Accelerator Core Android
 
-You can start using one of the example applications already develop for testing:
- 
+You can start testing a basic one-to-one video application using the Accelerator Core with best-practices for Android.
  - [One to one sample application](https://github.com/opentok/one-to-one-sample-apps).
  
 ###Initialization
@@ -73,7 +72,7 @@ The first step in using the OTWrapper is to initialize it by calling the constru
 ```java
     OTConfig config =
                 new OTConfig.OTConfigBuilder(SESSION_ID, TOKEN,
-                        API_KEY).name("sdk-wrapper-sample").subscribeAutomatically(true).subscribeToSelf(false).build();
+                        API_KEY).name("core-sample").subscribeAutomatically(true).subscribeToSelf(false).build();
 
     OTWrapper mWrapper = new OTWrapper(MainActivity.this, config);
 
@@ -155,11 +154,10 @@ Call to start and stop displaying the camera's video in the Preview's view befor
   mWrapper.startPreview(new PreviewConfig.PreviewConfigBuilder().
                         name("Tokboxer").build());
 
-    //.....
+  //.....
     
-    mWrapper.stopPreview();
-
-              
+  mWrapper.stopPreview();
+            
 ```
 
 When the OTWrapper started the preview, the BasicListener.onPreviewViewReady(...) event is called. And when the OTWrapper stopped the preview, the BasicListener.onPreviewViewDestroyed(...) event is called.
@@ -167,19 +165,18 @@ When the OTWrapper started the preview, the BasicListener.onPreviewViewReady(...
 ```java
   private BasicListener mBasicListener =
             new PausableBasicListener(new BasicListener<OTWrapper>() {
+      @Override
+      public void onPreviewViewReady(OTWrapper otWrapper, View localView) throws ListenerException {
+        Log.i(LOG_TAG, "Local preview view is ready");
+        //....
+      }
 
       @Override
-                public void onPreviewViewReady(OTWrapper otWrapper, View localView) throws ListenerException {
-                    Log.i(LOG_TAG, "Local preview view is ready");
-                    //....
-                }
-
-                @Override
-                public void onPreviewViewDestroyed(OTWrapper otWrapper, View localView) throws ListenerException {
-                    Log.i(LOG_TAG, "Local preview view is destroyed");
-                   //....
-                }
-    });
+      public void onPreviewViewDestroyed(OTWrapper otWrapper, View localView) throws ListenerException {
+        Log.i(LOG_TAG, "Local preview view is destroyed");
+        //....
+      }
+  });
 ```
 
 #### Start and stop publishing media
@@ -195,10 +192,10 @@ Call to start and stop the local streaming video. The source of the stream can b
                         name("Tokboxer").build();
   mWrapper.startPublishingMedia(config, false);
 
-    //or screen streaming, using a custom screen capturer
-    config = new PreviewConfig.PreviewConfigBuilder().
+  //or screen streaming, using a custom screen capturer
+  config = new PreviewConfig.PreviewConfigBuilder().
                     name("screenPublisher").capturer(screenCapturer).build();
-    mWrapper.startSharingMedia(config, true);
+  mWrapper.startSharingMedia(config, true);
 
 ```
 
@@ -209,16 +206,16 @@ When the OTWrapper started the publishing media, the BasicListener.onStartedPubl
             new PausableBasicListener(new BasicListener<OTWrapper>() {
 
       @Override
-                public void onStartedSharingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
-                    Log.i(LOG_TAG, "Local started streaming video.");
-                    //....
-                }
+      public void onStartedSharingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
+        Log.i(LOG_TAG, "Local started streaming video.");
+        //....
+      }
 
-                @Override
-                public void onStoppedSharingMedia(OTWrapper otWrapper, boolean isScreensharing) throws ListenerException {
-                    Log.i(LOG_TAG, "Local stopped streaming video.");
-                }
-    });
+      @Override
+      public void onStoppedSharingMedia(OTWrapper otWrapper, boolean isScreensharing) throws ListenerException {
+        Log.i(LOG_TAG, "Local stopped streaming video.");
+      }
+  });
 ```
 
 ### Remote participants management
@@ -230,18 +227,18 @@ Then, when a new remote participant connected to the session, the BasicListener.
   private BasicListener mBasicListener =
             new PausableBasicListener(new BasicListener<OTWrapper>() {
 
-    @Override
-    public void onRemoteJoined(OTWrapper otWrapper, String remoteId) throws ListenerException {
-          Log.i(LOGTAG, "A new remote joined.");
-          //...
-        }
+      @Override
+      public void onRemoteJoined(OTWrapper otWrapper, String remoteId) throws ListenerException {
+        Log.i(LOGTAG, "A new remote joined.");
+        //...
+      }
 
-        @Override
-        public void onRemoteLeft(OTWrapper otWrapper, String remoteId) throws ListenerException {
-          Log.i(LOGTAG, "A new remote left.");
-          //...    
-        }
-    });
+      @Override
+      public void onRemoteLeft(OTWrapper otWrapper, String remoteId) throws ListenerException {
+        Log.i(LOGTAG, "A new remote left.");
+        //...    
+      }
+  });
 ```
 
 When the remote participant view is ready, the BasicListener.onRemoteViewReady(...) event is called. And when the remote participant view is destroyed, the BasicListener.onRemoteViewDestroyed(....) event is called.
@@ -255,11 +252,11 @@ When the remote participant view is ready, the BasicListener.onRemoteViewReady(.
             //...
       }
 
-        @Override
-        public void onRemoteViewDestroyed(OTWrapper otWrapper, View remoteView, String remoteId) throws ListenerException {
-          Log.i(LOGTAG, "Remote view is destroyed");
-          //...
-        }
+      @Override
+      public void onRemoteViewDestroyed(OTWrapper otWrapper, View remoteView, String remoteId) throws ListenerException {
+        Log.i(LOGTAG, "Remote view is destroyed");
+        //...
+      }
     });
 ```
 
@@ -342,7 +339,7 @@ The Accelerator Core includes a complete Signaling protocol to register a signal
 	//manage the received signals. All the received signals will be of the registered type: SIGNAL_TYPE
 	public void onSignalReceived(SignalInfo signalInfo, boolean isSelfSignal) {
    		//....
-    }
+  }
 
 ```
 
@@ -351,13 +348,13 @@ A custom video capturer or renderer can be used in the OpenTok communication for
 
 ```java
 
-   CustomRenderer myCustomRenderer = new CustomRenderer(...);
-   CustomCapturer myCustomCapturer = new CustomCapturer(...);
+  CustomRenderer myCustomRenderer = new CustomRenderer(...);
+  CustomCapturer myCustomCapturer = new CustomCapturer(...);
 
-   PreviewConfig config = new PreviewConfig.PreviewConfigBuilder().
+  PreviewConfig config = new PreviewConfig.PreviewConfigBuilder().
                     name("screenPublisher").capturer(myCustomCapturer).renderer(myCustomRenderer).build();
 
-   mWrapper.startPublishingMedia(config, false);
+  mWrapper.startPublishingMedia(config, false);
 
 ```
 
@@ -365,13 +362,12 @@ A custom video renderer can be used in the OpenTok communication for the receive
 
 ```java
 	
-   CustomRenderer myCustomRenderer = new CustomRenderer(...);
-   //set a custom renderer dor the received video stream
-   mWrapper.setRemoteVideoRenderer(myCustomRenderer);
+  CustomRenderer myCustomRenderer = new CustomRenderer(...);
+  //set a custom renderer dor the received video stream
+  mWrapper.setRemoteVideoRenderer(myCustomRenderer);
 
-   //or set a custom renderer for the received screen stream 
-   mWrapper.setRemoteScreenRenderer(myCustomRenderer);
-
+  //or set a custom renderer for the received screen stream 
+  mWrapper.setRemoteScreenRenderer(myCustomRenderer);
 ```
 
 #### Set Video Renderer styles
@@ -394,30 +390,30 @@ The SDK Wrapper include an AdvancedListener to define some events like when the 
 
 ```java
 	private AdvancedListener mAdvancedListener =
-            new PausableAdvancedListener(new AdvancedListener<OTWrapper>() {
+    new PausableAdvancedListener(new AdvancedListener<OTWrapper>() {
 
-                @Override
-                public void onReconnecting(OTWrapper otWrapper) throws ListenerException {
-                    Log.i(LOG_TAG, "The session is reconnecting.");
-                }
+      @Override
+      public void onReconnecting(OTWrapper otWrapper) throws ListenerException {
+        Log.i(LOG_TAG, "The session is reconnecting.");
+      }
 
-                @Override
-                public void onReconnected(OTWrapper otWrapper) throws ListenerException {
-                    Log.i(LOG_TAG, "The session reconnected.");
-                }
+      @Override
+      public void onReconnected(OTWrapper otWrapper) throws ListenerException {
+        Log.i(LOG_TAG, "The session reconnected.");
+      }
 
-                @Override
-                public void onVideoQualityWarning(OTWrapper otWrapper, String remoteId) throws ListenerException {
-                    Log.i(LOG_TAG, "The quality has degraded");
-                }
+      @Override
+      public void onVideoQualityWarning(OTWrapper otWrapper, String remoteId) throws ListenerException {
+        Log.i(LOG_TAG, "The quality has degraded");
+      }
 
-                @Override
-                public void onVideoQualityWarningLifted(OTWrapper otWrapper, String remoteId) throws ListenerException {
-                    Log.i(LOG_TAG, "The quality has improved");
-                }
+      @Override
+      public void onVideoQualityWarningLifted(OTWrapper otWrapper, String remoteId) throws ListenerException {
+        Log.i(LOG_TAG, "The quality has improved");
+      }
 
-               	//...
-            });
+      //...
+    });
 ```
 #### Using OTAcceleratorSession
 
@@ -426,14 +422,18 @@ The Accelerator Core library uses the `OTAcceleratorSession` to manage the OpenT
 In the case, you don't need the audio/video communication, you can start by creating an OTAcceleratorSession instance, an apiKey and sessionID are requires. For more visit [Obtaining OpenTok Credentials](obtaining-pentok-redentials) 
 
 ```java
-    /**
-     * @param context
-     * @param apiKey
-     * @param sessionId
-     */
-    public OTAcceleratorSession(Context context, String apiKey, String sessionId) {
-        super(context, apiKey, sessionId);
-    }
+    
+    OTAcceleratorSession mSession = new OTAcceleratorSession(context, apikey, sessionId);
+    mSession.addSignalListener("CHAT", this);
+
+    //send a new signal
+    JSONObject messageObj = new JSONObject();
+    messageObj.put("sender", "Tokbox");
+    messageObj.put("text", "hi!");
+    messageObj.put("sentOn", System.currentTimeMillis());
+
+    mSession.sendSignal(new SignalInfo(mSession.getConnection().getConnectionId(), null, "CHAT", messageObj.toString()), null);
+
 ```
 
 To get the OTAcceleratorSession instance used in the audio/video communication, call to:
@@ -451,7 +451,7 @@ mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
                        name("Tokboxer").build(), true);
 ```
 
-In the other hand, screesharing with a customer capturer can be achieved using: 
+Screesharing with a customer capturer can be achieved using: 
 
 ```java
 mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().

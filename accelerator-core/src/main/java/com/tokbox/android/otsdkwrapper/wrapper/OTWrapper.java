@@ -37,6 +37,7 @@ import com.tokbox.android.otsdkwrapper.utils.VideoScale;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.UUID;
@@ -545,6 +546,43 @@ public class OTWrapper {
     addLogEvent(ClientLog.LOG_ACTION_REMOVE_ADVANCED_LISTENER, ClientLog.LOG_VARIATION_ATTEMPT);
     removeOTListener(listener, mRetriableAdvancedListeners, mAdvancedListeners);
     addLogEvent(ClientLog.LOG_ACTION_REMOVE_ADVANCED_LISTENER, ClientLog.LOG_VARIATION_SUCCESS);
+  }
+
+  /**
+   * Registers a signal listener for a given signal.
+   * @param signalName Name of the signal this listener will listen to. Pass "*" if the listener
+   *                   is to be invoked for all signals.
+   * @param listener Listener that will be invoked when a signal is received.
+   */
+  public void addSignalListener(String signalName, com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
+    if (mSession != null) {
+      mSession.addSignalListener(signalName, listener);
+    }
+  }
+
+  /**
+   * Removes an object as signal listener everywhere it's used. This is added to support the common
+   * cases where an activity (or some object that depends on an activity) is used as a listener
+   * but the activity can be destroyed at some points (which would cause the app to crash if the
+   * signal was delivered).
+   * @param listener Listener to be removed
+   */
+  public void removeSignalListener(com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
+    if (mSession != null) {
+      mSession.removeSignalListener(listener);
+    }
+  }
+
+  /**
+   * Removes a signal listener.
+   * @param signalName Name of the signal this listener will listen to. Pass "*" if the listener
+   *                   is to be invoked for all signals.
+   * @param listener Listener to be removed.
+   */
+  public void removeSignalListener(String signalName, com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
+    if (mSession != null) {
+      mSession.removeSignalListener(signalName, listener);
+    }
   }
 
   /**
