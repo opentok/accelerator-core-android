@@ -7,9 +7,11 @@ android:
     - add-on
     - extra
 
-#before_install:
-#  - gradle wrapper
+before_install:
+  - jdk_switcher use oraclejdk8
+  - gradle wrapper
 
 script:
+  - jdk_switcher use oraclejdk8
   - ./gradlew build
   - ./gradlew test
