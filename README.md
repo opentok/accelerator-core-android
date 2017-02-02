@@ -4,7 +4,6 @@
 The Accelerator Core Android library gives you an easy way to integrate [OpenTok SDK](https://tokbox.com) to any Android applications. 
 
 ##Installation
-There are 2 options for installing the library:
 
   - [Using the repository](#using-the-repository)
   - [Using Maven](#using-maven)
@@ -83,7 +82,7 @@ The first step in using the OTWrapper is to initialize it by calling the constru
 To use OpenTok's framework you need a Session ID, Token, and API Key you can get these values at the [OpenTok Developer Dashboard](https://dashboard.tokbox.com/) . For production deployment, you must generate the Session ID and Token values using one of the [OpenTok Server SDKs](https://tokbox.com/developer/sdks/server/).
  
 
-#### Set and define listeners
+###Set and define listeners
 
 ```java
     
@@ -103,7 +102,7 @@ To use OpenTok's framework you need a Session ID, Token, and API Key you can get
         });
 ```
 
-#### Connect and disconnect from an OpenTok session
+###Connect and disconnect from an OpenTok session
 
 Call to connect or disconnect from an OpenTok session. When the OTWrapper is connected, the BasicListener.onConnected(...) event is called.
 If the OTWrapper failed to connect, the BasicListener.onError(...) event is called.
@@ -145,7 +144,7 @@ To check if the new connection is our own connection or not, use OTWrapper.getOw
 ```
 
 
-#### Start and stop preview
+###Start and stop preview
 
 Call to start and stop displaying the camera's video in the Preview's view before it starts streaming video. Therefore, the other participants are not going to receive this video stream.
 
@@ -179,7 +178,7 @@ When the OTWrapper started the preview, the BasicListener.onPreviewViewReady(...
   });
 ```
 
-#### Start and stop publishing media
+###Start and stop publishing media
 
 Call to start and stop the local streaming video. The source of the stream can be the camera or the screen. To indicate the screen source, it is necessary to set the screensharing parameter to TRUE.
 
@@ -218,7 +217,7 @@ When the OTWrapper started the publishing media, the BasicListener.onStartedPubl
   });
 ```
 
-### Remote participants management
+###Remote participants management
 
 To subscribe automatically to a new participant connected to the session, the `subscribeAutomatically` property in the OTConfig has to be TRUE.
 Then, when a new remote participant connected to the session, the BasicListener.onRemoteJoined(...) event is called. And the BasicListener.onRemoteLeft(...) event is called. These callbacks contain the identifier for the remote participant, which is equals to the stream id of them.
@@ -260,7 +259,7 @@ When the remote participant view is ready, the BasicListener.onRemoteViewReady(.
     });
 ```
 
-#### Pause and resume communication
+###Pause and resume communication
 
 Call these methods when the app's activity pauses or resumes. These pause or resume the video for the local preview and remotes. 
 The Accelerator Core offers the posibility to resume the events setting the `resumeEvents` parameter to TRUE in the `resume` method.
@@ -273,7 +272,7 @@ The Accelerator Core offers the posibility to resume the events setting the `res
   mWrapper.resume(true);  
 ```
 
-#### Connections management
+###Connections management
 
 The Accelerator Core offers a set of methods to manage the connections of the session.
 
@@ -292,7 +291,7 @@ The Accelerator Core offers a set of methods to manage the connections of the se
 
 ```
 
-#### Enable and disable the publishing and receiving media
+###Enable and disable the publishing and receiving media
 
 To enable or disable the publishing audio or video.
 
@@ -311,7 +310,7 @@ To enable or disable the publishing audio or video.
 	
 ```
 
-#### Get stream status
+###Get stream status
 The status of a stream includes the media status, the stream type, the status of the media containers and the stream dimensions.
 
 ```java
@@ -323,7 +322,7 @@ The status of a stream includes the media status, the stream type, the status of
 
 ```
 
-#### Signals Management
+###Signals Management
 The Accelerator Core includes a complete Signaling protocol to register a signal listener for a given type.
 
 ```java
@@ -343,7 +342,7 @@ The Accelerator Core includes a complete Signaling protocol to register a signal
 
 ```
 
-#### Customize capturer and renderers
+###Customize capturer and renderers
 A custom video capturer or renderer can be used in the OpenTok communication for the publishing media.
 
 ```java
@@ -370,7 +369,7 @@ A custom video renderer can be used in the OpenTok communication for the receive
   mWrapper.setRemoteScreenRenderer(myCustomRenderer);
 ```
 
-#### Set Video Renderer styles
+###Set Video Renderer styles
 The video scale mode can be modified to FILL or FIT value for the publishing video or for the received video from the remotes.
 
 ```java
@@ -378,14 +377,14 @@ The video scale mode can be modified to FILL or FIT value for the publishing vid
 	mWrapper.setRemoteStyle(remoteId, VideoScale.FILL);
 ```
 
-#### Cycle the camera
+###Cycle the camera
 Cycle between cameras, if there are multiple cameras on the device. Then, the AdvancedListener.onCameraChanged(...) event is called. 
 
 ```java
 	mWrapper.cycleCamera();
 ```
 
-#### Advanced events
+###Advanced events
 The SDK Wrapper include an AdvancedListener to define some events like when the video changed by quality reasons, or when the communication tries to reconnect,...etc.
 
 ```java
@@ -415,7 +414,7 @@ The SDK Wrapper include an AdvancedListener to define some events like when the 
       //...
     });
 ```
-#### Using OTAcceleratorSession
+###Using OTAcceleratorSession
 
 The Accelerator Core library uses the `OTAcceleratorSession` to manage the OpenTok Session. This class lets you have several Session listeners and manage the signalling in the lib. 
 
@@ -442,7 +441,7 @@ To get the OTAcceleratorSession instance used in the audio/video communication, 
    OTAcceleratorSession mSession = mWrapper.getSession();
 ```
  
-#### Screensharing
+###Screensharing
 
 According to [start and stop publishing media](#start-and-stop-publishing-media), you can start screensharing using OTWrapper
 
