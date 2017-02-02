@@ -1,1 +1,8 @@
-OpenTok Accelerator Core Android
+# Accelerator Core Android CHANGELOG
+All notable changes to this project will be documented in this file.
+
+--------------------------------------
+####[1.0.0]
+
+Official release
+
