@@ -11,6 +11,11 @@ env:
     - ALL_GRADLE_VERSIONS=2.14.1
     - GRADLE_OPTS="-Xms128m"
 
+matrix:
+  include:
+    - jdk: oraclejdk8
+      env: GRADLE_VERSIONS=2.14.1
+
 before_install:
   - jdk_switcher use oraclejdk8
   - gradle wrapper
