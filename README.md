@@ -414,6 +414,23 @@ The SDK Wrapper include an AdvancedListener to define some events like when the 
       //...
     });
 ```
+ 
+###Screensharing
+
+According to [start and stop publishing media](#start-and-stop-publishing-media), you can start screensharing using OTWrapper
+
+```java
+mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
+                       name("Tokboxer").build(), true);
+```
+
+Screesharing with a customer capturer can be achieved using: 
+
+```java
+mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
+                       name("Tokboxer”).capturer(myCapturer).build(), true);
+```
+ 
 ###Using OTAcceleratorSession
 
 The Accelerator Core library uses the `OTAcceleratorSession` to manage the OpenTok Session. This class lets you have several Session listeners and manage the signalling in the lib. 
@@ -440,20 +457,4 @@ To get the OTAcceleratorSession instance used in the audio/video communication, 
 ```java
    OTAcceleratorSession mSession = mWrapper.getSession();
 ```
- 
-###Screensharing
 
-According to [start and stop publishing media](#start-and-stop-publishing-media), you can start screensharing using OTWrapper
-
-```java
-mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
-                       name("Tokboxer").build(), true);
-```
-
-Screesharing with a customer capturer can be achieved using: 
-
-```java
-mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
-                       name("Tokboxer”).capturer(myCapturer).build(), true);
-```
- 
