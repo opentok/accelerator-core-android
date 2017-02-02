@@ -1,4 +1,11 @@
 language: android
+android:
+  components:
+    - build-tools-23.0.0
+    - android-23
+    - sys-img-armeabi-v7a-android-tv-l
+    - add-on
+    - extra
 
 before_install:
   - gradle wrapper
