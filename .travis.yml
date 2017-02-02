@@ -1,0 +1,8 @@
+{
+  "language": "java",
+  "script": [
+    "gradle wrapper
+    ./gradlew build
+    ./gradlew test"
+  ]
+}
