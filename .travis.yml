@@ -18,5 +18,4 @@ before_script:
     - gradle wrapper
 
 script:
-  - ./gradlew build
   - ./gradlew test
