@@ -169,9 +169,7 @@ public class OTAcceleratorSession extends Session {
     }
 
     /**
-     * Sets a input signal processor. The input processor will process all the signals coming from
-     * the wire. The SignalListeners will be invoked only on processed signals. That allows you to
-     * easily implement and enforce a connection wide protocol for all sent and received signals.
+     * Sets an input signal processor.
      * @param inputProtocol The input protocol you want to enforce. Pass null if you wish to receive
      *                      raw signals.
      */
@@ -182,10 +180,7 @@ public class OTAcceleratorSession extends Session {
     }
 
     /**
-     * Sets a output signal protocol. The output protocol will process all the signals going to
-     * the wire. A Signal will be sent using Opentok only after it has been processed by the protocol.
-     * That allows you to easily implement and enforce a connection wide protocol for all sent and
-     * received signals.
+     * Sets an output signal protocol.
      * @param outputProtocol
      */
     public synchronized void setOutputSignalProtocol(SignalProtocol outputProtocol) {
