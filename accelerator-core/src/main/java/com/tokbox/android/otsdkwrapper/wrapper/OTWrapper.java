@@ -28,6 +28,7 @@ import com.tokbox.android.otsdkwrapper.listeners.RetriableOTListener;
 import com.tokbox.android.otsdkwrapper.listeners.UnfailingAdvancedListener;
 import com.tokbox.android.otsdkwrapper.listeners.UnfailingBasicListener;
 import com.tokbox.android.otsdkwrapper.signal.SignalInfo;
+import com.tokbox.android.otsdkwrapper.signal.SignalProtocol;
 import com.tokbox.android.otsdkwrapper.utils.ClientLog;
 import com.tokbox.android.otsdkwrapper.utils.MediaType;
 import com.tokbox.android.otsdkwrapper.utils.OTConfig;
@@ -91,6 +92,10 @@ public class OTWrapper {
   //Custom renderer
   private BaseVideoRenderer mVideoRemoteRenderer;
   private BaseVideoRenderer mScreenRemoteRenderer;
+
+  //Signal protocol
+  private SignalProtocol mInputSignalProtocol;
+  private SignalProtocol mOutputSignalProtol;
 
   //Analytics for internal use
   private OTKAnalyticsData mAnalyticsData;
@@ -162,8 +167,18 @@ public class OTWrapper {
     mSession.setSessionListener(mSessionListener);
     mSession.setSignalListener(mSession.getSignalListener());
     mSession.setReconnectionListener(mReconnectionListener);
+
     mOlderThanMe = 0;
     mConnectionsCount = 0;
+
+    //check signal protocol
+    if (mInputSignalProtocol != null) {
+      mSession.setInputSignalProtocol(mInputSignalProtocol);
+    }
+    if (mOutputSignalProtol != null) {
+      mSession.setOutputSignalProtocol(mOutputSignalProtol);
+    }
+
     mSession.connect(mOTConfig.getToken());
   }
 
@@ -747,6 +762,34 @@ public class OTWrapper {
   }
 
   /**
+   * Sets an input signal processor. The input processor will process all the signals coming from
+   * the wire. The SignalListeners will be invoked only on processed signals. That allows you to
+   * easily implement and enforce a connection wide protocol for all sent and received signals.
+   * @param inputProtocol The input protocol you want to enforce. Pass null if you wish to receive
+   *                      raw signals.
+   */
+  public synchronized void setInputSignalProtocol(SignalProtocol inputProtocol) {
+    mInputSignalProtocol = inputProtocol;
+    if ( mSession != null ){
+      mSession.setInputSignalProtocol(mInputSignalProtocol);
+    }
+  }
+
+  /**
+   * Sets an output signal protocol. The output protocol will process all the signals going to
+   * the wire. A Signal will be sent using Opentok only after it has been processed by the protocol.
+   * That allows you to easily implement and enforce a connection wide protocol for all sent and
+   * received signals.
+   * @param outputProtocol
+   */
+  public synchronized void setOutputSignalProtocol(SignalProtocol outputProtocol) {
+    mOutputSignalProtol = outputProtocol;
+    if ( mSession != null ){
+      mSession.setOutputSignalProtocol(mOutputSignalProtol);
+    }
+  }
+
+  /**
    * Get the OTAcceleratorSession
    * @return The session
    */
@@ -1049,6 +1092,8 @@ public class OTWrapper {
     @Override
     public void onConnected(Session session) {
       mSessionConnection = session.getConnection();
+      mConnections.put(mSessionConnection.getConnectionId(), mSessionConnection);
+
       Log.d(LOG_TAG, "onConnected: " + mSessionConnection.getData() +
         ". listeners: " + mBasicListeners );
 
@@ -1417,7 +1462,6 @@ public class OTWrapper {
                 BaseVideoRenderer.STYLE_VIDEO_FILL);
         attachPublisherScreenView();
         mSession.publish(mScreenPublisher);
-
       }
     }
 

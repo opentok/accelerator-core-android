@@ -1,7 +1,11 @@
+![logo](tokbox-logo.png)
+
+[![Build Status](https://travis-ci.com/opentok/accelerator-core-android.svg?token=CxoLD2TL8UCwsuAUJUsN&branch=master)](https://travis-ci.com/opentok/accelerator-core-android)
+
 #Accelerator Core Android
 
 ##Quickstart
-The Accelerator Core Android library gives you an easy way to integrate [OpenTok SDK](https://tokbox.com) to any Android applications. 
+The Accelerator Core Android library gives you an easy way to integrate [OpenTok SDK](https://tokbox.com) to any Android applications.
 
 ##Installation
 
@@ -46,7 +50,7 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 
 | Class        | Description  |
 | ------------- | ------------- |
-| `OTAcceleratorSession` | Manages the session, allows multiple listeners and implements a signaling protocol. | 
+| `OTAcceleratorSession` | Manages the session, allows multiple listeners and implements a signaling protocol. |
 | `OTWrapper` | Represents an OpenTok object to enable a video communication. |
 | `OTConfig`   | Defines the OpenTok Configuration to be used in the communication. It includes SessionId, Token and APIKey, and features like to subscribe automatically or subscribe to self. |
 | `PreviewConfig` | Defines the configuration of the local preview. |
@@ -63,7 +67,7 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 
 You can start testing a basic one-to-one video application using the Accelerator Core with best-practices for Android.
  - [One to one sample application](https://github.com/opentok/one-to-one-sample-apps).
- 
+
 ###Initialization
 
 The first step in using the OTWrapper is to initialize it by calling the constructor with the OpenTokConfig parameter.
@@ -80,17 +84,17 @@ The first step in using the OTWrapper is to initialize it by calling the constru
 ####Obtaining OpenTok Credentials
 
 To use OpenTok's framework you need a Session ID, Token, and API Key you can get these values at the [OpenTok Developer Dashboard](https://dashboard.tokbox.com/) . For production deployment, you must generate the Session ID and Token values using one of the [OpenTok Server SDKs](https://tokbox.com/developer/sdks/server/).
- 
+
 
 ###Set and define listeners
 
 ```java
-    
+
     mWrapper.addBasicListener(mBasicListener);
     mWrapper.addAdvancedListener(mAdvancedListener);
 
     ....
-    
+
     private BasicListener mBasicListener =
             new PausableBasicListener(new BasicListener<OTWrapper>() {
                 //.......
@@ -108,12 +112,12 @@ Call to connect or disconnect from an OpenTok session. When the OTWrapper is con
 If the OTWrapper failed to connect, the BasicListener.onError(...) event is called.
 
 ```java
-  
+
   mWrapper.connect();
-    
+
   //.....
 
-  mWrapper.disconnect(); 
+  mWrapper.disconnect();
 
 ```
 Each time a new participant connects to the same session, the BasicListener.onConnected(...) event is called.
@@ -121,7 +125,7 @@ This event offers the information about the new connection id of the participant
 To check if the new connection is our own connection or not, use OTWrapper.getOwnConnId().
 
 ```java
-  
+
   private boolean isConnected = false;
   private String mRemoteConnId;
 
@@ -131,7 +135,7 @@ To check if the new connection is our own connection or not, use OTWrapper.getOw
                 @Override
                 public void onConnected(OTWrapper otWrapper, int participantsCount, String connId, String data) throws ListenerException {
                     Log.i(LOG_TAG, "Connected to the session. Number of participants: " + participantsCount);
-                    
+
                     if (mWrapper.getOwnConnId() == connId) {
                         isConnected = true;
                     }
@@ -149,14 +153,14 @@ To check if the new connection is our own connection or not, use OTWrapper.getOw
 Call to start and stop displaying the camera's video in the Preview's view before it starts streaming video. Therefore, the other participants are not going to receive this video stream.
 
 ```java
-   
+
   mWrapper.startPreview(new PreviewConfig.PreviewConfigBuilder().
                         name("Tokboxer").build());
 
   //.....
-    
+
   mWrapper.stopPreview();
-            
+
 ```
 
 When the OTWrapper started the preview, the BasicListener.onPreviewViewReady(...) event is called. And when the OTWrapper stopped the preview, the BasicListener.onPreviewViewDestroyed(...) event is called.
@@ -183,7 +187,7 @@ When the OTWrapper started the preview, the BasicListener.onPreviewViewReady(...
 Call to start and stop the local streaming video. The source of the stream can be the camera or the screen. To indicate the screen source, it is necessary to set the screensharing parameter to TRUE.
 
 ```java
-  
+
   PreviewConfig config;
 
   //camera streaming
@@ -261,7 +265,7 @@ When the remote participant view is ready, the BasicListener.onRemoteViewReady(.
 
 ###Pause and resume communication
 
-Call these methods when the app's activity pauses or resumes. These pause or resume the video for the local preview and remotes. 
+Call these methods when the app's activity pauses or resumes. These pause or resume the video for the local preview and remotes.
 The Accelerator Core offers the posibility to resume the events setting the `resumeEvents` parameter to TRUE in the `resume` method.
 
 ```java
@@ -304,10 +308,10 @@ To enable or disable the publishing audio or video.
 
 	//enable the video
 	mWrapper.enablePublishingMedia(MediaType.Video, true);
-	
+
 	//disable the audio
 	mWrapper.enablePublishingMedia(MediaType.Audio, false);
-	
+
 ```
 
 ###Get stream status
@@ -326,7 +330,7 @@ The status of a stream includes the media status, the stream type, the status of
 The Accelerator Core includes a complete Signaling protocol to register a signal listener for a given type.
 
 ```java
-	
+
 	mWrapper.addSignalListener(SIGNAL_TYPE, this);
 
 	//send a signal to all the participants
@@ -360,12 +364,12 @@ A custom video capturer or renderer can be used in the OpenTok communication for
 A custom video renderer can be used in the OpenTok communication for the received media. Please note, this should be set before to start the communication.
 
 ```java
-	
+
   CustomRenderer myCustomRenderer = new CustomRenderer(...);
   //set a custom renderer dor the received video stream
   mWrapper.setRemoteVideoRenderer(myCustomRenderer);
 
-  //or set a custom renderer for the received screen stream 
+  //or set a custom renderer for the received screen stream
   mWrapper.setRemoteScreenRenderer(myCustomRenderer);
 ```
 
@@ -378,7 +382,7 @@ The video scale mode can be modified to FILL or FIT value for the publishing vid
 ```
 
 ###Cycle the camera
-Cycle between cameras, if there are multiple cameras on the device. Then, the AdvancedListener.onCameraChanged(...) event is called. 
+Cycle between cameras, if there are multiple cameras on the device. Then, the AdvancedListener.onCameraChanged(...) event is called.
 
 ```java
 	mWrapper.cycleCamera();
@@ -414,7 +418,7 @@ The SDK Wrapper include an AdvancedListener to define some events like when the 
       //...
     });
 ```
- 
+
 ###Screensharing
 
 According to [start and stop publishing media](#start-and-stop-publishing-media), you can start screensharing using OTWrapper
@@ -424,21 +428,21 @@ mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
                        name("Tokboxer").build(), true);
 ```
 
-Screesharing with a customer capturer can be achieved using: 
+Screesharing with a customer capturer can be achieved using:
 
 ```java
 mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
                        name("Tokboxer”).capturer(myCapturer).build(), true);
 ```
- 
+
 ###Using OTAcceleratorSession
 
-The Accelerator Core library uses the `OTAcceleratorSession` to manage the OpenTok Session. This class lets you have several Session listeners and manage the signalling in the lib. 
+The Accelerator Core library uses the `OTAcceleratorSession` to manage the OpenTok Session. This class lets you have several Session listeners and manage the signalling in the lib.
 
-In the case, you don't need the audio/video communication, you can start by creating an OTAcceleratorSession instance, an apiKey and sessionID are requires. For more visit [Obtaining OpenTok Credentials](obtaining-pentok-redentials) 
+In the case, you don't need the audio/video communication, you can start by creating an OTAcceleratorSession instance, an apiKey and sessionID are requires. For more visit [Obtaining OpenTok Credentials](obtaining-pentok-redentials)
 
 ```java
-    
+
     OTAcceleratorSession mSession = new OTAcceleratorSession(context, apikey, sessionId);
     mSession.addSignalListener("CHAT", this);
 
@@ -457,4 +461,3 @@ To get the OTAcceleratorSession instance used in the audio/video communication, 
 ```java
    OTAcceleratorSession mSession = mWrapper.getSession();
 ```
-
