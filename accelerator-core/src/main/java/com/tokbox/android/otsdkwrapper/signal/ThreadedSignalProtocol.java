@@ -27,7 +27,7 @@ public abstract class ThreadedSignalProtocol<OutputDataType, InputDataType>
     }
 
     @Override
-    final public void close() {
+    public void close() {
         mIsOpen = false;
         this.interrupt();
     }
@@ -75,7 +75,7 @@ public abstract class ThreadedSignalProtocol<OutputDataType, InputDataType>
     }
 
     @Override
-    final public void write(SignalInfo<InputDataType> signalInfo) {
+    public void write(SignalInfo<InputDataType> signalInfo) {
         mInputQueue.add(signalInfo);
     }
 
