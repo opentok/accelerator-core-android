@@ -62,7 +62,7 @@ public abstract class ThreadedSignalProtocol<OutputDataType, InputDataType>
     }
 
     @Override
-    final public SignalInfo<OutputDataType> read() {
+    public SignalInfo<OutputDataType> read() {
         while (true) {
             try {
                 return mOutputQueue.take();
