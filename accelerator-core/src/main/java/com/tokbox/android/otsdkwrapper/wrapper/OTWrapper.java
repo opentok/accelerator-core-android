@@ -1049,6 +1049,8 @@ public class OTWrapper {
     @Override
     public void onConnected(Session session) {
       mSessionConnection = session.getConnection();
+      mConnections.put(mSessionConnection.getConnectionId(), mSessionConnection);
+
       Log.d(LOG_TAG, "onConnected: " + mSessionConnection.getData() +
         ". listeners: " + mBasicListeners );
 
