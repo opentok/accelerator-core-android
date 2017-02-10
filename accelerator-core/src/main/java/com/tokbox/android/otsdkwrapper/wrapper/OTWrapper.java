@@ -3,7 +3,6 @@ package com.tokbox.android.otsdkwrapper.wrapper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 
 import com.opentok.android.BaseVideoRenderer;
@@ -15,10 +14,9 @@ import com.opentok.android.Session;
 import com.opentok.android.Stream;
 import com.opentok.android.Subscriber;
 import com.opentok.android.SubscriberKit;
-import com.tokbox.android.otsdkwrapper.screensharing.ScreenSharingCapturer;
-import com.tokbox.android.otsdkwrapper.screensharing.ScreenSharingFragment;
 import com.tokbox.android.logging.OTKAnalytics;
 import com.tokbox.android.logging.OTKAnalyticsData;
+import com.tokbox.android.otsdkwrapper.GlobalLogLevel;
 import com.tokbox.android.otsdkwrapper.listeners.AdvancedListener;
 import com.tokbox.android.otsdkwrapper.listeners.BaseOTListener;
 import com.tokbox.android.otsdkwrapper.listeners.BasicListener;
@@ -27,9 +25,12 @@ import com.tokbox.android.otsdkwrapper.listeners.RetriableBasicListener;
 import com.tokbox.android.otsdkwrapper.listeners.RetriableOTListener;
 import com.tokbox.android.otsdkwrapper.listeners.UnfailingAdvancedListener;
 import com.tokbox.android.otsdkwrapper.listeners.UnfailingBasicListener;
+import com.tokbox.android.otsdkwrapper.screensharing.ScreenSharingCapturer;
+import com.tokbox.android.otsdkwrapper.screensharing.ScreenSharingFragment;
 import com.tokbox.android.otsdkwrapper.signal.SignalInfo;
 import com.tokbox.android.otsdkwrapper.signal.SignalProtocol;
 import com.tokbox.android.otsdkwrapper.utils.ClientLog;
+import com.tokbox.android.otsdkwrapper.utils.LogWrapper;
 import com.tokbox.android.otsdkwrapper.utils.MediaType;
 import com.tokbox.android.otsdkwrapper.utils.OTConfig;
 import com.tokbox.android.otsdkwrapper.utils.PreviewConfig;
@@ -38,7 +39,6 @@ import com.tokbox.android.otsdkwrapper.utils.VideoScale;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.UUID;
@@ -49,8 +49,13 @@ import java.util.UUID;
  * OpenTokConfig parameter.
  */
 public class OTWrapper {
-
   private static final String LOG_TAG = OTWrapper.class.getSimpleName();
+  private static final short LOCAL_LOG_LEVEL = 0xFF;
+  private static final LogWrapper LOG =
+    new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+  public static void setLogLevel(short logLevel) {
+    LOG.setLogLevel(logLevel);
+  }
 
   private Context mContext = null;
   private final OTWrapper SELF = this;
@@ -449,10 +454,10 @@ public class OTWrapper {
    * @param remoteId String to identify the remote
    */
   public void addRemote(String remoteId) {
-    Log.i(LOG_TAG, "Add remote with ID: " + remoteId);
+    LOG.i(LOG_TAG, "Add remote with ID: ", remoteId);
     addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT);
     Stream stream = mStreams.get(remoteId);
-    Log.i(LOG_TAG, "private add new remote stream != null");
+    LOG.i(LOG_TAG, "private add new remote stream != null");
     Subscriber sub = new Subscriber(mContext, stream);
     sub.setVideoListener(mVideoListener);
     sub.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
@@ -483,7 +488,7 @@ public class OTWrapper {
    * @param remoteId String to identify the remote
    */
   public void removeRemote(String remoteId) {
-    Log.i(LOG_TAG, "Remove remote with ID: " + remoteId);
+    LOG.i(LOG_TAG, "Remove remote with ID: ", remoteId);
     addLogEvent(ClientLog.LOG_ACTION_REMOVE_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT);
     Subscriber sub = mSubscribers.get(remoteId);
     mSubscribers.remove(sub);
@@ -523,7 +528,7 @@ public class OTWrapper {
    * @return The added listener
    */
   public BasicListener addBasicListener(BasicListener listener) {
-    Log.d(LOG_TAG, "Adding BasicListener");
+    LOG.d(LOG_TAG, "Adding BasicListener");
     addLogEvent(ClientLog.LOG_ACTION_ADD_BASIC_LISTENER, ClientLog.LOG_VARIATION_ATTEMPT);
     BasicListener returnedListener = (BasicListener) addOTListener(listener, mRetriableBasicListeners, mBasicListeners);
     addLogEvent(ClientLog.LOG_ACTION_ADD_BASIC_LISTENER, ClientLog.LOG_VARIATION_SUCCESS);
@@ -729,7 +734,7 @@ public class OTWrapper {
    * @param FPS
    */
   public void setPublishingFPS(int FPS) {
-    Log.d(LOG_TAG, "setSharingFPS: " + mPublisher);
+    LOG.d(LOG_TAG, "setSharingFPS: ", mPublisher);
     Publisher.CameraCaptureFrameRate frameRate = getFPS(FPS);
     if (mPublisher != null) {
       int currentCamera = mPublisher.getCameraId();
@@ -848,8 +853,8 @@ public class OTWrapper {
   }
 
   private synchronized void publishIfReady() {
-    Log.d(LOG_TAG, "publishIfReady: " + mSessionConnection + ", " + mPublisher + ", " +
-      startPublishing + ", " + isPreviewing);
+    LOG.d(LOG_TAG, "publishIfReady: ", mSessionConnection, ", ", mPublisher, ", ",
+      startPublishing, ", ", isPreviewing);
     if (mSession != null && mSessionConnection != null && mPublisher != null && startPublishing) {
       if (!isPreviewing) {
         attachPublisherView();
@@ -863,7 +868,7 @@ public class OTWrapper {
   }
 
   private synchronized  void publishIfScreenReady(){
-    Log.d(LOG_TAG, "publishIfScreenReady: " + mSessionConnection + ", " + mScreenPublisher + ", " +
+    LOG.d(LOG_TAG, "publishIfScreenReady: ", mSessionConnection, ", ", mScreenPublisher, ", ",
       startSharingScreen);
     if (mSession!= null && mSessionConnection != null && mScreenPublisher != null && startSharingScreen) {
 
@@ -882,20 +887,20 @@ public class OTWrapper {
 
   private void createPublisher(){
     //TODO: add more cases
-    Log.d(LOG_TAG, "createPublisher: " + mPreviewConfig);
+    LOG.d(LOG_TAG, "createPublisher: ", mPreviewConfig);
     Publisher.Builder builder = new Publisher.Builder(mContext);
     builder.name(mPreviewConfig.getName());
 
     if (mPreviewConfig != null) {
       if (mPreviewConfig.getResolution() != Publisher.CameraCaptureResolution.MEDIUM ||
         mPreviewConfig.getFrameRate() != Publisher.CameraCaptureFrameRate.FPS_15) {
-        Log.d(LOG_TAG, "createPublisher: Creating publisher with: " +
-          mPreviewConfig.getResolution() + ", " + mPreviewConfig.getFrameRate());
+        LOG.d(LOG_TAG, "createPublisher: Creating publisher with: ",
+          mPreviewConfig.getResolution(), ", ", mPreviewConfig.getFrameRate());
         builder.resolution(mPreviewConfig.getResolution());
         builder.frameRate(mPreviewConfig.getFrameRate());
 
       } else {
-        Log.d(LOG_TAG, "createPublisher: Creating Publisher with audio and video specified");
+        LOG.d(LOG_TAG, "createPublisher: Creating Publisher with audio and video specified");
         builder.audioTrack(mPreviewConfig.isAudioTrack()).videoTrack(mPreviewConfig.isVideoTrack());
       }
 
@@ -908,7 +913,7 @@ public class OTWrapper {
       }
       mPublisher = builder.build();
     } else {
-      Log.d(LOG_TAG, "createPublisher: Creating DefaultPublisher");
+      LOG.d(LOG_TAG, "createPublisher: Creating DefaultPublisher");
       mPublisher = builder.build();
     }
 
@@ -919,18 +924,18 @@ public class OTWrapper {
   }
 
   private void createScreenPublisher(PreviewConfig config){
-    Log.d(LOG_TAG, "createScreenPublisher: " + config);
+    LOG.d(LOG_TAG, "createScreenPublisher: ", config);
     mScreenPublisherBuilder = new Publisher.Builder(mContext);
     mScreenPublisherBuilder.name(config.getName());
 
     if (config != null) {
       if (config.getResolution() != Publisher.CameraCaptureResolution.MEDIUM ||
         config.getFrameRate() != Publisher.CameraCaptureFrameRate.FPS_15) {
-        Log.d(LOG_TAG, "createPublisher: Creating publisher with: " + config.getResolution() +
-          ", " + config.getFrameRate());
+        LOG.d(LOG_TAG, "createPublisher: Creating publisher with: ", config.getResolution(),
+          ", ", config.getFrameRate());
         mScreenPublisherBuilder.resolution(config.getResolution()).frameRate(config.getFrameRate());
       } else {
-        Log.d(LOG_TAG, "createPublisher: Creating Publisher with audio and video specified");
+        LOG.d(LOG_TAG, "createPublisher: Creating Publisher with audio and video specified");
         mScreenPublisherBuilder.audioTrack(config.isAudioTrack()).videoTrack(config.isVideoTrack());
       }
 
@@ -954,7 +959,7 @@ public class OTWrapper {
       mScreenPublisher = mScreenPublisherBuilder.build();
 
     } else {
-      Log.d(LOG_TAG, "createPublisher: Creating DefaultPublisher");
+      LOG.d(LOG_TAG, "createPublisher: Creating DefaultPublisher");
       mScreenPublisher = mScreenPublisherBuilder.build();
     }
     if ( !isScreensharingByDefault ) {
@@ -1094,9 +1099,8 @@ public class OTWrapper {
       mSessionConnection = session.getConnection();
       mConnections.put(mSessionConnection.getConnectionId(), mSessionConnection);
 
-      Log.d(LOG_TAG, "onConnected: " + mSessionConnection.getData() +
-        ". listeners: " + mBasicListeners );
-
+      LOG.d(LOG_TAG, "onConnected: ", mSessionConnection.getData(),
+        ". listeners: ", mBasicListeners );
       mConnectionsCount++;
 
       publishIfReady();
@@ -1127,7 +1131,7 @@ public class OTWrapper {
 
     @Override
     public void onStreamReceived(Session session, Stream stream) {
-      Log.d(LOG_TAG, "OnStreamReceived: " + stream.getConnection().getData());
+      LOG.d(LOG_TAG, "OnStreamReceived: ", stream.getConnection().getData());
 
       if ( mStreams != null ) {
         mStreams.put(stream.getStreamId(), stream);
@@ -1145,7 +1149,7 @@ public class OTWrapper {
 
     @Override
     public void onStreamDropped(Session session, Stream stream) {
-      Log.d(LOG_TAG, "OnStreamDropped: " + stream.getConnection().getData());
+      LOG.d(LOG_TAG, "OnStreamDropped: ", stream.getConnection().getData());
 
       String subId = stream.getStreamId();
       if ( mStreams.containsKey(subId) ) {
@@ -1164,7 +1168,7 @@ public class OTWrapper {
 
     @Override
     public void onError(Session session, OpentokError opentokError) {
-      Log.d(LOG_TAG, "Session: onError " + opentokError.getMessage());
+      LOG.d(LOG_TAG, "Session: onError ", opentokError.getMessage());
       cleanup();
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
@@ -1177,7 +1181,7 @@ public class OTWrapper {
   private Session.ConnectionListener mConnectionListener = new Session.ConnectionListener() {
     @Override
     public void onConnectionCreated(Session session, Connection connection) {
-      Log.d(LOG_TAG, "onConnectionCreated: " + connection.getData());
+      LOG.d(LOG_TAG, "onConnectionCreated: ", connection.getData());
       mConnections.put(connection.getConnectionId(), connection);
       mConnectionsCount++;
       if (connection.getCreationTime().compareTo(mSessionConnection.getCreationTime()) <= 0) {
@@ -1194,7 +1198,7 @@ public class OTWrapper {
 
     @Override
     public void onConnectionDestroyed(Session session, Connection connection) {
-      Log.d(LOG_TAG, "onConnectionDestroyed: " + connection.getData());
+      LOG.d(LOG_TAG, "onConnectionDestroyed: ", connection.getData());
       mConnections.remove(connection.getConnectionId());
       mConnectionsCount--;
       if (connection.getCreationTime().compareTo(mSessionConnection.getCreationTime()) <= 0) {
@@ -1214,7 +1218,7 @@ public class OTWrapper {
     new SubscriberKit.SubscriberListener() {
       @Override
       public void onConnected(SubscriberKit sub) {
-        Log.i(LOG_TAG, "Subscriber is connected");
+        LOG.i(LOG_TAG, "Subscriber is connected");
         addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_SUCCESS);
 
         if (mBasicListeners != null) {
@@ -1241,14 +1245,14 @@ public class OTWrapper {
 
       @Override
       public void onError(SubscriberKit subscriberKit, OpentokError opentokError) {
-        Log.e(LOG_TAG, "Subscriber: onError " + opentokError.getErrorCode() + ", " +
+        LOG.e(LOG_TAG, "Subscriber: onError ", opentokError.getErrorCode(), ", ",
           opentokError.getMessage());
         String id = subscriberKit.getStream().getStreamId();
         OpentokError.ErrorCode errorCode = opentokError.getErrorCode();
         switch (errorCode) {
           case SubscriberInternalError:
             //TODO: Add client logs for the different subscribers errors
-            Log.e(LOG_TAG, "Subscriber error: SubscriberInternalError");
+            LOG.e(LOG_TAG, "Subscriber error: SubscriberInternalError");
             mSubscribers.remove(id);
           case ConnectionTimedOut:
             addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ERROR);
@@ -1259,14 +1263,14 @@ public class OTWrapper {
             }
             break;
           case SubscriberWebRTCError:
-            Log.e(LOG_TAG, "Subscriber error: SubscriberWebRTCError");
+            LOG.e(LOG_TAG, "Subscriber error: SubscriberWebRTCError");
             mSubscribers.remove(id);
           case SubscriberServerCannotFindStream:
-            Log.e(LOG_TAG, "Subscriber error: SubscriberServerCannotFindStream");
+            LOG.e(LOG_TAG, "Subscriber error: SubscriberServerCannotFindStream");
             mSubscribers.remove(id);
             break;
           default:
-            Log.e(LOG_TAG, "Subscriber error: default ");
+            LOG.e(LOG_TAG, "Subscriber error: default ");
             mSubscribers.remove(id);
             if (!mStreams.containsKey(id)){
               mStreams.put(id, subscriberKit.getStream());
@@ -1319,13 +1323,13 @@ public class OTWrapper {
 
     @Override
     public void onError(PublisherKit publisherKit, OpentokError opentokError) {
-      Log.e(LOG_TAG, "Publisher: onError " + opentokError.getErrorCode() + ", " +
+      LOG.e(LOG_TAG, "Publisher: onError ", opentokError.getErrorCode(), ", ",
         opentokError.getMessage());
       OpentokError.ErrorCode errorCode = opentokError.getErrorCode();
       switch (errorCode) {
         case PublisherInternalError:
           //TODO: Add client logs for the different publisher errors
-          Log.e(LOG_TAG, "Publisher error: PublisherInternalError");
+          LOG.e(LOG_TAG, "Publisher error: PublisherInternalError");
           mPublisher = null;
         case PublisherTimeout:
           addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ERROR);
@@ -1336,10 +1340,10 @@ public class OTWrapper {
           }
           break;
         case PublisherWebRTCError:
-          Log.e(LOG_TAG, "Publisher error: PublisherWebRTCError");
+          LOG.e(LOG_TAG, "Publisher error: PublisherWebRTCError");
           mPublisher = null;
         default:
-          Log.e(LOG_TAG, "Publisher error: default");
+          LOG.e(LOG_TAG, "Publisher error: default");
           mPublisher = null;
           for (BasicListener listener : mBasicListeners) {
             ((RetriableBasicListener) listener).onError(SELF, opentokError);
@@ -1434,7 +1438,7 @@ public class OTWrapper {
 
     @Override
     public void onCameraError(Publisher publisher, OpentokError opentokError) {
-      Log.d(LOG_TAG, "onCameraError: onError " + opentokError.getMessage());
+      LOG.d(LOG_TAG, "onCameraError: onError ", opentokError.getMessage());
       if ( mAdvancedListeners != null ) {
         for (AdvancedListener listener : mAdvancedListeners) {
           ((RetriableAdvancedListener) listener).onError(SELF, opentokError);
@@ -1467,7 +1471,7 @@ public class OTWrapper {
 
     @Override
     public void onError(String errorMsg) {
-      Log.i(LOG_TAG, "Error in Screensharing by default");
+      LOG.i(LOG_TAG, "Error in Screensharing by default");
       for (BasicListener listener : mBasicListeners) {
         OpentokError error = new OpentokError(OpentokError.Domain.PublisherErrorDomain, OpentokError.ErrorCode.PublisherInternalError.getErrorCode(), errorMsg);
         ((RetriableBasicListener) listener).onError(SELF, error);
