@@ -4,7 +4,7 @@ public class ClientLog {
 
     // For internal use only. Please do not modify or remove this code.
 
-    public static final String LOG_CLIENT_VERSION = "android-vsol-2.0.0";
+    public static final String LOG_CLIENT_VERSION = "android-vsol-1.0.1";
     public static final String LOG_COMPONENTID = "acceleratorCore";
 
     public static final String LOG_ACTION_CONNECT = "Connect";
