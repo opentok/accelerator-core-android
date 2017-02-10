@@ -1101,7 +1101,6 @@ public class OTWrapper {
 
       LOG.d(LOG_TAG, "onConnected: ", mSessionConnection.getData(),
         ". listeners: ", mBasicListeners );
-
       mConnectionsCount++;
 
       publishIfReady();
