@@ -5,5 +5,5 @@ package com.tokbox.android.otsdkwrapper;
  * modules.
  */
 public class GlobalLogLevel {
-  public final static short MAX_LOG_LEVEL = 0xFF;
+  public static short sMaxLogLevel = 0xFF;
 }

@@ -3,7 +3,6 @@ package com.tokbox.android.otsdkwrapper.utils;
 import android.util.Log;
 import android.util.SparseArray;
 
-
 /**
  * Created by amac on 01/02/2017.
  */
@@ -21,7 +20,10 @@ public class LogWrapper {
     void log(String tag, String message, Exception e);
   }
 
-  final static SparseArray<RunnableLogger> LOGGERS = new SparseArray<RunnableLogger>() {
+  /**
+   * Protected and not final to allow modification by subclasses
+   */
+  protected static SparseArray<RunnableLogger> sLoggers = new SparseArray<RunnableLogger>() {
     {
       append(LOG_ERROR, new RunnableLogger() {
         @Override
@@ -105,7 +107,7 @@ public class LogWrapper {
 
   private void log(short level, Object... messages) {
     RunnableLogger logger;
-    if ((mCurrentLogLevel & level) == 0 || (logger = LOGGERS.get(level)) == null) {
+    if ((mCurrentLogLevel & level) == 0 || (logger = sLoggers.get(level)) == null) {
       return;
     }
     String logTag = null;

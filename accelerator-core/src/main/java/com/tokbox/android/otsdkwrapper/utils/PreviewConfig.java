@@ -7,12 +7,20 @@ import android.view.ViewGroup;
 import com.opentok.android.BaseVideoCapturer;
 import com.opentok.android.BaseVideoRenderer;
 import com.opentok.android.Publisher;
+import com.tokbox.android.otsdkwrapper.GlobalLogLevel;
 
 /**
  * Defines the configuration of the local preview
  */
 public class PreviewConfig {
     private static final String LOG_TAG = PreviewConfig.class.getSimpleName();
+    private static final short LOCAL_LOG_LEVEL = 0xFF;
+    private static final LogWrapper LOG =
+      new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+
+    public static void setLogLevel(short logLevel) {
+        LOG.setLogLevel(logLevel);
+    }
 
     String name=""; //optinal
     boolean audioTrack = true; //optional

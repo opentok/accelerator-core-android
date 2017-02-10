@@ -3,13 +3,22 @@ package com.tokbox.android.otsdkwrapper.utils;
 
 import android.util.Log;
 
+import com.tokbox.android.otsdkwrapper.GlobalLogLevel;
+
 /**
  * Defines the OpenTok Configuration to be used in the communication.
  */
 public class OTConfig {
 
     private static final String LOG_TAG = OTConfig.class.getSimpleName();
+    private static final short LOCAL_LOG_LEVEL = 0xFF;
+    private static final LogWrapper LOG =
+      new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
 
+    public static void setLogLevel(short logLevel) {
+        LOG.setLogLevel(logLevel);
+    }
+    
     private static final int MAX_LENGTH_NAME = 50;
 
     String sessionId; //required
@@ -139,15 +148,15 @@ public class OTConfig {
 
         private boolean validateInfoObject(OTConfig info) {
             if ( sessionId == null || sessionId.isEmpty() || sessionId.trim().length() == 0 ) {
-                Log.i(LOG_TAG, "SessionId cannot be null or empty");
+                LOG.i(LOG_TAG, "SessionId cannot be null or empty");
                 return false;
             }
             if ( token == null || token.isEmpty() || token.trim().length() == 0 ) {
-                Log.i(LOG_TAG, "Token cannot be null or empty");
+                LOG.i(LOG_TAG, "Token cannot be null or empty");
                 return false;
             }
             if ( apiKey == null || apiKey.isEmpty() || apiKey.trim().length() == 0 ) {
-                Log.i(LOG_TAG, "ApiKey cannot be null or empty");
+                LOG.i(LOG_TAG, "ApiKey cannot be null or empty");
                 return false;
             }
             return true;

@@ -2,7 +2,9 @@ package com.tokbox.android.otsdkwrapper.signal;
 
 import android.util.Log;
 
+import com.tokbox.android.otsdkwrapper.GlobalLogLevel;
 import com.tokbox.android.otsdkwrapper.utils.Callback;
+import com.tokbox.android.otsdkwrapper.utils.LogWrapper;
 
 /**
  * This class implements a thread that reads from a input signal pipe and invokes a Callback
@@ -11,6 +13,13 @@ import com.tokbox.android.otsdkwrapper.utils.Callback;
  */
 public class SignalProcessorThread<OutputDataType, InputDataType> extends Thread {
     private static final String LOG_TAG = SignalProcessorThread.class.getSimpleName();
+    private static final short LOCAL_LOG_LEVEL = 0xFF;
+    private static final LogWrapper LOG =
+      new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+
+    public static void setLogLevel(short logLevel) {
+        LOG.setLogLevel(logLevel);
+    }
 
     private SignalProtocol<OutputDataType, InputDataType> mProcessedProtocol;
     private boolean mChangingPipe = false;
@@ -31,8 +40,8 @@ public class SignalProcessorThread<OutputDataType, InputDataType> extends Thread
         do {
             signal = mProcessedProtocol.read();
             if (signal != null) {
-                Log.d(LOG_TAG, "(" + mProcessedProtocol.getClass().getSimpleName() +
-                        "): got a processed signal: " + signal.mSignalName);
+                LOG.d(LOG_TAG, "(", mProcessedProtocol.getClass().getSimpleName(),
+                      "): got a processed signal: ", signal.mSignalName);
                 mCallback.run(signal);
             } else if (mChangingPipe) {
                 mChangingPipe = false;
