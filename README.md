@@ -1,8 +1,7 @@
 ![logo](tokbox-logo.png)
 
-[![Build Status](https://travis-ci.com/opentok/accelerator-core-android.svg?token=CxoLD2TL8UCwsuAUJUsN&branch=master)](https://travis-ci.com/opentok/accelerator-core-android)
-
 #Accelerator Core Android
+[![Build Status](https://travis-ci.org/opentok/accelerator-core-android.svg?branch=master)](https://travis-ci.org/opentok/accelerator-core-android)
 
 ##Quickstart
 The Accelerator Core Android library gives you an easy way to integrate [OpenTok SDK](https://tokbox.com) to any Android applications.
