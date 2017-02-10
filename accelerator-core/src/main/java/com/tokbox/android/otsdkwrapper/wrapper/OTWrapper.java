@@ -52,8 +52,11 @@ public class OTWrapper {
   private static final String LOG_TAG = OTWrapper.class.getSimpleName();
   private static final short LOCAL_LOG_LEVEL = 0xFF;
   private static final LogWrapper LOG =
-    new LogWrapper((short)(GlobalLogLevel.MAX_LOG_LEVEL & LOCAL_LOG_LEVEL));
-  
+    new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+  public static void setLogLevel(short logLevel) {
+    LOG.setLogLevel(logLevel);
+  }
+
   private Context mContext = null;
   private final OTWrapper SELF = this;
 

@@ -15,7 +15,11 @@ public class ThreadPool {
   private final String LOG_TAG = this.getClass().getSimpleName();
   private static final short LOCAL_LOG_LEVEL = LogWrapper.LOG_ERROR | LogWrapper.LOG_WARN;
   private static final LogWrapper LOG =
-    new LogWrapper((short)(GlobalLogLevel.MAX_LOG_LEVEL & LOCAL_LOG_LEVEL));
+    new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+
+  public static void setLogLevel(short logLevel) {
+    LOG.setLogLevel(logLevel);
+  }
 
   private class WorkerThread extends Thread {
 

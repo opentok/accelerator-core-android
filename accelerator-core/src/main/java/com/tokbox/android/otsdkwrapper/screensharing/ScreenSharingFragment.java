@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.ViewGroup;
 
@@ -30,7 +29,11 @@ public class ScreenSharingFragment extends Fragment {
     private static final String LOG_TAG = ScreenSharingFragment.class.getSimpleName();
     private static final short LOCAL_LOG_LEVEL = 0xFF;
     private static final LogWrapper LOG =
-            new LogWrapper((short)(GlobalLogLevel.MAX_LOG_LEVEL & LOCAL_LOG_LEVEL));
+            new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+    public static void setLogLevel(short logLevel) {
+        LOG.setLogLevel(logLevel);
+    }
+
 
     private static final String ERROR = "ScreenSharing error";
     private static final int REQUEST_MEDIA_PROJECTION = 1;

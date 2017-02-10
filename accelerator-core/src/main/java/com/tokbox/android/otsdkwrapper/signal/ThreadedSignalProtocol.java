@@ -2,6 +2,9 @@ package com.tokbox.android.otsdkwrapper.signal;
 
 import android.util.Log;
 
+import com.tokbox.android.otsdkwrapper.GlobalLogLevel;
+import com.tokbox.android.otsdkwrapper.utils.LogWrapper;
+
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -14,6 +17,14 @@ public abstract class ThreadedSignalProtocol<OutputDataType, InputDataType>
         extends Thread
         implements SignalProtocol<OutputDataType, InputDataType> {
     protected final String LOG_TAG = getClass().getSimpleName();
+    private static final short LOCAL_LOG_LEVEL = 0xFF;
+    private static final LogWrapper LOG =
+      new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+
+    public static void setLogLevel(short logLevel) {
+        LOG.setLogLevel(logLevel);
+    }
+
 
     private BlockingQueue<SignalInfo<InputDataType>> mInputQueue;
 
@@ -48,7 +59,7 @@ public abstract class ThreadedSignalProtocol<OutputDataType, InputDataType>
     final public void run() {
         while (mIsOpen) {
             try {
-                Log.d(LOG_TAG, "Waiting for signal data");
+                LOG.d(LOG_TAG, "Waiting for signal data");
                 Collection<SignalInfo<OutputDataType>> processedSignals = processSignal(mInputQueue.take());
                 if (processedSignals != null) {
                     for(SignalInfo processedSignal: processedSignals) {
@@ -56,7 +67,7 @@ public abstract class ThreadedSignalProtocol<OutputDataType, InputDataType>
                     }
                 }
             } catch (InterruptedException e) {
-                Log.d(LOG_TAG, "Got interrupted while waiting for data. isOpen: " + mIsOpen);
+                LOG.d(LOG_TAG, "Got interrupted while waiting for data. isOpen: ", mIsOpen);
             }
         }
     }
