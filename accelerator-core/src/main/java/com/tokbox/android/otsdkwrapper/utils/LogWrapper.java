@@ -15,7 +15,7 @@ public class LogWrapper {
   public static final short LOG_DEBUG = 0x8;
   public static final short LOG_VERBOSE = 0x10;
 
-  private interface RunnableLogger {
+  protected interface RunnableLogger {
     void log(String tag, String message);
     void log(String tag, String message, Exception e);
   }
