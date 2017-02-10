@@ -49,7 +49,6 @@ import java.util.UUID;
  * OpenTokConfig parameter.
  */
 public class OTWrapper {
-
   private static final String LOG_TAG = OTWrapper.class.getSimpleName();
   private static final short LOCAL_LOG_LEVEL = 0xFF;
   private static final LogWrapper LOG =

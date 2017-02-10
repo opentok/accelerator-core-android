@@ -3,7 +3,6 @@ package com.tokbox.android.otsdkwrapper.utils;
 import android.util.Log;
 import android.util.SparseArray;
 
-
 /**
  * Created by amac on 01/02/2017.
  */

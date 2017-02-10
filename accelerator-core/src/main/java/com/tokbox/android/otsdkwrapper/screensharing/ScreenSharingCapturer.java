@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.view.View;
 
 import com.opentok.android.BaseVideoCapturer;
+import com.tokbox.android.otsdkwrapper.GlobalLogLevel;
+import com.tokbox.android.otsdkwrapper.utils.LogWrapper;
 
 import java.io.FileOutputStream;
 import java.nio.Buffer;
@@ -23,7 +25,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ScreenSharingCapturer extends BaseVideoCapturer{
     private static final String LOG_TAG = ScreenSharingCapturer.class.getSimpleName();
-    private Context mContext;
+    private static final short LOCAL_LOG_LEVEL = 0xFF;
+    private static final LogWrapper LOG =
+            new LogWrapper((short)(GlobalLogLevel.MAX_LOG_LEVEL & LOCAL_LOG_LEVEL));
 
     private boolean capturing = false;
     private View contentView;
@@ -74,7 +78,6 @@ public class ScreenSharingCapturer extends BaseVideoCapturer{
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public ScreenSharingCapturer(Context context, View view, ImageReader imageReader) {
-        this.mContext = context;
         this.contentView = view;
         this.mImageReader = imageReader;
         this.mImageReader.setOnImageAvailableListener(new ImageAvailableListener(), null);
@@ -91,14 +94,15 @@ public class ScreenSharingCapturer extends BaseVideoCapturer{
 
     @Override
     public int startCapture() {
+        LOG.d(LOG_TAG, "Start Screensharing Capturer");
         capturing = true;
-
         mHandler.postDelayed(newFrame, 1000 / fps);
         return 0;
     }
 
     @Override
     public int stopCapture() {
+        LOG.d(LOG_TAG, "Stop Screensharing Capturer");
         capturing = false;
         mHandler.removeCallbacks(newFrame);
         return 0;

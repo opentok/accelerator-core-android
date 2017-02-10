@@ -19,12 +19,18 @@ import android.util.Log;
 import android.view.Display;
 import android.view.ViewGroup;
 
+import com.tokbox.android.otsdkwrapper.GlobalLogLevel;
+import com.tokbox.android.otsdkwrapper.utils.LogWrapper;
+
 /**
  * Represents a headless fragment to enable the screensharing by default
  */
 public class ScreenSharingFragment extends Fragment {
 
     private static final String LOG_TAG = ScreenSharingFragment.class.getSimpleName();
+    private static final short LOCAL_LOG_LEVEL = 0xFF;
+    private static final LogWrapper LOG =
+            new LogWrapper((short)(GlobalLogLevel.MAX_LOG_LEVEL & LOCAL_LOG_LEVEL));
 
     private static final String ERROR = "ScreenSharing error";
     private static final int REQUEST_MEDIA_PROJECTION = 1;
@@ -87,7 +93,6 @@ public class ScreenSharingFragment extends Fragment {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-
         super.onActivityCreated(savedInstanceState);
 
         Activity activity = getActivity();
@@ -107,7 +112,7 @@ public class ScreenSharingFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_MEDIA_PROJECTION) {
             if (resultCode != Activity.RESULT_OK) {
-                Log.i(LOG_TAG, "User cancelled screensharing permission");
+                LOG.i(LOG_TAG, "User cancelled screensharing permission");
                 mListener.onError(ERROR + ": User cancelled screensharing permission");
                 return;
             }
@@ -117,7 +122,7 @@ public class ScreenSharingFragment extends Fragment {
                 return;
             }
 
-            Log.i(LOG_TAG, "Starting screen capture");
+            LOG.i(LOG_TAG, "Starting screen capture");
             mResultCode = resultCode;
             mResultData = data;
             startScreenCapture();
@@ -171,15 +176,15 @@ public class ScreenSharingFragment extends Fragment {
     public void startScreenCapture() {
 
         if (mMediaProjection != null) {
-            Log.i(LOG_TAG, "mMediaProjection != null");
+            LOG.i(LOG_TAG, "mMediaProjection != null");
 
             setUpVirtualDisplay();
         } else if (mResultCode != 0 && mResultData != null) {
-            Log.i(LOG_TAG, "mResultCode != 0 && mResultData != null");
+            LOG.i(LOG_TAG, "mResultCode != 0 && mResultData != null");
             setUpMediaProjection();
             setUpVirtualDisplay();
         } else {
-            Log.i(LOG_TAG, "Requesting confirmation");
+            LOG.i(LOG_TAG, "Requesting confirmation");
             startActivityForResult(
                     mMediaProjectionManager.createScreenCaptureIntent(),
                     REQUEST_MEDIA_PROJECTION);

@@ -23,7 +23,6 @@ import java.util.Iterator;
  * Represents an OpenTok Session
  */
 public class OTAcceleratorSession extends Session {
-
     private final String LOG_TAG = this.getClass().getSimpleName();
     private static final short LOCAL_LOG_LEVEL = 0xFF;
     private static final LogWrapper LOG =
