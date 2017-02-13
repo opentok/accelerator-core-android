@@ -6,7 +6,6 @@ public class ClientLog {
 
     public static final String LOG_CLIENT_VERSION = "android-vsol-1.0.2";
     public static final String LOG_COMPONENTID = "acceleratorCore";
-
     public static final String LOG_ACTION_CONNECT = "Connect";
     public static final String LOG_ACTION_DISCONNECT = "Disconnect";
     public static final String LOG_ACTION_GET_OWN_CONNECTION = "GetOwnConnection";
