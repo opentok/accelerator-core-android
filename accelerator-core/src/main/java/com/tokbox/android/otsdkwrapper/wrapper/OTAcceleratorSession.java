@@ -316,8 +316,10 @@ public class OTAcceleratorSession extends Session {
         for (SessionListener l : mSessionListeners) {
             l.onDisconnected(this);
         }
-        mSignalThreadPool.finish();
-        mSignalThreadPool = null;
+        if (mSignalThreadPool != null) {
+          mSignalThreadPool.finish();
+          mSignalThreadPool = null;
+        }
     }
 
     @Override
