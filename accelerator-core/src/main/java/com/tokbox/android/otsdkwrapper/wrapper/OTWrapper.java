@@ -321,6 +321,7 @@ public class OTWrapper {
       }
       publishIfReady();
     } else {
+      addLogEvent(ClientLog.LOG_ACTION_START_SCREENSHARING, ClientLog.LOG_VARIATION_ATTEMPT);
       startSharingScreen = true;
       if (mScreenPublisher == null) {
         createScreenPublisher(config);
@@ -337,29 +338,30 @@ public class OTWrapper {
   public void stopPublishingMedia(Boolean screensharing) {
     addLogEvent(ClientLog.LOG_ACTION_STOP_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
     if (!screensharing) {
-        if (mPublisher != null && startPublishing) {
-          mSession.unpublish(mPublisher);
-        }
-        isPublishing = false;
-        startPublishing = false;
-        if (!isPreviewing) {
-          dettachPublisherView();
-          mPublisher = null;
-        }
-      } else {
-        if ( mScreensharingFragment != null){
-          mScreensharingFragment.stopScreenCapture();
-          isScreensharingByDefault = false;
-        }
-        dettachPublisherScreenView();
-        if (mScreenPublisher != null && startSharingScreen) {
-          mSession.unpublish(mScreenPublisher);
-        }
-        isSharingScreen = false;
-        startSharingScreen = false;
-
-        mScreenPublisher = null;
+      if (mPublisher != null && startPublishing) {
+        mSession.unpublish(mPublisher);
       }
+      isPublishing = false;
+      startPublishing = false;
+      if (!isPreviewing) {
+        dettachPublisherView();
+        mPublisher = null;
+      }
+    } else {
+      addLogEvent(ClientLog.LOG_ACTION_STOP_SCREENSHARING, ClientLog.LOG_VARIATION_ATTEMPT);
+      if (mScreensharingFragment != null) {
+        mScreensharingFragment.stopScreenCapture();
+        isScreensharingByDefault = false;
+      }
+      dettachPublisherScreenView();
+      if (mScreenPublisher != null && startSharingScreen) {
+        mSession.unpublish(mScreenPublisher);
+      }
+      isSharingScreen = false;
+      startSharingScreen = false;
+
+      mScreenPublisher = null;
+    }
     addLogEvent(ClientLog.LOG_ACTION_STOP_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
@@ -1098,7 +1100,9 @@ public class OTWrapper {
     public void onConnected(Session session) {
       mSessionConnection = session.getConnection();
       mConnections.put(mSessionConnection.getConnectionId(), mSessionConnection);
-
+      //update internal client logs with connectionId
+      mAnalyticsData.setConnectionId(mSessionConnection.getConnectionId());
+      mAnalytics.setData(mAnalyticsData);
       LOG.d(LOG_TAG, "onConnected: ", mSessionConnection.getData(),
         ". listeners: ", mBasicListeners );
       mConnectionsCount++;
@@ -1292,6 +1296,7 @@ public class OTWrapper {
 
       if (stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeScreen){
         screensharing = true;
+        addLogEvent(ClientLog.LOG_ACTION_START_SCREENSHARING, ClientLog.LOG_VARIATION_SUCCESS);
       }
       else{
         isPublishing = true;
@@ -1312,6 +1317,7 @@ public class OTWrapper {
       boolean screensharing = false;
       if (stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeScreen){
         screensharing = true;
+        addLogEvent(ClientLog.LOG_ACTION_STOP_SCREENSHARING, ClientLog.LOG_VARIATION_SUCCESS);
       }
       else {
         isPublishing = false;
