@@ -1,5 +1,11 @@
 ![logo](tokbox-logo.png)
 
+[![Build Status](https://travis-ci.org/opentok/accelerator-core-android.svg?branch=master)](https://travis-ci.org/opentok/accelerator-core-android)
+[![GitHub release](https://img.shields.io/github/release/opentok/accelerator-core-android.svg)](./README.md)
+[![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./.github/LICENSE)
+
+--------
+
 #Accelerator Core Android
 [![Build Status](https://travis-ci.org/opentok/accelerator-core-android.svg?branch=master)](https://travis-ci.org/opentok/accelerator-core-android)
 
@@ -37,7 +43,7 @@ a) Edit the build.gradle for your project and add the following code snippet to 
 b) Modify build.gradle for your module and add the following code snippet to the dependencies section:
 
   ```
-  compile 'com.opentok.android:opentok-accelerator-core:1.0.0’
+  compile 'com.opentok.android:opentok-accelerator-core:1.0.+’
   ```
 
 ##Exploring the Code

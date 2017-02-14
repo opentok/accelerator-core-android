@@ -4,9 +4,8 @@ public class ClientLog {
 
     // For internal use only. Please do not modify or remove this code.
 
-    public static final String LOG_CLIENT_VERSION = "android-vsol-1.0.2";
+    public static final String LOG_CLIENT_VERSION = "android-vsol-1.0.3";
     public static final String LOG_COMPONENTID = "acceleratorCore";
-
     public static final String LOG_ACTION_CONNECT = "Connect";
     public static final String LOG_ACTION_DISCONNECT = "Disconnect";
     public static final String LOG_ACTION_GET_OWN_CONNECTION = "GetOwnConnection";
@@ -36,6 +35,9 @@ public class ClientLog {
     public static final String LOG_ACTION_SET_LOCAL_STYLE = "SetLocalStyle";
     public static final String LOG_ACTION_SET_REMOTE_VIDEO_RENDERER = "SetRemoteVideoRenderer";
     public static final String LOG_ACTION_SET_REMOTE_SCREEN_RENDERER = "SetRemoteScreenRenderer";
+    public static final String LOG_ACTION_START_SCREENSHARING = "StartScreensharing";
+    public static final String LOG_ACTION_STOP_SCREENSHARING = "StopScreensharing";
+
     public static final String LOG_ACTION_RESUME = "Resume";
     public static final String LOG_ACTION_PAUSE = "Pause";
 
