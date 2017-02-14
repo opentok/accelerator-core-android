@@ -7,6 +7,7 @@
 --------
 
 #Accelerator Core Android
+[![Build Status](https://travis-ci.org/opentok/accelerator-core-android.svg?branch=master)](https://travis-ci.org/opentok/accelerator-core-android)
 
 ##Quickstart
 The Accelerator Core Android library gives you an easy way to integrate [OpenTok SDK](https://tokbox.com) to any Android applications.
@@ -42,7 +43,7 @@ a) Edit the build.gradle for your project and add the following code snippet to 
 b) Modify build.gradle for your module and add the following code snippet to the dependencies section:
 
   ```
-  compile 'com.opentok.android:opentok-accelerator-core:1.0.0’
+  compile 'com.opentok.android:opentok-accelerator-core:1.0.+’
   ```
 
 ##Exploring the Code
