@@ -1100,11 +1100,9 @@ public class OTWrapper {
     public void onConnected(Session session) {
       mSessionConnection = session.getConnection();
       mConnections.put(mSessionConnection.getConnectionId(), mSessionConnection);
-
       //update internal client logs with connectionId
       mAnalyticsData.setConnectionId(mSessionConnection.getConnectionId());
       mAnalytics.setData(mAnalyticsData);
-
       LOG.d(LOG_TAG, "onConnected: ", mSessionConnection.getData(),
         ". listeners: ", mBasicListeners );
       mConnectionsCount++;
