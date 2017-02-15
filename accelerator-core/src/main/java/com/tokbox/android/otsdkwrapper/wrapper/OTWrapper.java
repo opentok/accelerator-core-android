@@ -811,9 +811,9 @@ public class OTWrapper {
     }
     mSession = null;
     mPublisher = null;
-    mSubscribers = null;
-    mConnections = null;
-    mStreams = null;
+    mSubscribers = new HashMap<String, Subscriber>();
+    mConnections = new Hashtable<String, Connection>();
+    mStreams = new Hashtable<String, Stream>();
     mConnectionsCount = 0;
     mSessionConnection = null;
     isPreviewing = false;
@@ -1172,7 +1172,7 @@ public class OTWrapper {
 
     @Override
     public void onError(Session session, OpentokError opentokError) {
-      LOG.d(LOG_TAG, "Session: onError ", opentokError.getMessage());
+      LOG.e(LOG_TAG, "Session: onError ", opentokError.getMessage());
       cleanup();
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
