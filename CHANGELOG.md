@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 --------------------------------------
 
+####[1.0.4]
+
+[FIXED] OTWrapper cleanup
+
+####[1.0.3]
+
+[ADDED] Internal client logs
+
+####[1.0.2]
+
+[ADDED] ThreadPool null-checks
+
 ####[1.0.1]
 
 [ADDED]	Simple LogWrapper above the android.util.Log class
