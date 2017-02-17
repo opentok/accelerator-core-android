@@ -1121,8 +1121,13 @@ public class OTWrapper {
 
     @Override
     public void onDisconnected(Session session) {
-
-      if (mBasicListeners != null ) {
+      if (mSession == null || mSessionConnection == null) {
+        // This can happen if somehow onError was called before onDisconnected or if we somehow
+        // call onDisconected twice (so cleanup has been done already)
+        LOG.w(LOG_TAG, "OnDisconnected called on a stale object");
+        mSessionConnection = session.getConnection();
+      }
+      if (mBasicListeners != null && mSessionConnection != null) {
         for (BasicListener listener : mBasicListeners) {
           ((RetriableBasicListener)listener).onDisconnected(SELF, 0,
                                                             mSessionConnection.getConnectionId(),
