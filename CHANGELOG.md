@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 
 ####[1.0.4]
 
+[FIXED] OnDisconnect callback
+
+####[1.0.4]
+
 [FIXED] OTWrapper cleanup
 
 ####[1.0.3]
