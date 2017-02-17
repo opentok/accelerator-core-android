@@ -263,31 +263,41 @@ public class OTAcceleratorSession extends Session {
     @Override
     public void setSessionListener(SessionListener listener) {
         super.setSessionListener(listener);
-        mSessionListeners.add(listener);
+        if (!mSessionListeners.contains(listener)) {
+            mSessionListeners.add(listener);
+        }
     }
 
     @Override
     public void setConnectionListener(ConnectionListener listener) {
         super.setConnectionListener(listener);
-        mConnectionsListeners.add(listener);
+        if (!mConnectionsListeners.contains(listener)) {
+            mConnectionsListeners.add(listener);
+        }
     }
 
     @Override
     public void setStreamPropertiesListener(StreamPropertiesListener listener) {
         super.setStreamPropertiesListener(listener);
-        mStreamPropertiesListeners.add(listener);
+        if (!mStreamPropertiesListeners.contains(listener)) {
+            mStreamPropertiesListeners.add(listener);
+        }
     }
 
     @Override
     public void setArchiveListener(ArchiveListener listener) {
         super.setArchiveListener(listener);
-        mArchiveListeners.add(listener);
+        if (!mArchiveListeners.contains(listener)) {
+            mArchiveListeners.add(listener);
+        }
     }
 
     @Override
     public void setReconnectionListener(ReconnectionListener listener) {
         super.setReconnectionListener(listener);
-        mReconnectionListeners.add(listener);
+        if (!mReconnectionListeners.contains(listener)) {
+            mReconnectionListeners.add(listener);
+        }
     }
 
     @Override
