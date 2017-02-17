@@ -1133,9 +1133,6 @@ public class OTWrapper {
                                                             mSessionConnection.getConnectionId(),
                                                             mSessionConnection.getData());
         }
-        // And just for sanity (or to keep our own sanity)...
-        mBasicListeners = new ArrayList<>();
-        mAdvancedListeners = new ArrayList<>();
       }
       addLogEvent(ClientLog.LOG_ACTION_DISCONNECT, ClientLog.LOG_VARIATION_SUCCESS);
       cleanup();
