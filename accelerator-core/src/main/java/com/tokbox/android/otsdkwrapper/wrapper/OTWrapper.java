@@ -312,8 +312,8 @@ public class OTWrapper {
    * @param screensharing Whether to indicate the camera or the screen streaming.
    */
   public void startPublishingMedia(PreviewConfig config, boolean screensharing) {
-    addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
     if (!screensharing) {
+      addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
       mPreviewConfig = config;
       startPublishing = true;
       if (mPublisher == null) {
@@ -336,8 +336,8 @@ public class OTWrapper {
    * @param screensharing Whether to indicate the camera or the screen streaming
    */
   public void stopPublishingMedia(Boolean screensharing) {
-    addLogEvent(ClientLog.LOG_ACTION_STOP_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
     if (!screensharing) {
+      addLogEvent(ClientLog.LOG_ACTION_STOP_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
       if (mPublisher != null && startPublishing) {
         mSession.unpublish(mPublisher);
       }
@@ -362,7 +362,6 @@ public class OTWrapper {
 
       mScreenPublisher = null;
     }
-    addLogEvent(ClientLog.LOG_ACTION_STOP_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
 
@@ -1305,16 +1304,16 @@ public class OTWrapper {
       }
       else{
         isPublishing = true;
+        addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
       }
       for (BasicListener listener : mBasicListeners) {
         ((RetriableBasicListener) listener).onStartedPublishingMedia(SELF, screensharing);
       }
 
       //check subscribe to self
-      if ( mOTConfig.shouldSubscribeToSelf() ){
+      if ( mOTConfig.shouldSubscribeToSelf() ) {
         addRemote(stream.getStreamId());
       }
-      addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
     }
 
     @Override
@@ -1326,6 +1325,7 @@ public class OTWrapper {
       }
       else {
         isPublishing = false;
+        addLogEvent(ClientLog.LOG_ACTION_STOP_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
       }
       for (BasicListener listener : mBasicListeners) {
         ((RetriableBasicListener) listener).onStoppedPublishingMedia(SELF, screensharing);
