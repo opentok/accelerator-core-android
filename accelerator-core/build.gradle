@@ -8,9 +8,9 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0.5"
+        versionName "1.0.6"
         project.archivesBaseName = "opentok-accelerator-core"
-        project.version = "1.0.5"
+        project.version = "1.0.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
