@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 --------------------------------------
 
+####[1.0.7]
+
+[UPDATED] OpenTok SDK version to 10.0.0
+
+####[1.0.6]
+
+[FIXED] Internal client logs
+
 ####[1.0.5]
 
 [FIXED] OnDisconnect callback
