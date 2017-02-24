@@ -40,10 +40,11 @@ public class ThreadPool {
           if (task != null) {
             task.run();
           }
-          mKeepRunning = mPool.moveToFree(this);
+          mKeepRunning = mKeepRunning && mPool.moveToFree(this);
         } catch (InterruptedException e) {
         }
       }
+      mPool = null;
       LOG.d(LOG_TAG, "WorkerThread: ", this, " exiting");
     }
 
