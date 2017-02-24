@@ -3,7 +3,7 @@ package com.tokbox.android.otsdkwrapper.utils;
 public class ClientLog {
 
     // For internal use only. Please do not modify or remove this code.
-    public static final String LOG_CLIENT_VERSION = "android-vsol-1.0.7";
+    public static final String LOG_CLIENT_VERSION = "android-vsol-1.0.8";
     public static final String LOG_COMPONENTID = "acceleratorCore";
     public static final String LOG_ACTION_CONNECT = "Connect";
     public static final String LOG_ACTION_DISCONNECT = "Disconnect";
