@@ -114,6 +114,8 @@ public class OTWrapper {
    *                data to connect.
    */
   public OTWrapper(Context context, OTConfig config) {
+    initAnalytics();
+    addLogEvent(ClientLog.LOG_ACTION_INIT, ClientLog.LOG_VARIATION_ATTEMPT);
     this.mContext = context;
     this.mOTConfig = config;
     mSubscribers = new HashMap<String, Subscriber>();
@@ -122,7 +124,7 @@ public class OTWrapper {
     mBasicListeners = new ArrayList<RetriableBasicListener<OTWrapper>>();
     mAdvancedListeners = new ArrayList<RetriableAdvancedListener<OTWrapper>>();
 
-    initAnalytics();
+    addLogEvent(ClientLog.LOG_ACTION_INIT, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -130,12 +132,10 @@ public class OTWrapper {
    * This pauses the video for the local preview and remotes
    */
   public void pause() {
-    addLogEvent(ClientLog.LOG_ACTION_PAUSE, ClientLog.LOG_VARIATION_ATTEMPT);
     if (mSession != null) {
       mSession.onPause();
     }
-    addLogEvent(ClientLog.LOG_ACTION_PAUSE, ClientLog.LOG_VARIATION_SUCCESS);
-  }
+   }
 
   /**
    * Call this method when the app's activity resumes.
@@ -144,7 +144,6 @@ public class OTWrapper {
    * @param resumeEvents Set to true if the events should be resumed
    */
   public void resume(boolean resumeEvents) {
-    addLogEvent(ClientLog.LOG_ACTION_RESUME, ClientLog.LOG_VARIATION_ATTEMPT);
     if (mSession != null) {
       mSession.onResume();
     }
@@ -155,7 +154,6 @@ public class OTWrapper {
       }
 
     }
-    addLogEvent(ClientLog.LOG_ACTION_RESUME, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -166,7 +164,8 @@ public class OTWrapper {
    * {@link BasicListener#onError(Object, OpentokError)} method is called.
    */
   public void connect() {
-    addLogEvent(ClientLog.LOG_ACTION_CONNECT, ClientLog.LOG_VARIATION_ATTEMPT);
+    addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
+
     mSession = new OTAcceleratorSession(mContext, mOTConfig.getApiKey(), mOTConfig.getSessionId());
     mSession.setConnectionListener(mConnectionListener);
     mSession.setSessionListener(mSessionListener);
@@ -195,8 +194,8 @@ public class OTWrapper {
    * {@link BasicListener#onError(Object, OpentokError)} method is called.
    */
   public void disconnect() {
+    addLogEvent(ClientLog.LOG_ACTION_DISCONNECT, ClientLog.LOG_VARIATION_ATTEMPT);
     if (mSession != null) {
-      addLogEvent(ClientLog.LOG_ACTION_DISCONNECT, ClientLog.LOG_VARIATION_ATTEMPT);
       mSession.disconnect();
     }
   }
@@ -207,9 +206,7 @@ public class OTWrapper {
    * @return the own connectionID
    */
   public String getOwnConnId() {
-    addLogEvent(ClientLog.LOG_ACTION_GET_OWN_CONNECTION, ClientLog.LOG_VARIATION_ATTEMPT);
     String ownConnectionId = mSessionConnection != null ? mSessionConnection.getConnectionId() : null;
-    addLogEvent(ClientLog.LOG_ACTION_GET_OWN_CONNECTION, ClientLog.LOG_VARIATION_SUCCESS);
     return ownConnectionId;
   }
 
@@ -219,8 +216,6 @@ public class OTWrapper {
    * @return the number of active connections.
    */
   public int getConnectionsCount() {
-    addLogEvent(ClientLog.LOG_ACTION_CONNECTIONS_COUNT, ClientLog.LOG_VARIATION_ATTEMPT);
-    addLogEvent(ClientLog.LOG_ACTION_CONNECTIONS_COUNT, ClientLog.LOG_VARIATION_SUCCESS);
     return mConnectionsCount;
   }
 
@@ -231,10 +226,7 @@ public class OTWrapper {
    * <code>false</code>).
    */
   public boolean isTheOldestConnection() {
-
-    addLogEvent(ClientLog.LOG_ACTION_CHECK_OLDEST_CONNECTION, ClientLog.LOG_VARIATION_ATTEMPT);
     boolean theOldest = mOlderThanMe <= 0;
-    addLogEvent(ClientLog.LOG_ACTION_CHECK_OLDEST_CONNECTION, ClientLog.LOG_VARIATION_SUCCESS);
     return theOldest;
   }
 
@@ -247,12 +239,10 @@ public class OTWrapper {
    */
   public int compareConnectionsTimes(String connectionId) {
     int age = 0;
-    addLogEvent(ClientLog.LOG_ACTION_COMPARE_CONNECTIONS, ClientLog.LOG_VARIATION_ATTEMPT);
     if (mSession != null) {
       age = mSession.getConnection().
               getCreationTime().compareTo(mConnections.get(connectionId).getCreationTime());
     }
-    addLogEvent(ClientLog.LOG_ACTION_COMPARE_CONNECTIONS, ClientLog.LOG_VARIATION_SUCCESS);
     return age;
   }
 
@@ -263,7 +253,6 @@ public class OTWrapper {
    * @param config The configuration of the preview
    */
   public void startPreview(PreviewConfig config) {
-    addLogEvent(ClientLog.LOG_ACTION_START_PREVIEW, ClientLog.LOG_VARIATION_ATTEMPT);
     mPreviewConfig = config;
     if (mPublisher == null && !isPreviewing) {
       createPublisher();
@@ -271,7 +260,6 @@ public class OTWrapper {
       mPublisher.startPreview();
       isPreviewing = true;
     }
-    addLogEvent(ClientLog.LOG_ACTION_START_PREVIEW, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -294,7 +282,6 @@ public class OTWrapper {
    * Call to stop the camera's video in the Preview's view.
    */
   public void stopPreview() {
-    addLogEvent(ClientLog.LOG_ACTION_STOP_PREVIEW, ClientLog.LOG_VARIATION_ATTEMPT);
     if (mPublisher != null && isPreviewing) {
       mPublisher.destroy();
       dettachPublisherView();
@@ -302,7 +289,6 @@ public class OTWrapper {
       isPreviewing = false;
       startPublishing = false;
     }
-    addLogEvent(ClientLog.LOG_ACTION_STOP_PREVIEW, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -312,8 +298,9 @@ public class OTWrapper {
    * @param screensharing Whether to indicate the camera or the screen streaming.
    */
   public void startPublishingMedia(PreviewConfig config, boolean screensharing) {
+    addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
+
     if (!screensharing) {
-      addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
       mPreviewConfig = config;
       startPublishing = true;
       if (mPublisher == null) {
@@ -321,7 +308,6 @@ public class OTWrapper {
       }
       publishIfReady();
     } else {
-      addLogEvent(ClientLog.LOG_ACTION_START_SCREENSHARING, ClientLog.LOG_VARIATION_ATTEMPT);
       startSharingScreen = true;
       if (mScreenPublisher == null) {
         createScreenPublisher(config);
@@ -336,8 +322,10 @@ public class OTWrapper {
    * @param screensharing Whether to indicate the camera or the screen streaming
    */
   public void stopPublishingMedia(Boolean screensharing) {
+
     if (!screensharing) {
-      addLogEvent(ClientLog.LOG_ACTION_STOP_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
+      addLogEvent(ClientLog.LOG_ACTION_END_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
+
       if (mPublisher != null && startPublishing) {
         mSession.unpublish(mPublisher);
       }
@@ -348,7 +336,8 @@ public class OTWrapper {
         mPublisher = null;
       }
     } else {
-      addLogEvent(ClientLog.LOG_ACTION_STOP_SCREENSHARING, ClientLog.LOG_VARIATION_ATTEMPT);
+      addLogEvent(ClientLog.LOG_ACTION_END_SCREEN_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
+
       if (mScreensharingFragment != null) {
         mScreensharingFragment.stopScreenCapture();
         isScreensharingByDefault = false;
@@ -373,10 +362,8 @@ public class OTWrapper {
    * <code>false</code>)
    */
   public boolean isLocalMediaEnabled(MediaType type) {
-    addLogEvent(ClientLog.LOG_ACTION_IS_LOCAL_MEDIA_ENABLED, ClientLog.LOG_VARIATION_ATTEMPT);
     boolean returnedValue = (mPublisher != null) &&
             (type == MediaType.VIDEO ? mPublisher.getPublishVideo() : mPublisher.getPublishAudio());
-    addLogEvent(ClientLog.LOG_ACTION_IS_LOCAL_MEDIA_ENABLED, ClientLog.LOG_VARIATION_SUCCESS);
     return returnedValue;
   }
 
@@ -388,7 +375,6 @@ public class OTWrapper {
    *                <code>false</code>).
    */
   public void enableLocalMedia(MediaType type, boolean enabled) {
-    addLogEvent(ClientLog.LOG_ACTION_ENABLE_LOCAL_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
     if (mPublisher != null) {
       switch (type) {
         case AUDIO:
@@ -404,7 +390,6 @@ public class OTWrapper {
           break;
       }
     }
-    addLogEvent(ClientLog.LOG_ACTION_ENABLE_LOCAL_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -415,7 +400,6 @@ public class OTWrapper {
    *                <code>false</code>).
    */
   public void enableReceivedMedia(String remoteId, MediaType type, boolean enabled) {
-    addLogEvent(ClientLog.LOG_ACTION_ENABLE_RECEIVED_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
     if (remoteId != null) {
       enableRemoteMedia(mSubscribers.get(remoteId), type, enabled);
     } else {
@@ -424,7 +408,6 @@ public class OTWrapper {
         enableRemoteMedia(sub, type, enabled);
       }
     }
-    addLogEvent(ClientLog.LOG_ACTION_ENABLE_RECEIVED_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -435,7 +418,6 @@ public class OTWrapper {
    * <code>false</code>).
    */
   public boolean isReceivedMediaEnabled(String remoteId, MediaType type) {
-    addLogEvent(ClientLog.LOG_ACTION_IS_RECEIVED_MEDIA_ENABLED, ClientLog.LOG_VARIATION_ATTEMPT);
     Subscriber sub = mSubscribers.get(remoteId);
     boolean returnedValue = false;
     if (sub != null) {
@@ -445,7 +427,6 @@ public class OTWrapper {
         returnedValue = sub.getSubscribeToAudio();
       }
     }
-    addLogEvent(ClientLog.LOG_ACTION_IS_RECEIVED_MEDIA_ENABLED, ClientLog.LOG_VARIATION_SUCCESS);
     return returnedValue;
   }
 
@@ -501,7 +482,6 @@ public class OTWrapper {
    * Call to cycle between cameras, if there are multiple cameras on the device.
    */
   public void cycleCamera(){
-    addLogEvent(ClientLog.LOG_ACTION_CYCLE_CAMERA, ClientLog.LOG_VARIATION_ATTEMPT);
     if ( mPublisher != null ) {
       mPublisher.cycleCamera();
     }
@@ -512,8 +492,6 @@ public class OTWrapper {
    * @return current OpenTok Configuration
    */
   public OTConfig getOTConfig(){
-    addLogEvent(ClientLog.LOG_ACTION_GET_OTCONFIG, ClientLog.LOG_VARIATION_ATTEMPT);
-    addLogEvent(ClientLog.LOG_ACTION_GET_OTCONFIG, ClientLog.LOG_VARIATION_SUCCESS);
     return this.mOTConfig;
   }
 
@@ -530,9 +508,7 @@ public class OTWrapper {
    */
   public BasicListener addBasicListener(BasicListener listener) {
     LOG.d(LOG_TAG, "Adding BasicListener");
-    addLogEvent(ClientLog.LOG_ACTION_ADD_BASIC_LISTENER, ClientLog.LOG_VARIATION_ATTEMPT);
     BasicListener returnedListener = (BasicListener) addOTListener(listener, mRetriableBasicListeners, mBasicListeners);
-    addLogEvent(ClientLog.LOG_ACTION_ADD_BASIC_LISTENER, ClientLog.LOG_VARIATION_SUCCESS);
     return returnedListener;
   }
 
@@ -541,9 +517,7 @@ public class OTWrapper {
    * @param listener
    */
   public void removeBasicListener(BasicListener listener) {
-    addLogEvent(ClientLog.LOG_ACTION_REMOVE_BASIC_LISTENER, ClientLog.LOG_VARIATION_ATTEMPT);
     removeOTListener(listener, mRetriableBasicListeners, mBasicListeners);
-    addLogEvent(ClientLog.LOG_ACTION_REMOVE_BASIC_LISTENER, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -552,10 +526,8 @@ public class OTWrapper {
    * @return The removed listener
    */
   public AdvancedListener addAdvancedListener(AdvancedListener<OTWrapper> listener) {
-    addLogEvent(ClientLog.LOG_ACTION_ADD_ADVANCED_LISTENER, ClientLog.LOG_VARIATION_ATTEMPT);
     AdvancedListener returnedListener = (AdvancedListener) addOTListener(listener, mRetriableAdvancedListeners,
             mAdvancedListeners);
-    addLogEvent(ClientLog.LOG_ACTION_ADD_ADVANCED_LISTENER, ClientLog.LOG_VARIATION_SUCCESS);
     return returnedListener;
   }
 
@@ -564,9 +536,7 @@ public class OTWrapper {
    * @param listener
    */
   public void removeAdvancedListener(AdvancedListener listener) {
-    addLogEvent(ClientLog.LOG_ACTION_REMOVE_ADVANCED_LISTENER, ClientLog.LOG_VARIATION_ATTEMPT);
     removeOTListener(listener, mRetriableAdvancedListeners, mAdvancedListeners);
-    addLogEvent(ClientLog.LOG_ACTION_REMOVE_ADVANCED_LISTENER, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -611,7 +581,6 @@ public class OTWrapper {
    * @param signalInfo {@link SignalInfo} of the signal to be sent
    */
   public void sendSignal(SignalInfo signalInfo) {
-    addLogEvent(ClientLog.LOG_ACTION_SEND_SIGNAL, ClientLog.LOG_VARIATION_ATTEMPT);
     if ( mSession != null ){
       if ( signalInfo.mDstConnId != null ){
         mSession.sendSignal(signalInfo, mConnections.get(signalInfo.mDstConnId));
@@ -620,7 +589,6 @@ public class OTWrapper {
         mSession.sendSignal(signalInfo, null);
       }
     }
-    addLogEvent(ClientLog.LOG_ACTION_SEND_SIGNAL, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -629,7 +597,6 @@ public class OTWrapper {
    *
    */
   public StreamStatus getLocalStreamStatus() {
-    addLogEvent(ClientLog.LOG_ACTION_GET_LOCAL_STREAM_STATUS, ClientLog.LOG_VARIATION_ATTEMPT);
     if (mPublisher != null) {
       Stream stream = mPublisher.getStream();
       boolean hasAudio = true;
@@ -644,13 +611,11 @@ public class OTWrapper {
         videoHeight = stream.getVideoHeight();
         videoWidth = stream.getVideoWidth();
       }
-      addLogEvent(ClientLog.LOG_ACTION_GET_LOCAL_STREAM_STATUS, ClientLog.LOG_VARIATION_SUCCESS);
       return new StreamStatus(mPublisher.getView(),
                               mPublisher.getPublishAudio(), mPublisher.getPublishVideo(),
                               hasAudio, hasVideo, streamVideoType,
                               videoWidth, videoHeight);
     }
-    addLogEvent(ClientLog.LOG_ACTION_GET_LOCAL_STREAM_STATUS, ClientLog.LOG_VARIATION_ERROR);
     return null;
   }
 
@@ -661,17 +626,13 @@ public class OTWrapper {
    *         video
    */
   public StreamStatus getRemoteStreamStatus(String id) {
-    addLogEvent(ClientLog.LOG_ACTION_GET_REMOTE_STREAM_STATUS, ClientLog.LOG_VARIATION_ATTEMPT);
     Subscriber sub = mSubscribers.get(id);
     if (sub != null) {
       Stream subSt = sub.getStream();
-      addLogEvent(ClientLog.LOG_ACTION_GET_REMOTE_STREAM_STATUS, ClientLog.LOG_VARIATION_SUCCESS);
-
       return new StreamStatus(sub.getView(), sub.getSubscribeToAudio(), sub.getSubscribeToVideo(),
                               subSt.hasAudio(), subSt.hasVideo(), subSt.getStreamVideoType(),
                               subSt.getVideoWidth(), subSt.getVideoHeight());
     }
-    addLogEvent(ClientLog.LOG_ACTION_GET_REMOTE_STREAM_STATUS, ClientLog.LOG_VARIATION_ERROR);
     return null;
   }
 
@@ -681,7 +642,6 @@ public class OTWrapper {
    * @param style VideoScale value: FILL or FIT
    */
   public void setRemoteStyle(String remoteId, VideoScale style) {
-    addLogEvent(ClientLog.LOG_ACTION_SET_REMOTE_STYLE, ClientLog.LOG_VARIATION_ATTEMPT);
     Subscriber sub = mSubscribers.get(remoteId);
     if ( sub != null ) {
       if (style == VideoScale.FILL) {
@@ -690,7 +650,6 @@ public class OTWrapper {
         sub.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT);
       }
     }
-    addLogEvent(ClientLog.LOG_ACTION_SET_REMOTE_STYLE, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -698,7 +657,6 @@ public class OTWrapper {
    * @param style VideoScale value: FILL or FIT
    */
   public void setLocalStyle(VideoScale style) {
-    addLogEvent(ClientLog.LOG_ACTION_SET_LOCAL_STYLE, ClientLog.LOG_VARIATION_ATTEMPT);
     if ( mPublisher != null ) {
       if (style == VideoScale.FILL) {
         mPublisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
@@ -706,7 +664,6 @@ public class OTWrapper {
         mPublisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT);
       }
     }
-    addLogEvent(ClientLog.LOG_ACTION_SET_LOCAL_STYLE, ClientLog.LOG_VARIATION_SUCCESS);
   }
 
   /**
@@ -717,15 +674,10 @@ public class OTWrapper {
   public void setRemoteVideoRenderer(BaseVideoRenderer renderer, boolean remoteScreen) {
     //todo: now, it will apply to all the subscribers
     if ( remoteScreen ){
-      addLogEvent(ClientLog.LOG_ACTION_SET_REMOTE_SCREEN_RENDERER, ClientLog.LOG_VARIATION_ATTEMPT);
       mScreenRemoteRenderer = renderer;
-      addLogEvent(ClientLog.LOG_ACTION_SET_REMOTE_SCREEN_RENDERER, ClientLog.LOG_VARIATION_SUCCESS);
-
     }
     else {
-      addLogEvent(ClientLog.LOG_ACTION_SET_REMOTE_VIDEO_RENDERER, ClientLog.LOG_VARIATION_ATTEMPT);
       mVideoRemoteRenderer = renderer;
-      addLogEvent(ClientLog.LOG_ACTION_SET_REMOTE_VIDEO_RENDERER, ClientLog.LOG_VARIATION_SUCCESS);
     }
   }
 
@@ -857,6 +809,7 @@ public class OTWrapper {
     LOG.d(LOG_TAG, "publishIfReady: ", mSessionConnection, ", ", mPublisher, ", ",
       startPublishing, ", ", isPreviewing);
     if (mSession != null && mSessionConnection != null && mPublisher != null && startPublishing) {
+      addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
       if (!isPreviewing) {
         attachPublisherView();
       }
@@ -1104,6 +1057,8 @@ public class OTWrapper {
       mAnalytics.setData(mAnalyticsData);
       LOG.d(LOG_TAG, "onConnected: ", mSessionConnection.getData(),
         ". listeners: ", mBasicListeners );
+      addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_SUCCESS);
+
       mConnectionsCount++;
 
       publishIfReady();
@@ -1115,11 +1070,12 @@ public class OTWrapper {
                                                          mSessionConnection.getData());
         }
       }
-      addLogEvent(ClientLog.LOG_ACTION_CONNECT, ClientLog.LOG_VARIATION_SUCCESS);
     }
 
     @Override
     public void onDisconnected(Session session) {
+      addLogEvent(ClientLog.LOG_ACTION_DISCONNECT, ClientLog.LOG_VARIATION_SUCCESS);
+
       if (mSession == null || mSessionConnection == null) {
         // This can happen if somehow onError was called before onDisconnected or if we somehow
         // call onDisconected twice (so cleanup has been done already)
@@ -1133,7 +1089,6 @@ public class OTWrapper {
                                                             mSessionConnection.getData());
         }
       }
-      addLogEvent(ClientLog.LOG_ACTION_DISCONNECT, ClientLog.LOG_VARIATION_SUCCESS);
       cleanup();
     }
 
@@ -1177,6 +1132,12 @@ public class OTWrapper {
     @Override
     public void onError(Session session, OpentokError opentokError) {
       LOG.e(LOG_TAG, "Session: onError ", opentokError.getMessage());
+      if (getOwnConnId() != null ) {
+        addLogEvent(ClientLog.LOG_ACTION_DISCONNECT, ClientLog.LOG_VARIATION_ERROR);
+      }
+      else {
+        addLogEvent(ClientLog.LOG_ACTION_CONNECT, ClientLog.LOG_VARIATION_ERROR);
+      }
       cleanup();
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
@@ -1299,12 +1260,12 @@ public class OTWrapper {
       boolean screensharing = false;
 
       if (stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeScreen){
+        addLogEvent(ClientLog.LOG_ACTION_START_SCREEN_COMM, ClientLog.LOG_VARIATION_SUCCESS);
         screensharing = true;
-        addLogEvent(ClientLog.LOG_ACTION_START_SCREENSHARING, ClientLog.LOG_VARIATION_SUCCESS);
       }
       else{
+        addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_SUCCESS);
         isPublishing = true;
-        addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
       }
       for (BasicListener listener : mBasicListeners) {
         ((RetriableBasicListener) listener).onStartedPublishingMedia(SELF, screensharing);
@@ -1320,12 +1281,12 @@ public class OTWrapper {
     public void onStreamDestroyed(PublisherKit publisherKit, Stream stream) {
       boolean screensharing = false;
       if (stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeScreen){
+        addLogEvent(ClientLog.LOG_ACTION_END_SCREEN_COMM, ClientLog.LOG_VARIATION_SUCCESS);
         screensharing = true;
-        addLogEvent(ClientLog.LOG_ACTION_STOP_SCREENSHARING, ClientLog.LOG_VARIATION_SUCCESS);
       }
       else {
+        addLogEvent(ClientLog.LOG_ACTION_END_COMM, ClientLog.LOG_VARIATION_SUCCESS);
         isPublishing = false;
-        addLogEvent(ClientLog.LOG_ACTION_STOP_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_SUCCESS);
       }
       for (BasicListener listener : mBasicListeners) {
         ((RetriableBasicListener) listener).onStoppedPublishingMedia(SELF, screensharing);
@@ -1337,16 +1298,27 @@ public class OTWrapper {
       LOG.e(LOG_TAG, "Publisher: onError ", opentokError.getErrorCode(), ", ",
         opentokError.getMessage());
       OpentokError.ErrorCode errorCode = opentokError.getErrorCode();
+      if (publisherKit.getStream().getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeCamera) {
+        addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ERROR);
+      }
+      else {
+        addLogEvent(ClientLog.LOG_ACTION_START_SCREEN_COMM, ClientLog.LOG_VARIATION_ERROR);
+      }
+
       switch (errorCode) {
         case PublisherInternalError:
           //TODO: Add client logs for the different publisher errors
           LOG.e(LOG_TAG, "Publisher error: PublisherInternalError");
           mPublisher = null;
         case PublisherTimeout:
-          addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ERROR);
           //re-try publishing
           if ( mSession != null ) {
-            addLogEvent(ClientLog.LOG_ACTION_START_PUBLISHING_MEDIA, ClientLog.LOG_VARIATION_ATTEMPT);
+            if (publisherKit.getStream().getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeCamera) {
+              addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
+            }
+            else {
+              addLogEvent(ClientLog.LOG_ACTION_START_SCREEN_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
+            }
             mSession.publish(publisherKit);
           }
           break;
@@ -1444,7 +1416,6 @@ public class OTWrapper {
           ((RetriableAdvancedListener) listener).onCameraChanged(SELF);
         }
       }
-      addLogEvent(ClientLog.LOG_ACTION_CYCLE_CAMERA, ClientLog.LOG_VARIATION_SUCCESS);
     }
 
     @Override
@@ -1455,7 +1426,6 @@ public class OTWrapper {
           ((RetriableAdvancedListener) listener).onError(SELF, opentokError);
         }
       }
-      addLogEvent(ClientLog.LOG_ACTION_CYCLE_CAMERA, ClientLog.LOG_VARIATION_ERROR);
     }
   };
 
