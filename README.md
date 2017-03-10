@@ -68,8 +68,8 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 
 ##Using Accelerator Core Android
 
-You can start testing a basic one-to-one video application using the Accelerator Core with best-practices for Android.
- - [One to one sample application](https://github.com/opentok/one-to-one-sample-apps).
+You can start testing a basic multiparty  application using the Accelerator Core with best-practices for Android.
+ - [OpenTok Accelerator Sample Application](https://github.com/opentok/accelerator-sample-apps-android).
 
 ###Initialization
 
