@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 [UPDATED] OpenTok SDK Version to 2.10.1
 
+####[1.0.9]
+
+[UPDATED] OpenTok SDK Version to 2.10.1
 ####[1.0.8]
 
 [FIXED] Avoid a race condition when finishing threads
