@@ -231,7 +231,6 @@ public class OTWrapper {
    * <code>false</code>).
    */
   public boolean isTheOldestConnection() {
-
     addLogEvent(ClientLog.LOG_ACTION_CHECK_OLDEST_CONNECTION, ClientLog.LOG_VARIATION_ATTEMPT);
     boolean theOldest = mOlderThanMe <= 0;
     addLogEvent(ClientLog.LOG_ACTION_CHECK_OLDEST_CONNECTION, ClientLog.LOG_VARIATION_SUCCESS);
@@ -254,6 +253,19 @@ public class OTWrapper {
     }
     addLogEvent(ClientLog.LOG_ACTION_COMPARE_CONNECTIONS, ClientLog.LOG_VARIATION_SUCCESS);
     return age;
+  }
+
+  /**
+   * Returns the remote connectionID
+   * @param remoteId the remote Id
+   * @return the remote connectionID
+   */
+  public String geRemoteConnId(String remoteId) {
+    addLogEvent(ClientLog.LOG_ACTION_GET_REMOTE_CONNECTION, ClientLog.LOG_VARIATION_ATTEMPT);
+    Subscriber remoteSub = mSubscribers.get(remoteId);
+    String remoteConnId = remoteSub.getStream().getConnection().getConnectionId();
+    addLogEvent(ClientLog.LOG_ACTION_GET_REMOTE_CONNECTION, ClientLog.LOG_VARIATION_SUCCESS);
+    return remoteConnId;
   }
 
   /**
