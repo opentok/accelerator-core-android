@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 --------------------------------------
+
+#### [1.0.10]
+
+[ADDED] New method to get remote connection Id
+
 #### [1.0.9]
 
 [UPDATED] OpenTok SDK Version to 2.10.1
