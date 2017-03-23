@@ -17,10 +17,11 @@ before_script:
 script:
 - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" ]]; then
     ./gradlew uploadArchives -PMAVEN_USERNAME=$MAVEN_USERNAME -PMAVEN_PASSWORD=$MAVEN_PASSWORD;
-    PRINTVERSION=$(./gradlew -q printVersionRelease);
-    VERSION=$(echo $PRINTVERSION | cut -c -5);
+    PRINTVERSION=$(./gradlew -q printVersionRelease)
+    LEN=$(echo $((${#PRINTVERSION} / 2)))
+    VERSION=$(echo $PRINTVERSION | cut -c -$LEN)
     git tag v$VERSION;
-    git push origin v$VERSION;
+    git push --quiet https://$GITHUBKEY@github.com/opentok/accelerator-core-android v$VERSION
   else
     ./gradlew build;
   fi
