@@ -15,7 +15,16 @@ before_script:
 - export PATH=$GRADLE_HOME/bin:$PATH
 - gradle wrapper
 script:
-- ./gradlew test
+- if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" ]]; then
+    ./gradlew uploadArchives -PMAVEN_USERNAME=$MAVEN_USERNAME -PMAVEN_PASSWORD=$MAVEN_PASSWORD;
+    PRINTVERSION=$(./gradlew -q printVersionRelease);
+    LEN=$(echo $((${#PRINTVERSION} / 2)));
+    VERSION=$(echo $PRINTVERSION | cut -c -$LEN);
+    git tag v$VERSION;
+    git push --quiet https://$GITHUBKEY@github.com/opentok/accelerator-core-android v$VERSION;
+  else
+    ./gradlew build;
+  fi
 notifications:
   slack:
     secure: RSDcVChSfjcf5dMWyb4wLxKOtlgk95R+icj7vT6kejc93FRuMTrmlLPrOIbSugdxj2M9ujTW/pgnuNq26RUgkqSSOcX4o+o+BxsD9lyw+YjrCEvjcWvo5rJP1mIHpCKtTwNZmuU9DPL0Qfxf01b0xQdCH3C3v0N7ubdfxmhXLuatAbHoOKM4ZNsmwW+pSJ56Cm40Enf08r+oe1OW6tXLJGdemiYlOnIyO65OSqVusguK7Ie4ju6Rw8Ezy+O+Geo4i5A2I7GfIVNL5/58Buw3LxjRo+XbwVlLVVmoXnQ2h1li7Y2f4x5Qg6dqXAHb2azDVN7qeuwTuyA7AkL+0y2JvCLNsiSwK22mlwAuNn1jQ7uOo8c6oPWwJXw/Oddm6u6DsZBuRSeslV7RUp5oje3G61/Ese9IP6jgaUxBwVMKXBFKEmTtbT47U4L66icrEvEYZ9leOiWGjmPLeRFubpFsOab1U/AEGwR1dlXs7LZnMlc8qauT7AYXyslpTHVbSgdwjPJA6KaSvXXTEdI4O0rT7gXMIBzf0NSkc9ttQamgHzesbWpM87T6r/mrg8HOzs3jso3z47+Lixng8/TJC2slSjqwRkWGanKpMJUzEVcDIGbtkVH2fn8c0pNk9RL65ui7ruIH++ovKdisiA+VdEAyt2qkFcc9wo9kcLQxoPdJHx0=

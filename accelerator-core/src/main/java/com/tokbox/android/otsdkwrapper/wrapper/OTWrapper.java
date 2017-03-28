@@ -247,6 +247,17 @@ public class OTWrapper {
   }
 
   /**
+   * Returns the remote connectionID
+   * @param remoteId the remote Id
+   * @return the remote connectionID
+   */
+  public String geRemoteConnId(String remoteId) {
+    Subscriber remoteSub = mSubscribers.get(remoteId);
+    String remoteConnId = remoteSub.getStream().getConnection().getConnectionId();
+    return remoteConnId;
+  }
+
+  /**
    * Call to display the camera's video in the Preview's view before it starts streaming
    * video.
    *
