@@ -61,12 +61,12 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 | `ScreenSharingCapturer` | Custom screen sharing capturer. In the absence of a custom or default camera capturer, `Core Android` will generate one using the full screen as the capturer. |
 | `ScreenSharingFragment` | Headless fragment used to implement the screensharing feature by default. |
 
-##Using Accelerator Core Android
+## Using Accelerator Core Android
 
 You can start testing a basic multiparty  application using the Accelerator Core with best-practices for Android.
  - [OpenTok Accelerator Sample Application](https://github.com/opentok/accelerator-sample-apps-android).
 
-###Initialization
+### Initialization
 
 The first step in using the OTWrapper is to initialize it by calling the constructor with the OpenTokConfig parameter.
 
