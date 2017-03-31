@@ -249,7 +249,7 @@ public class OTWrapper {
    * @param remoteId the remote Id
    * @return the remote connectionID
    */
-  public String geRemoteConnId(String remoteId) {
+  public String getRemoteConnId(String remoteId) {
     Subscriber remoteSub = mSubscribers.get(remoteId);
     String remoteConnId = remoteSub.getStream().getConnection().getConnectionId();
     return remoteConnId;
