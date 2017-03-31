@@ -114,8 +114,6 @@ public class OTWrapper {
    *                data to connect.
    */
   public OTWrapper(Context context, OTConfig config) {
-    initAnalytics();
-    addLogEvent(ClientLog.LOG_ACTION_INIT, ClientLog.LOG_VARIATION_ATTEMPT);
     this.mContext = context;
     this.mOTConfig = config;
     mSubscribers = new HashMap<String, Subscriber>();
@@ -124,8 +122,8 @@ public class OTWrapper {
     mBasicListeners = new ArrayList<RetriableBasicListener<OTWrapper>>();
     mAdvancedListeners = new ArrayList<RetriableAdvancedListener<OTWrapper>>();
 
-    addLogEvent(ClientLog.LOG_ACTION_INIT, ClientLog.LOG_VARIATION_SUCCESS);
-  }
+    initAnalytics();
+   }
 
   /**
    * Call this method when the app's activity pauses.
