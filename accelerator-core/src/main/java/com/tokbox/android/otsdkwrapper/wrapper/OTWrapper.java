@@ -67,7 +67,6 @@ public class OTWrapper {
 
   //indexed by streamId, *not* per subscriber Id
   private HashMap<String, Subscriber> mSubscribers = null;
-  private Hashtable<String, Connection> mConnections = null;
   private Hashtable<String, Stream> mStreams = null;
 
   //listeners
@@ -117,7 +116,6 @@ public class OTWrapper {
     this.mContext = context;
     this.mOTConfig = config;
     mSubscribers = new HashMap<String, Subscriber>();
-    mConnections = new Hashtable<String, Connection>();
     mStreams = new Hashtable<String, Stream>();
     mBasicListeners = new ArrayList<RetriableBasicListener<OTWrapper>>();
     mAdvancedListeners = new ArrayList<RetriableAdvancedListener<OTWrapper>>();
@@ -239,7 +237,7 @@ public class OTWrapper {
     int age = 0;
     if (mSession != null) {
       age = mSession.getConnection().
-              getCreationTime().compareTo(mConnections.get(connectionId).getCreationTime());
+              getCreationTime().compareTo(mSession.connections.get(connectionId).getCreationTime());
     }
     return age;
   }
@@ -592,7 +590,7 @@ public class OTWrapper {
   public void sendSignal(SignalInfo signalInfo) {
     if ( mSession != null ){
       if ( signalInfo.mDstConnId != null ){
-        mSession.sendSignal(signalInfo, mConnections.get(signalInfo.mDstConnId));
+        mSession.sendSignal(signalInfo, mSession.connections.get(signalInfo.mDstConnId));
       }
       else {
         mSession.sendSignal(signalInfo, null);
@@ -772,7 +770,6 @@ public class OTWrapper {
     mSession = null;
     mPublisher = null;
     mSubscribers = new HashMap<String, Subscriber>();
-    mConnections = new Hashtable<String, Connection>();
     mStreams = new Hashtable<String, Stream>();
     mConnectionsCount = 0;
     mSessionConnection = null;
@@ -1060,7 +1057,7 @@ public class OTWrapper {
     @Override
     public void onConnected(Session session) {
       mSessionConnection = session.getConnection();
-      mConnections.put(mSessionConnection.getConnectionId(), mSessionConnection);
+      mSession.connections.put(mSessionConnection.getConnectionId(), mSessionConnection);
       //update internal client logs with connectionId
       mAnalyticsData.setConnectionId(mSessionConnection.getConnectionId());
       mAnalytics.setData(mAnalyticsData);
@@ -1160,7 +1157,7 @@ public class OTWrapper {
     @Override
     public void onConnectionCreated(Session session, Connection connection) {
       LOG.d(LOG_TAG, "onConnectionCreated: ", connection.getData());
-      mConnections.put(connection.getConnectionId(), connection);
+      mSession.connections.put(connection.getConnectionId(), connection);
       mConnectionsCount++;
       if (connection.getCreationTime().compareTo(mSessionConnection.getCreationTime()) <= 0) {
         mOlderThanMe++;
@@ -1177,7 +1174,7 @@ public class OTWrapper {
     @Override
     public void onConnectionDestroyed(Session session, Connection connection) {
       LOG.d(LOG_TAG, "onConnectionDestroyed: ", connection.getData());
-      mConnections.remove(connection.getConnectionId());
+      mSession.connections.remove(connection.getConnectionId());
       mConnectionsCount--;
       if (connection.getCreationTime().compareTo(mSessionConnection.getCreationTime()) <= 0) {
         mOlderThanMe--;
