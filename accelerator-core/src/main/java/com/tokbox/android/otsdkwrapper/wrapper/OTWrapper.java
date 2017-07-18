@@ -52,7 +52,8 @@ public class OTWrapper {
   private static final String LOG_TAG = OTWrapper.class.getSimpleName();
   private static final short LOCAL_LOG_LEVEL = 0xFF;
   private static final LogWrapper LOG =
-    new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+          new LogWrapper((short) (GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+
   public static void setLogLevel(short logLevel) {
     LOG.setLogLevel(logLevel);
   }
@@ -121,7 +122,7 @@ public class OTWrapper {
     mAdvancedListeners = new ArrayList<RetriableAdvancedListener<OTWrapper>>();
 
     initAnalytics();
-   }
+  }
 
   /**
    * Call this method when the app's activity pauses.
@@ -131,7 +132,7 @@ public class OTWrapper {
     if (mSession != null) {
       mSession.onPause();
     }
-   }
+  }
 
   /**
    * Call this method when the app's activity resumes.
@@ -244,6 +245,7 @@ public class OTWrapper {
 
   /**
    * Returns the remote connectionID
+   *
    * @param remoteId the remote Id
    * @return the remote connectionID
    */
@@ -449,6 +451,7 @@ public class OTWrapper {
     LOG.i(LOG_TAG, "private add new remote stream != null");
     Subscriber sub = new Subscriber(mContext, stream);
     sub.setVideoListener(mVideoListener);
+    sub.setAudioLevelListener(mSubscriberAudioLevelUpdated);
     sub.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
     String subId = stream.getStreamId();
     mSubscribers.put(subId, sub);
@@ -488,28 +491,30 @@ public class OTWrapper {
   /**
    * Call to cycle between cameras, if there are multiple cameras on the device.
    */
-  public void cycleCamera(){
-    if ( mPublisher != null ) {
+  public void cycleCamera() {
+    if (mPublisher != null) {
       mPublisher.cycleCamera();
     }
   }
 
   /**
    * Returns the OpenTok Configuration
+   *
    * @return current OpenTok Configuration
    */
-  public OTConfig getOTConfig(){
+  public OTConfig getOTConfig() {
     return this.mOTConfig;
   }
 
   private RetriableOTListener getUnfailingFromBaseListener(BaseOTListener listener) {
     return listener instanceof BasicListener ?
-      new UnfailingBasicListener((BasicListener) listener) :
-      new UnfailingAdvancedListener<>((AdvancedListener) listener);
+            new UnfailingBasicListener((BasicListener) listener) :
+            new UnfailingAdvancedListener<>((AdvancedListener) listener);
   }
 
   /**
    * Adds a {@link BasicListener}. If the listener was already added, nothing is done.
+   *
    * @param listener
    * @return The added listener
    */
@@ -521,6 +526,7 @@ public class OTWrapper {
 
   /**
    * Removes a {@link BasicListener}
+   *
    * @param listener
    */
   public void removeBasicListener(BasicListener listener) {
@@ -529,6 +535,7 @@ public class OTWrapper {
 
   /**
    * Adds an {@link AdvancedListener}
+   *
    * @param listener
    * @return The removed listener
    */
@@ -540,6 +547,7 @@ public class OTWrapper {
 
   /**
    * Removes an {@link AdvancedListener}
+   *
    * @param listener
    */
   public void removeAdvancedListener(AdvancedListener listener) {
@@ -548,9 +556,10 @@ public class OTWrapper {
 
   /**
    * Registers a signal listener for a given signal.
+   *
    * @param signalName Name of the signal this listener will listen to. Pass "*" if the listener
    *                   is to be invoked for all signals.
-   * @param listener Listener that will be invoked when a signal is received.
+   * @param listener   Listener that will be invoked when a signal is received.
    */
   public void addSignalListener(String signalName, com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
     if (mSession != null) {
@@ -563,6 +572,7 @@ public class OTWrapper {
    * cases where an activity (or some object that depends on an activity) is used as a listener
    * but the activity can be destroyed at some points (which would cause the app to crash if the
    * signal was delivered).
+   *
    * @param listener Listener to be removed
    */
   public void removeSignalListener(com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
@@ -573,9 +583,10 @@ public class OTWrapper {
 
   /**
    * Removes a signal listener.
+   *
    * @param signalName Name of the signal this listener will listen to. Pass "*" if the listener
    *                   is to be invoked for all signals.
-   * @param listener Listener to be removed.
+   * @param listener   Listener to be removed.
    */
   public void removeSignalListener(String signalName, com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
     if (mSession != null) {
@@ -585,14 +596,14 @@ public class OTWrapper {
 
   /**
    * Sends a new signal
+   *
    * @param signalInfo {@link SignalInfo} of the signal to be sent
    */
   public void sendSignal(SignalInfo signalInfo) {
-    if ( mSession != null ){
-      if ( signalInfo.mDstConnId != null ){
+    if (mSession != null) {
+      if (signalInfo.mDstConnId != null) {
         mSession.sendSignal(signalInfo, mSession.connections.get(signalInfo.mDstConnId));
-      }
-      else {
+      } else {
         mSession.sendSignal(signalInfo, null);
       }
     }
@@ -600,8 +611,8 @@ public class OTWrapper {
 
   /**
    * Returns the {@link StreamStatus} of the local.
-   * @return The {@link StreamStatus} of the local.
    *
+   * @return The {@link StreamStatus} of the local.
    */
   public StreamStatus getLocalStreamStatus() {
     if (mPublisher != null) {
@@ -619,38 +630,40 @@ public class OTWrapper {
         videoWidth = stream.getVideoWidth();
       }
       return new StreamStatus(mPublisher.getView(),
-                              mPublisher.getPublishAudio(), mPublisher.getPublishVideo(),
-                              hasAudio, hasVideo, streamVideoType,
-                              videoWidth, videoHeight);
+              mPublisher.getPublishAudio(), mPublisher.getPublishVideo(),
+              hasAudio, hasVideo, streamVideoType,
+              videoWidth, videoHeight);
     }
     return null;
   }
 
   /**
    * Returns the stream status for the requested subscriber (actually, subId is the streamId..)
+   *
    * @param id Id of the subscriber/stream
    * @return The status including the view, and if it's subscribing to video and if it has local
-   *         video
+   * video
    */
   public StreamStatus getRemoteStreamStatus(String id) {
     Subscriber sub = mSubscribers.get(id);
     if (sub != null) {
       Stream subSt = sub.getStream();
       return new StreamStatus(sub.getView(), sub.getSubscribeToAudio(), sub.getSubscribeToVideo(),
-                              subSt.hasAudio(), subSt.hasVideo(), subSt.getStreamVideoType(),
-                              subSt.getVideoWidth(), subSt.getVideoHeight());
+              subSt.hasAudio(), subSt.hasVideo(), subSt.getStreamVideoType(),
+              subSt.getVideoWidth(), subSt.getVideoHeight());
     }
     return null;
   }
 
   /**
    * Sets the  Video Scale style for a remote
+   *
    * @param remoteId the remote subscriber ID
-   * @param style VideoScale value: FILL or FIT
+   * @param style    VideoScale value: FILL or FIT
    */
   public void setRemoteStyle(String remoteId, VideoScale style) {
     Subscriber sub = mSubscribers.get(remoteId);
-    if ( sub != null ) {
+    if (sub != null) {
       if (style == VideoScale.FILL) {
         sub.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
       } else {
@@ -661,10 +674,11 @@ public class OTWrapper {
 
   /**
    * Sets the Local Video Style
+   *
    * @param style VideoScale value: FILL or FIT
    */
   public void setLocalStyle(VideoScale style) {
-    if ( mPublisher != null ) {
+    if (mPublisher != null) {
       if (style == VideoScale.FILL) {
         mPublisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
       } else {
@@ -675,15 +689,15 @@ public class OTWrapper {
 
   /**
    * Sets a custom video renderer for the remote
-   * @param renderer The custom video renderer
+   *
+   * @param renderer     The custom video renderer
    * @param remoteScreen Whether the renderer is applied to the remote received screen or not.
    */
   public void setRemoteVideoRenderer(BaseVideoRenderer renderer, boolean remoteScreen) {
     //todo: now, it will apply to all the subscribers
-    if ( remoteScreen ){
+    if (remoteScreen) {
       mScreenRemoteRenderer = renderer;
-    }
-    else {
+    } else {
       mVideoRemoteRenderer = renderer;
     }
   }
@@ -691,6 +705,7 @@ public class OTWrapper {
   /**
    * (Tries) to set the FPS of the shared video stream to the passed one. The FPS is rounded to
    * the nearest supported one.
+   *
    * @param FPS
    */
   public void setPublishingFPS(int FPS) {
@@ -730,12 +745,13 @@ public class OTWrapper {
    * Sets an input signal processor. The input processor will process all the signals coming from
    * the wire. The SignalListeners will be invoked only on processed signals. That allows you to
    * easily implement and enforce a connection wide protocol for all sent and received signals.
+   *
    * @param inputProtocol The input protocol you want to enforce. Pass null if you wish to receive
    *                      raw signals.
    */
   public synchronized void setInputSignalProtocol(SignalProtocol inputProtocol) {
     mInputSignalProtocol = inputProtocol;
-    if ( mSession != null ){
+    if (mSession != null) {
       mSession.setInputSignalProtocol(mInputSignalProtocol);
     }
   }
@@ -745,26 +761,28 @@ public class OTWrapper {
    * the wire. A Signal will be sent using Opentok only after it has been processed by the protocol.
    * That allows you to easily implement and enforce a connection wide protocol for all sent and
    * received signals.
+   *
    * @param outputProtocol
    */
   public synchronized void setOutputSignalProtocol(SignalProtocol outputProtocol) {
     mOutputSignalProtol = outputProtocol;
-    if ( mSession != null ){
+    if (mSession != null) {
       mSession.setOutputSignalProtocol(mOutputSignalProtol);
     }
   }
 
   /**
    * Get the OTAcceleratorSession
+   *
    * @return The session
    */
-  public OTAcceleratorSession getSession(){
+  public OTAcceleratorSession getSession() {
     return mSession;
   }
 
   //Private methods
   private void cleanup() {
-    if ( mSession != null ) {
+    if (mSession != null) {
       mSession.cleanUpSignals();
     }
     mSession = null;
@@ -813,7 +831,7 @@ public class OTWrapper {
 
   private synchronized void publishIfReady() {
     LOG.d(LOG_TAG, "publishIfReady: ", mSessionConnection, ", ", mPublisher, ", ",
-      startPublishing, ", ", isPreviewing);
+            startPublishing, ", ", isPreviewing);
     if (mSession != null && mSessionConnection != null && mPublisher != null && startPublishing) {
       addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
       if (!isPreviewing) {
@@ -827,10 +845,10 @@ public class OTWrapper {
     }
   }
 
-  private synchronized  void publishIfScreenReady(){
+  private synchronized void publishIfScreenReady() {
     LOG.d(LOG_TAG, "publishIfScreenReady: ", mSessionConnection, ", ", mScreenPublisher, ", ",
-      startSharingScreen);
-    if (mSession!= null && mSessionConnection != null && mScreenPublisher != null && startSharingScreen) {
+            startSharingScreen);
+    if (mSession != null && mSessionConnection != null && mScreenPublisher != null && startSharingScreen) {
 
       if (!isScreensharingByDefault) {
         if (!isPreviewing) {
@@ -845,7 +863,7 @@ public class OTWrapper {
     }
   }
 
-  private void createPublisher(){
+  private void createPublisher() {
     //TODO: add more cases
     LOG.d(LOG_TAG, "createPublisher: ", mPreviewConfig);
     Publisher.Builder builder = new Publisher.Builder(mContext);
@@ -853,9 +871,9 @@ public class OTWrapper {
 
     if (mPreviewConfig != null) {
       if (mPreviewConfig.getResolution() != Publisher.CameraCaptureResolution.MEDIUM ||
-        mPreviewConfig.getFrameRate() != Publisher.CameraCaptureFrameRate.FPS_15) {
+              mPreviewConfig.getFrameRate() != Publisher.CameraCaptureFrameRate.FPS_15) {
         LOG.d(LOG_TAG, "createPublisher: Creating publisher with: ",
-          mPreviewConfig.getResolution(), ", ", mPreviewConfig.getFrameRate());
+                mPreviewConfig.getResolution(), ", ", mPreviewConfig.getFrameRate());
         builder.resolution(mPreviewConfig.getResolution());
         builder.frameRate(mPreviewConfig.getFrameRate());
 
@@ -864,11 +882,11 @@ public class OTWrapper {
         builder.audioTrack(mPreviewConfig.isAudioTrack()).videoTrack(mPreviewConfig.isVideoTrack());
       }
 
-      if ( mPreviewConfig.getCapturer() != null ){
+      if (mPreviewConfig.getCapturer() != null) {
         //custom video capturer
         builder.capturer(mPreviewConfig.getCapturer());
       }
-      if ( mPreviewConfig.getRenderer() != null ){
+      if (mPreviewConfig.getRenderer() != null) {
         builder.renderer(mPreviewConfig.getRenderer());
       }
       mPublisher = builder.build();
@@ -879,40 +897,40 @@ public class OTWrapper {
 
     mPublisher.setPublisherListener(mPublisherListener);
     mPublisher.setCameraListener(mCameraListener);
+    mPublisher.setAudioLevelListener(mPublisherAudioLevelListener);
     //byDefault
     mPublisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
   }
 
-  private void createScreenPublisher(PreviewConfig config){
+  private void createScreenPublisher(PreviewConfig config) {
     LOG.d(LOG_TAG, "createScreenPublisher: ", config);
     mScreenPublisherBuilder = new Publisher.Builder(mContext);
     mScreenPublisherBuilder.name(config.getName());
 
     if (config != null) {
       if (config.getResolution() != Publisher.CameraCaptureResolution.MEDIUM ||
-        config.getFrameRate() != Publisher.CameraCaptureFrameRate.FPS_15) {
+              config.getFrameRate() != Publisher.CameraCaptureFrameRate.FPS_15) {
         LOG.d(LOG_TAG, "createPublisher: Creating publisher with: ", config.getResolution(),
-          ", ", config.getFrameRate());
+                ", ", config.getFrameRate());
         mScreenPublisherBuilder.resolution(config.getResolution()).frameRate(config.getFrameRate());
       } else {
         LOG.d(LOG_TAG, "createPublisher: Creating Publisher with audio and video specified");
         mScreenPublisherBuilder.audioTrack(config.isAudioTrack()).videoTrack(config.isVideoTrack());
       }
 
-      if ( config.getCapturer() != null ){
+      if (config.getCapturer() != null) {
         //custom video capturer
         mScreenPublisherBuilder.capturer(config.getCapturer());
-      }
-      else {
+      } else {
         //create screensharing by default
         isScreensharingByDefault = true;
         mScreensharingFragment = ScreenSharingFragment.newInstance();
-        ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction()
+        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
                 .add(mScreensharingFragment, "screensharing-fragment").commit();
         mScreensharingFragment.setListener(screenListener);
       }
 
-      if ( config.getRenderer() != null ){
+      if (config.getRenderer() != null) {
         mScreenPublisherBuilder.renderer(config.getRenderer());
       }
 
@@ -922,7 +940,7 @@ public class OTWrapper {
       LOG.d(LOG_TAG, "createPublisher: Creating DefaultPublisher");
       mScreenPublisher = mScreenPublisherBuilder.build();
     }
-    if ( !isScreensharingByDefault ) {
+    if (!isScreensharingByDefault) {
       mScreenPublisher.setPublisherListener(mPublisherListener);
       mScreenPublisher.setCameraListener(mCameraListener);
       mScreenPublisher.
@@ -936,6 +954,7 @@ public class OTWrapper {
 
   /**
    * Rounds to the smallest FPS. Could round to the closest one instead!
+   *
    * @param FPS
    */
   private Publisher.CameraCaptureFrameRate getFPS(int FPS) {
@@ -954,19 +973,18 @@ public class OTWrapper {
 
   private void attachPublisherView() {
     if (mPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
-      for (BasicListener listener: mBasicListeners) {
-          ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mPublisher.getView());
+      for (BasicListener listener : mBasicListeners) {
+        ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mPublisher.getView());
       }
     }
   }
 
   private void attachPublisherScreenView() {
     if (mScreenPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
-      for (BasicListener listener: mBasicListeners) {
+      for (BasicListener listener : mBasicListeners) {
         if (isScreensharingByDefault) {
           ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mScreensharingFragment.getScreen());
-        }
-        else {
+        } else {
           ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mScreenPublisher.getView());
         }
       }
@@ -975,16 +993,16 @@ public class OTWrapper {
 
   private void dettachPublisherView() {
     if (mPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
-      for (BasicListener listener: mBasicListeners) {
-        ((RetriableBasicListener)listener).onPreviewViewDestroyed(SELF, mPublisher.getView());
+      for (BasicListener listener : mBasicListeners) {
+        ((RetriableBasicListener) listener).onPreviewViewDestroyed(SELF, mPublisher.getView());
       }
     }
   }
 
   private void dettachPublisherScreenView() {
     if (mScreenPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
-      for (BasicListener listener: mBasicListeners) {
-        ((RetriableBasicListener)listener).onPreviewViewDestroyed(SELF, mScreenPublisher.getView());
+      for (BasicListener listener : mBasicListeners) {
+        ((RetriableBasicListener) listener).onPreviewViewDestroyed(SELF, mScreenPublisher.getView());
       }
     }
   }
@@ -992,20 +1010,20 @@ public class OTWrapper {
   private void refreshPeerList() {
     if (mBasicListeners != null && !mBasicListeners.isEmpty()) {
       if (mBasicListeners != null && !mBasicListeners.isEmpty()) {
-        for (BasicListener listener: mBasicListeners) {
-          if ( ((RetriableBasicListener)listener).getInternalListener() != null ){
+        for (BasicListener listener : mBasicListeners) {
+          if (((RetriableBasicListener) listener).getInternalListener() != null) {
             if (mPublisher != null) {
-              ((RetriableBasicListener)listener).onPreviewViewReady(SELF, mPublisher.getView());
+              ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mPublisher.getView());
             }
             if (mScreenPublisher != null) {
-              ((RetriableBasicListener)listener).onPreviewViewReady(SELF,
-                                                                    mScreenPublisher.getView());
+              ((RetriableBasicListener) listener).onPreviewViewReady(SELF,
+                      mScreenPublisher.getView());
             }
-            for(Subscriber sub: mSubscribers.values()) {
+            for (Subscriber sub : mSubscribers.values()) {
               Stream stream = sub.getStream();
-              ((RetriableBasicListener)listener).
-                onRemoteViewReady(SELF, sub.getView(), stream.getStreamId(),
-                                  stream.getConnection().getData());
+              ((RetriableBasicListener) listener).
+                      onRemoteViewReady(SELF, sub.getView(), stream.getStreamId(),
+                              stream.getConnection().getData());
             }
           }
         }
@@ -1024,7 +1042,7 @@ public class OTWrapper {
   }
 
   //Analytics
-  private void initAnalytics (){
+  private void initAnalytics() {
     //Init the analytics logging
     String source = mContext.getPackageName();
 
@@ -1036,17 +1054,17 @@ public class OTWrapper {
     }
 
     mAnalyticsData = new OTKAnalyticsData.
-      Builder(ClientLog.LOG_CLIENT_VERSION, source, ClientLog.LOG_COMPONENTID, guidVSol).build();
+            Builder(ClientLog.LOG_CLIENT_VERSION, source, ClientLog.LOG_COMPONENTID, guidVSol).build();
     mAnalytics = new OTKAnalytics(mAnalyticsData);
     mAnalytics.enableConsoleLog(false);
 
     mAnalyticsData.setSessionId(getOTConfig().getSessionId());
     mAnalyticsData.setPartnerId(getOTConfig().getApiKey());
-    mAnalytics. setData(mAnalyticsData);
+    mAnalytics.setData(mAnalyticsData);
   }
 
-  private void addLogEvent(String action, String variation){
-    if ( mAnalytics!= null ) {
+  private void addLogEvent(String action, String variation) {
+    if (mAnalytics != null) {
       mAnalytics.logEvent(action, variation);
     }
   }
@@ -1062,18 +1080,18 @@ public class OTWrapper {
       mAnalyticsData.setConnectionId(mSessionConnection.getConnectionId());
       mAnalytics.setData(mAnalyticsData);
       LOG.d(LOG_TAG, "onConnected: ", mSessionConnection.getData(),
-        ". listeners: ", mBasicListeners );
+              ". listeners: ", mBasicListeners);
       addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_SUCCESS);
 
       mConnectionsCount++;
 
       publishIfReady();
 
-      if ( mBasicListeners != null ) {
+      if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener)listener).onConnected(SELF, mConnectionsCount,
-                                                         mSessionConnection.getConnectionId(),
-                                                         mSessionConnection.getData());
+          ((RetriableBasicListener) listener).onConnected(SELF, mConnectionsCount,
+                  mSessionConnection.getConnectionId(),
+                  mSessionConnection.getData());
         }
       }
     }
@@ -1090,9 +1108,9 @@ public class OTWrapper {
       }
       if (mBasicListeners != null && mSessionConnection != null) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener)listener).onDisconnected(SELF, 0,
-                                                            mSessionConnection.getConnectionId(),
-                                                            mSessionConnection.getData());
+          ((RetriableBasicListener) listener).onDisconnected(SELF, 0,
+                  mSessionConnection.getConnectionId(),
+                  mSessionConnection.getData());
         }
       }
       cleanup();
@@ -1102,7 +1120,7 @@ public class OTWrapper {
     public void onStreamReceived(Session session, Stream stream) {
       LOG.d(LOG_TAG, "OnStreamReceived: ", stream.getConnection().getData());
 
-      if ( mStreams != null ) {
+      if (mStreams != null) {
         mStreams.put(stream.getStreamId(), stream);
       }
       if (mOTConfig.shouldSubscribeAutomatically()) {
@@ -1121,16 +1139,16 @@ public class OTWrapper {
       LOG.d(LOG_TAG, "OnStreamDropped: ", stream.getConnection().getData());
 
       String subId = stream.getStreamId();
-      if ( mStreams.containsKey(subId) ) {
+      if (mStreams.containsKey(subId)) {
         mStreams.remove(stream.getStreamId());
       }
-      if ( mSubscribers.containsKey(subId) ) {
+      if (mSubscribers.containsKey(subId)) {
         mSubscribers.remove(stream.getStreamId());
       }
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener)listener).onRemoteLeft(SELF, subId);
-          ((RetriableBasicListener)listener).onRemoteViewDestroyed(SELF, null, subId);
+          ((RetriableBasicListener) listener).onRemoteLeft(SELF, subId);
+          ((RetriableBasicListener) listener).onRemoteViewDestroyed(SELF, null, subId);
         }
       }
     }
@@ -1138,16 +1156,15 @@ public class OTWrapper {
     @Override
     public void onError(Session session, OpentokError opentokError) {
       LOG.e(LOG_TAG, "Session: onError ", opentokError.getMessage());
-      if (getOwnConnId() != null ) {
+      if (getOwnConnId() != null) {
         addLogEvent(ClientLog.LOG_ACTION_DISCONNECT, ClientLog.LOG_VARIATION_ERROR);
-      }
-      else {
+      } else {
         addLogEvent(ClientLog.LOG_ACTION_CONNECT, ClientLog.LOG_VARIATION_ERROR);
       }
       cleanup();
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener)listener).onError(SELF, opentokError);
+          ((RetriableBasicListener) listener).onError(SELF, opentokError);
         }
       }
     }
@@ -1165,8 +1182,8 @@ public class OTWrapper {
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
           ((RetriableBasicListener) listener).onConnected(SELF, mConnectionsCount,
-                                                          connection.getConnectionId(),
-                                                          connection.getData());
+                  connection.getConnectionId(),
+                  connection.getData());
         }
       }
     }
@@ -1182,82 +1199,94 @@ public class OTWrapper {
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
           ((RetriableBasicListener) listener).onDisconnected(SELF, mConnectionsCount,
-                                                             connection.getConnectionId(),
-                                                             connection.getData());
+                  connection.getConnectionId(),
+                  connection.getData());
         }
       }
     }
   };
 
   private SubscriberKit.SubscriberListener mSubscriberListener =
-    new SubscriberKit.SubscriberListener() {
-      @Override
-      public void onConnected(SubscriberKit sub) {
-        LOG.i(LOG_TAG, "Subscriber is connected");
-        addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_SUCCESS);
+          new SubscriberKit.SubscriberListener() {
+            @Override
+            public void onConnected(SubscriberKit sub) {
+              LOG.i(LOG_TAG, "Subscriber is connected");
+              addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_SUCCESS);
 
-        if (mBasicListeners != null) {
-          for (BasicListener listener : mBasicListeners) {
-            Stream stream = sub.getStream();
-            ((RetriableBasicListener) listener).
-              onRemoteViewReady(SELF, sub.getView(), stream.getStreamId(),
-                                stream.getConnection().getData());
-          }
-        }
-      }
-
-      @Override
-      public void onDisconnected(SubscriberKit sub) {
-        addLogEvent(ClientLog.LOG_ACTION_REMOVE_REMOTE, ClientLog.LOG_VARIATION_SUCCESS);
-
-        if (mBasicListeners != null) {
-          for (BasicListener listener : mBasicListeners) {
-            ((RetriableBasicListener) listener).
-                    onRemoteViewDestroyed(SELF, null, sub.getStream().getStreamId());
-          }
-        }
-      }
-
-      @Override
-      public void onError(SubscriberKit subscriberKit, OpentokError opentokError) {
-        LOG.e(LOG_TAG, "Subscriber: onError ", opentokError.getErrorCode(), ", ",
-          opentokError.getMessage());
-        String id = subscriberKit.getStream().getStreamId();
-        OpentokError.ErrorCode errorCode = opentokError.getErrorCode();
-        switch (errorCode) {
-          case SubscriberInternalError:
-            //TODO: Add client logs for the different subscribers errors
-            LOG.e(LOG_TAG, "Subscriber error: SubscriberInternalError");
-            mSubscribers.remove(id);
-          case ConnectionTimedOut:
-            addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ERROR);
-            // Just try again
-            if ( mSession != null ) {
-              addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT);
-              mSession.subscribe(subscriberKit);
-            }
-            break;
-          case SubscriberWebRTCError:
-            LOG.e(LOG_TAG, "Subscriber error: SubscriberWebRTCError");
-            mSubscribers.remove(id);
-          case SubscriberServerCannotFindStream:
-            LOG.e(LOG_TAG, "Subscriber error: SubscriberServerCannotFindStream");
-            mSubscribers.remove(id);
-            break;
-          default:
-            LOG.e(LOG_TAG, "Subscriber error: default ");
-            mSubscribers.remove(id);
-            if (!mStreams.containsKey(id)){
-              mStreams.put(id, subscriberKit.getStream());
+              if (mBasicListeners != null) {
+                for (BasicListener listener : mBasicListeners) {
+                  Stream stream = sub.getStream();
+                  ((RetriableBasicListener) listener).
+                          onRemoteViewReady(SELF, sub.getView(), stream.getStreamId(),
+                                  stream.getConnection().getData());
+                }
+              }
             }
 
-            for (BasicListener listener : mBasicListeners) {
-              ((RetriableBasicListener) listener).onError(SELF, opentokError);
+            @Override
+            public void onDisconnected(SubscriberKit sub) {
+              addLogEvent(ClientLog.LOG_ACTION_REMOVE_REMOTE, ClientLog.LOG_VARIATION_SUCCESS);
+
+              if (mBasicListeners != null) {
+                for (BasicListener listener : mBasicListeners) {
+                  ((RetriableBasicListener) listener).
+                          onRemoteViewDestroyed(SELF, null, sub.getStream().getStreamId());
+                }
+              }
             }
-            break;
-        }
-      }
-    };
+
+            @Override
+            public void onError(SubscriberKit subscriberKit, OpentokError opentokError) {
+              LOG.e(LOG_TAG, "Subscriber: onError ", opentokError.getErrorCode(), ", ",
+                      opentokError.getMessage());
+              String id = subscriberKit.getStream().getStreamId();
+              OpentokError.ErrorCode errorCode = opentokError.getErrorCode();
+              switch (errorCode) {
+                case SubscriberInternalError:
+                  //TODO: Add client logs for the different subscribers errors
+                  LOG.e(LOG_TAG, "Subscriber error: SubscriberInternalError");
+                  mSubscribers.remove(id);
+                case ConnectionTimedOut:
+                  addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ERROR);
+                  // Just try again
+                  if (mSession != null) {
+                    addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT);
+                    mSession.subscribe(subscriberKit);
+                  }
+                  break;
+                case SubscriberWebRTCError:
+                  LOG.e(LOG_TAG, "Subscriber error: SubscriberWebRTCError");
+                  mSubscribers.remove(id);
+                case SubscriberServerCannotFindStream:
+                  LOG.e(LOG_TAG, "Subscriber error: SubscriberServerCannotFindStream");
+                  mSubscribers.remove(id);
+                  break;
+                default:
+                  LOG.e(LOG_TAG, "Subscriber error: default ");
+                  mSubscribers.remove(id);
+                  if (!mStreams.containsKey(id)) {
+                    mStreams.put(id, subscriberKit.getStream());
+                  }
+
+                  for (BasicListener listener : mBasicListeners) {
+                    ((RetriableBasicListener) listener).onError(SELF, opentokError);
+                  }
+                  break;
+              }
+            }
+          };
+
+  private SubscriberKit.AudioLevelListener mSubscriberAudioLevelUpdated =
+          new SubscriberKit.AudioLevelListener() {
+              @Override
+              public void onAudioLevelUpdated(SubscriberKit subscriberKit, float level) {
+                if ( mAdvancedListeners != null ) {
+                  for (AdvancedListener listener : mAdvancedListeners) {
+                    ((RetriableAdvancedListener) listener).onRemoteAudioLevelUpdated(SELF, subscriberKit.getStream().getStreamId(), level);
+                  }
+                }
+              }
+  };
 
   private Publisher.PublisherListener mPublisherListener = new Publisher.PublisherListener() {
 
@@ -1430,6 +1459,18 @@ public class OTWrapper {
       if ( mAdvancedListeners != null ) {
         for (AdvancedListener listener : mAdvancedListeners) {
           ((RetriableAdvancedListener) listener).onError(SELF, opentokError);
+        }
+      }
+    }
+  };
+
+  private Publisher.AudioLevelListener mPublisherAudioLevelListener = new Publisher.AudioLevelListener() {
+
+    @Override
+    public void onAudioLevelUpdated(PublisherKit publisherKit, float level) {
+      if ( mAdvancedListeners != null ) {
+        for (AdvancedListener listener : mAdvancedListeners) {
+          ((RetriableAdvancedListener) listener).onPreviewAudioLevelUpdated(SELF, level);
         }
       }
     }

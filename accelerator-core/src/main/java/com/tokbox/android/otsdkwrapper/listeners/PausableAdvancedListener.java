@@ -3,6 +3,7 @@ package com.tokbox.android.otsdkwrapper.listeners;
 import android.os.Handler;
 
 import com.opentok.android.OpentokError;
+import com.opentok.android.PublisherKit;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -102,6 +103,26 @@ public class PausableAdvancedListener<Wrapper> implements RetriableAdvancedListe
             @Override
             public void run() throws ListenerException {
                 mUnderlyingListener.onError(wrapper, error);
+            }
+        });
+    }
+
+    @Override
+    public void onPreviewAudioLevelUpdated(final Wrapper wrapper, final float level) {
+        runUIListenerTask(new ListenerTask() {
+            @Override
+            public void run() throws ListenerException {
+                mUnderlyingListener.onPreviewAudioLevelUpdated(wrapper, level);
+            }
+        });
+    }
+
+    @Override
+    public void onRemoteAudioLevelUpdated(final Wrapper wrapper, final String remoteId, final float level) {
+        runUIListenerTask(new ListenerTask() {
+            @Override
+            public void run() throws ListenerException {
+                mUnderlyingListener.onRemoteAudioLevelUpdated(wrapper, remoteId, level);
             }
         });
     }

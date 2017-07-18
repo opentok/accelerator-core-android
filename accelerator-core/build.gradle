@@ -3,14 +3,14 @@ apply plugin: 'maven'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0.15"
+        versionName "1.0.16"
         project.archivesBaseName = "opentok-accelerator-core"
-        project.version = "1.0.15"
+        project.version = "1.0.16"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -58,9 +58,10 @@ android {
 dependencies {
     repositories {
         maven { url 'http://tokbox.bintray.com/maven' }
+        maven { url "https://maven.google.com" }
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.4.0'
     compile 'com.opentok.android:opentok-solutions-logging:+'
     compile 'com.opentok.android:opentok-android-sdk:2.11.+'
 }

@@ -3,6 +3,7 @@ package com.tokbox.android.otsdkwrapper.listeners;
 import android.util.Log;
 
 import com.opentok.android.OpentokError;
+import com.opentok.android.PublisherKit;
 
 public class UnfailingAdvancedListener<Wrapper> implements RetriableAdvancedListener<Wrapper> {
 
@@ -85,6 +86,28 @@ public class UnfailingAdvancedListener<Wrapper> implements RetriableAdvancedList
             }
         } catch (ListenerException e) {
             Log.d(LOG_TAG, "onError Exception: ", e);
+        }
+    }
+
+    @Override
+    public void onPreviewAudioLevelUpdated(Wrapper wrapper, float level) {
+        try {
+            if (mInternalListener != null) {
+                mInternalListener.onPreviewAudioLevelUpdated(wrapper, level);
+            }
+        } catch (ListenerException e) {
+            Log.d(LOG_TAG, "onPreviewAudioLevelUpdated Exception: ", e);
+        }
+    }
+
+    @Override
+    public void onRemoteAudioLevelUpdated(Wrapper wrapper, String remoteId, float level) {
+        try {
+            if (mInternalListener != null) {
+                mInternalListener.onRemoteAudioLevelUpdated(wrapper, remoteId, level);
+            }
+        } catch (ListenerException e) {
+            Log.d(LOG_TAG, "onRemoteAudioLevelUpdated Exception: ", e);
         }
     }
 
