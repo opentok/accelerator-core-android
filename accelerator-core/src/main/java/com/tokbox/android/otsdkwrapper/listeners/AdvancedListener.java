@@ -70,6 +70,7 @@ public interface AdvancedListener<Wrapper> extends BaseOTListener {
      * Invoked when there are changes in the audio level of the publisher.
      * @param wrapper
      * @param level
+     * @param remoteId
      * @throws ListenerException
      */
     void onRemoteAudioLevelUpdated(Wrapper wrapper, String remoteId, float level) throws ListenerException;
