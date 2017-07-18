@@ -1,6 +1,7 @@
 package com.tokbox.android.otsdkwrapper.listeners;
 
 import com.opentok.android.OpentokError;
+import com.opentok.android.PublisherKit;
 
 /**
  * Monitors advanced state changes in the OpenTok communication.
@@ -56,4 +57,20 @@ public interface AdvancedListener<Wrapper> extends BaseOTListener {
      * @throws ListenerException
      */
     void onError(Wrapper wrapper, OpentokError error) throws ListenerException;
+
+    /**
+     * Invoked when there are changes in the audio level of the publisher.
+     * @param wrapper
+     * @param level
+     * @throws ListenerException
+     */
+    void onPreviewAudioLevelUpdated(Wrapper wrapper, float level) throws ListenerException;
+
+    /**
+     * Invoked when there are changes in the audio level of the publisher.
+     * @param wrapper
+     * @param level
+     * @throws ListenerException
+     */
+    void onRemoteAudioLevelUpdated(Wrapper wrapper, String remoteId, float level) throws ListenerException;
 }
