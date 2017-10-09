@@ -1,16 +1,11 @@
 ![logo](tokbox-logo.png)
 
-#Accelerator Core Android
+# Accelerator Core Android &nbsp; [![GitHub version](https://badge.fury.io/gh/opentok%2Faccelerator-core-android.svg)](https://badge.fury.io/gh/opentok%2Faccelerator-core-android) [![Build Status](https://travis-ci.org/opentok/accelerator-core-android.svg?branch=master)](https://travis-ci.org/opentok/accelerator-core-android) [![license MIT](https://img.shields.io/github/license/opentok/accelerator-core-android.svg)](./.github/LICENSE)
 
-[![Build Status](https://travis-ci.org/opentok/accelerator-core-android.svg?branch=master)](https://travis-ci.org/opentok/accelerator-core-android)
-[![GitHub release](https://img.shields.io/github/release/opentok/accelerator-core-android.svg)](./README.md)
-[![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./.github/LICENSE)
-
-
-##Quickstart
+## Quickstart
 The Accelerator Core Android library gives you an easy way to integrate [OpenTok SDK](https://tokbox.com) to any Android applications.
 
-##Installation
+## Installation
 
   - [Using the repository](#using-the-repository)
   - [Using Maven](#using-maven)
@@ -32,7 +27,7 @@ compile project(':accelerator-core-android')
 
 Download it from http://tokbox.bintray.com/maven. For example:
 
-a) Edit the build.gradle for your project and add the following code snippet to the allprojects/repositiories section:
+a) Edit the build.gradle for your project and add the following code snippet to the allprojects/repositories section:
 
   ```
   maven { url  "http://tokbox.bintray.com/maven" }
@@ -44,7 +39,7 @@ b) Modify build.gradle for your module and add the following code snippet to the
   compile 'com.opentok.android:opentok-accelerator-core:1.0.+’
   ```
 
-##Exploring the Code
+## Exploring the Code
 
 For detail about the APIs used to develop this library, see the [OpenTok Android SDK Reference](https://tokbox.com/developer/sdks/android/reference/) and [Android API Reference](http://developer.android.com/reference/packages.html).
 
@@ -66,12 +61,12 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 | `ScreenSharingCapturer` | Custom screen sharing capturer. In the absence of a custom or default camera capturer, `Core Android` will generate one using the full screen as the capturer. |
 | `ScreenSharingFragment` | Headless fragment used to implement the screensharing feature by default. |
 
-##Using Accelerator Core Android
+## Using Accelerator Core Android
 
 You can start testing a basic multiparty  application using the Accelerator Core with best-practices for Android.
  - [OpenTok Accelerator Sample Application](https://github.com/opentok/accelerator-sample-apps-android).
 
-###Initialization
+### Initialization
 
 The first step in using the OTWrapper is to initialize it by calling the constructor with the OpenTokConfig parameter.
 
@@ -84,12 +79,12 @@ The first step in using the OTWrapper is to initialize it by calling the constru
 
 ```
 
-####Obtaining OpenTok Credentials
+#### Obtaining OpenTok Credentials
 
 To use OpenTok's framework you need a Session ID, Token, and API Key you can get these values at the [OpenTok Developer Dashboard](https://dashboard.tokbox.com/) . For production deployment, you must generate the Session ID and Token values using one of the [OpenTok Server SDKs](https://tokbox.com/developer/sdks/server/).
 
 
-###Set and define listeners
+### Set and define listeners
 
 ```java
 
@@ -109,7 +104,7 @@ To use OpenTok's framework you need a Session ID, Token, and API Key you can get
         });
 ```
 
-###Connect and disconnect from an OpenTok session
+### Connect and disconnect from an OpenTok session
 
 Call to connect or disconnect from an OpenTok session. When the OTWrapper is connected, the BasicListener.onConnected(...) event is called.
 If the OTWrapper failed to connect, the BasicListener.onError(...) event is called.
@@ -151,7 +146,7 @@ To check if the new connection is our own connection or not, use OTWrapper.getOw
 ```
 
 
-###Start and stop preview
+### Start and stop preview
 
 Call to start and stop displaying the camera's video in the Preview's view before it starts streaming video. Therefore, the other participants are not going to receive this video stream.
 
@@ -185,7 +180,7 @@ When the OTWrapper started the preview, the BasicListener.onPreviewViewReady(...
   });
 ```
 
-###Start and stop publishing media
+### Start and stop publishing media
 
 Call to start and stop the local streaming video. The source of the stream can be the camera or the screen. To indicate the screen source, it is necessary to set the screensharing parameter to TRUE.
 
@@ -224,7 +219,7 @@ When the OTWrapper started the publishing media, the BasicListener.onStartedPubl
   });
 ```
 
-###Remote participants management
+### Remote participants management
 
 To subscribe automatically to a new participant connected to the session, the `subscribeAutomatically` property in the OTConfig has to be TRUE.
 Then, when a new remote participant connected to the session, the BasicListener.onRemoteJoined(...) event is called. And the BasicListener.onRemoteLeft(...) event is called. These callbacks contain the identifier for the remote participant, which is equals to the stream id of them.
@@ -266,10 +261,10 @@ When the remote participant view is ready, the BasicListener.onRemoteViewReady(.
     });
 ```
 
-###Pause and resume communication
+### Pause and resume communication
 
 Call these methods when the app's activity pauses or resumes. These pause or resume the video for the local preview and remotes.
-The Accelerator Core offers the posibility to resume the events setting the `resumeEvents` parameter to TRUE in the `resume` method.
+The Accelerator Core offers the possibility to resume the events setting the `resumeEvents` parameter to TRUE in the `resume` method.
 
 ```java
   mWrapper.pause();
@@ -279,7 +274,7 @@ The Accelerator Core offers the posibility to resume the events setting the `res
   mWrapper.resume(true);  
 ```
 
-###Connections management
+### Connections management
 
 The Accelerator Core offers a set of methods to manage the connections of the session.
 
@@ -298,7 +293,7 @@ The Accelerator Core offers a set of methods to manage the connections of the se
 
 ```
 
-###Enable and disable the publishing and receiving media
+### Enable and disable the publishing and receiving media
 
 To enable or disable the publishing audio or video.
 
@@ -317,7 +312,8 @@ To enable or disable the publishing audio or video.
 
 ```
 
-###Get stream status
+### Get stream status
+
 The status of a stream includes the media status, the stream type, the status of the media containers and the stream dimensions.
 
 ```java
@@ -329,7 +325,8 @@ The status of a stream includes the media status, the stream type, the status of
 
 ```
 
-###Signals Management
+### Signals Management
+
 The Accelerator Core includes a complete Signaling protocol to register a signal listener for a given type.
 
 ```java
@@ -349,7 +346,8 @@ The Accelerator Core includes a complete Signaling protocol to register a signal
 
 ```
 
-###Customize capturer and renderers
+### Customize capturer and renderers
+
 A custom video capturer or renderer can be used in the OpenTok communication for the publishing media.
 
 ```java
@@ -376,7 +374,8 @@ A custom video renderer can be used in the OpenTok communication for the receive
   mWrapper.setRemoteScreenRenderer(myCustomRenderer);
 ```
 
-###Set Video Renderer styles
+### Set Video Renderer styles
+
 The video scale mode can be modified to FILL or FIT value for the publishing video or for the received video from the remotes.
 
 ```java
@@ -384,14 +383,16 @@ The video scale mode can be modified to FILL or FIT value for the publishing vid
 	mWrapper.setRemoteStyle(remoteId, VideoScale.FILL);
 ```
 
-###Cycle the camera
+### Cycle the camera
+
 Cycle between cameras, if there are multiple cameras on the device. Then, the AdvancedListener.onCameraChanged(...) event is called.
 
 ```java
 	mWrapper.cycleCamera();
 ```
 
-###Advanced events
+### Advanced events
+
 The SDK Wrapper include an AdvancedListener to define some events like when the video changed by quality reasons, or when the communication tries to reconnect,...etc.
 
 ```java
@@ -422,7 +423,7 @@ The SDK Wrapper include an AdvancedListener to define some events like when the 
     });
 ```
 
-###Screensharing
+### Screensharing
 
 According to [start and stop publishing media](#start-and-stop-publishing-media), you can start screensharing using OTWrapper
 
@@ -438,7 +439,7 @@ mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
                        name("Tokboxer”).capturer(myCapturer).build(), true);
 ```
 
-###Using OTAcceleratorSession
+### Using OTAcceleratorSession
 
 The Accelerator Core library uses the `OTAcceleratorSession` to manage the OpenTok Session. This class lets you have several Session listeners and manage the signalling in the lib.
 

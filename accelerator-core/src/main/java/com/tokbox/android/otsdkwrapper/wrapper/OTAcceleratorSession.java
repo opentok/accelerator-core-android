@@ -23,6 +23,8 @@ import java.util.Iterator;
  * Represents an OpenTok Session
  */
 public class OTAcceleratorSession extends Session {
+    Hashtable<String, Connection> connections = new Hashtable<String, Connection>();
+
     private final String LOG_TAG = this.getClass().getSimpleName();
     private static final short LOCAL_LOG_LEVEL = 0xFF;
     private static final LogWrapper LOG =
@@ -224,7 +226,11 @@ public class OTAcceleratorSession extends Session {
     private Callback<SignalInfo> mInternalSendSignal = new Callback<SignalInfo>() {
         @Override
         public void run(SignalInfo signalInfo) {
-            internalSendSignal(signalInfo, null); //TODO-MARINAS: Fix dst connection is not null
+            Connection connection = null;
+            if (signalInfo.mDstConnId != null) {
+                connection = connections.get(signalInfo.mDstConnId);
+            }
+            internalSendSignal(signalInfo, connection);
         }
     };
 

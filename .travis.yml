@@ -4,8 +4,8 @@ android:
   components:
   - platform-tools
   - tools
-  - build-tools-25.0.1
-  - android-25
+  - build-tools-26.0.2
+  - android-26
   - add-on
   - extra-android-m2repository
 before_script:
@@ -17,11 +17,11 @@ before_script:
 script:
 - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" ]]; then
     ./gradlew uploadArchives -PMAVEN_USERNAME=$MAVEN_USERNAME -PMAVEN_PASSWORD=$MAVEN_PASSWORD;
-    PRINTVERSION=$(./gradlew -q printVersionRelease)
-    LEN=$(echo $((${#PRINTVERSION} / 2)))
-    VERSION=$(echo $PRINTVERSION | cut -c -$LEN)
+    PRINTVERSION=$(./gradlew -q printVersionRelease);
+    LEN=$(echo $((${#PRINTVERSION} / 2)));
+    VERSION=$(echo $PRINTVERSION | cut -c -$LEN);
     git tag v$VERSION;
-    git push --quiet https://$GITHUBKEY@github.com/opentok/accelerator-core-android v$VERSION
+    git push --quiet https://$GITHUBKEY@github.com/opentok/accelerator-core-android v$VERSION;
   else
     ./gradlew build;
   fi
