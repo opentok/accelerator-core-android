@@ -2,20 +2,22 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    def acceleratorCoreVersion = '\"1.0.17\"'
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
-        versionName "1.0.15"
+        versionName "1.0.17"
         project.archivesBaseName = "opentok-accelerator-core"
-        project.version = "1.0.15"
+        project.version = {acceleratorCoreVersion}
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
+            buildConfigField "String", "acceleratorCoreVersion", acceleratorCoreVersion
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -57,15 +59,16 @@ android {
 }
 dependencies {
     repositories {
+        maven { url 'https://maven.google.com' }
         maven { url 'http://tokbox.bintray.com/maven' }
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.opentok.android:opentok-solutions-logging:+'
     if (isPreview()) {
         compile 'com.opentok.android:opentok-android-sdk-preview:2.13.+'
     } else {
-        compile 'com.opentok.android:opentok-android-sdk:2.11.+'
+        compile 'com.opentok.android:opentok-android-sdk:2.12.0'
     }
 }
 
