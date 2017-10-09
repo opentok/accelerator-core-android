@@ -62,20 +62,24 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.opentok.android:opentok-solutions-logging:+'
-    compile 'com.opentok.android:opentok-android-sdk:2.11.+'
+    if (isPreview()) {
+        compile 'com.opentok.android:opentok-android-sdk-preview:2.13.+'
+    } else {
+        compile 'com.opentok.android:opentok-android-sdk:2.11.+'
+    }
 }
 
 if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD")) {
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: "https://api.bintray.com/maven/tokbox/maven/${ARTIFACT_ID}/;publish=1") {
+                repository(url: "https://api.bintray.com/maven/tokbox/maven/" + getArtifactId() + "/;publish=1") {
                     authentication(userName: "$MAVEN_USERNAME" ? "$MAVEN_USERNAME" : "", password: "$MAVEN_PASSWORD" ? "$MAVEN_PASSWORD" : "")
                 }
                 def (revision, buildTime) = getRevisionAndTime()
                 pom.version = "${version}"
                 pom.groupId = 'com.opentok.android'
-                pom.artifactId = "${ARTIFACT_ID}"
+                pom.artifactId = getArtifactId()
             }
         }
    }
@@ -97,4 +101,17 @@ def getRevisionAndTime() {
     TimeZone.setDefault(TimeZone.getTimeZone('PST'))
     def formattedDate = date.format('yyyyMMddHHmmss')
     return ["${hash}".toString(), formattedDate.toString()]
+}
+
+def isEnvVarNotEmptyOrNull(envVar) {
+    def value = System.getenv(envVar)
+    return value != null && !value.isEmpty()
+}
+
+def isPreview() {
+    return isEnvVarNotEmptyOrNull("PREVIEW") && '1'.equals(System.getenv('PREVIEW'));
+}
+
+def getArtifactId() {
+    return isPreview() ? "${PREVIEW_ARTIFACT_ID}" : "${ARTIFACT_ID}"
 }
