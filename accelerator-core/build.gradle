@@ -17,7 +17,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            buildConfigField "String", "acceleratorCoreVersion", acceleratorCoreVersion
+            buildConfigField 'String', 'acceleratorCoreVersion', acceleratorCoreVersion
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
