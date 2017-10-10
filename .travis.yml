@@ -24,7 +24,7 @@ script:
     git tag v$VERSION;
     git push --quiet https://$GITHUBKEY@github.com/opentok/accelerator-core-android v$VERSION;
   else
-    ./gradlew build;
+    ./gradlew assembleRelease;
   fi
 notifications:
   slack:
