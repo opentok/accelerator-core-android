@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    def acceleratorCoreVersion = '\"1.0.17\"'
+    def acceleratorCoreVersion = '1.0.17'
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
     defaultConfig {
@@ -11,13 +11,13 @@ android {
         versionCode 1
         versionName "1.0.17"
         project.archivesBaseName = "opentok-accelerator-core"
-        project.version = {acceleratorCoreVersion}
+        project.version = acceleratorCoreVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
-            buildConfigField 'String', 'acceleratorCoreVersion', acceleratorCoreVersion
+            buildConfigField 'String', 'acceleratorCoreVersion', '\"'+acceleratorCoreVersion+'\"'
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
