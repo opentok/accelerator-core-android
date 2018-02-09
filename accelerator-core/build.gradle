@@ -57,6 +57,9 @@ android {
         zipBundle.dependsOn javadoc
     }
 }
+ext.sdkVersion = 2.13
+ext.previewVersion = sdkVersion+0.01
+
 dependencies {
     repositories {
         maven { url 'https://maven.google.com' }
@@ -66,9 +69,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.opentok.android:opentok-solutions-logging:+'
     if (isPreview()) {
-        compile 'com.opentok.android:opentok-android-sdk-preview:2.14.+'
+        compile "com.opentok.android:opentok-android-sdk-preview:$previewVersion.+"
     } else {
-        compile 'com.opentok.android:opentok-android-sdk:2.13.+'
+        compile "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
     }
 }
 
