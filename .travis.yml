@@ -9,6 +9,8 @@ android:
   - add-on
   - extra-android-m2repository
   - extra-google-m2repository
+before_install:
+- yes | sdkmanager "platforms;android-27"
 before_script:
 - wget http://services.gradle.org/distributions/gradle-4.1-bin.zip
 - unzip gradle-4.1-bin.zip
