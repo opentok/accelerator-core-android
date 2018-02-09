@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    def acceleratorCoreVersion = '1.0.18'
+    def acceleratorCoreVersion = '1.0.19'
     compileSdkVersion 27
     buildToolsVersion "27.0.2"
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0.18"
+        versionName "1.0.19"
         project.archivesBaseName = "opentok-accelerator-core"
         project.version = acceleratorCoreVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -27,11 +27,11 @@ android {
         disable 'OldTargetApi'
     }
     libraryVariants.all { variant ->
-        variant.outputs.each { output ->
-            def outputFile = output.outputFile
-            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+        variant.outputs.all { output ->
+            def outputFile = outputFileName
+            if (outputFile != null && outputFile.endsWith('.aar')) {
                 def fileName = "${archivesBaseName}-${version}.aar"
-                output.outputFile = new File(outputFile.parent, fileName)
+                outputFileName = new File(outputFile, fileName)
             }
         }
         def javadoc = task("generateJavaDoc${variant.name.capitalize()}", type: Javadoc, dependsOn: "generate${variant.name.capitalize()}Sources") {
@@ -66,9 +66,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.opentok.android:opentok-solutions-logging:+'
     if (isPreview()) {
-        compile 'com.opentok.android:opentok-android-sdk-preview:2.13.+'
+        compile 'com.opentok.android:opentok-android-sdk-preview:2.14.+'
     } else {
-        compile 'com.opentok.android:opentok-android-sdk:2.12.1'
+        compile 'com.opentok.android:opentok-android-sdk:2.13.+'
     }
 }
 
