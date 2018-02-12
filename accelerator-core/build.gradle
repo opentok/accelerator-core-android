@@ -2,22 +2,22 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    def acceleratorCoreVersion = '\"1.0.17\"'
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    def acceleratorCoreVersion = '1.0.19'
+    compileSdkVersion 27
+    buildToolsVersion "27.0.2"
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
-        versionName "1.0.17"
+        versionName "1.0.19"
         project.archivesBaseName = "opentok-accelerator-core"
-        project.version = {acceleratorCoreVersion}
+        project.version = acceleratorCoreVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
-            buildConfigField "String", "acceleratorCoreVersion", acceleratorCoreVersion
+            buildConfigField 'String', 'acceleratorCoreVersion', '\"'+acceleratorCoreVersion+'\"'
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -27,11 +27,11 @@ android {
         disable 'OldTargetApi'
     }
     libraryVariants.all { variant ->
-        variant.outputs.each { output ->
-            def outputFile = output.outputFile
-            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+        variant.outputs.all { output ->
+            def outputFile = outputFileName
+            if (outputFile != null && outputFile.endsWith('.aar')) {
                 def fileName = "${archivesBaseName}-${version}.aar"
-                output.outputFile = new File(outputFile.parent, fileName)
+                outputFileName = new File(outputFile, fileName)
             }
         }
         def javadoc = task("generateJavaDoc${variant.name.capitalize()}", type: Javadoc, dependsOn: "generate${variant.name.capitalize()}Sources") {
@@ -57,18 +57,21 @@ android {
         zipBundle.dependsOn javadoc
     }
 }
+ext.sdkVersion = 2.13
+ext.previewVersion = sdkVersion+0.01
+
 dependencies {
     repositories {
         maven { url 'https://maven.google.com' }
         maven { url 'http://tokbox.bintray.com/maven' }
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.opentok.android:opentok-solutions-logging:+'
     if (isPreview()) {
-        compile 'com.opentok.android:opentok-android-sdk-preview:2.13.+'
+        compile "com.opentok.android:opentok-android-sdk-preview:$previewVersion.+"
     } else {
-        compile 'com.opentok.android:opentok-android-sdk:2.12.0'
+        compile "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
     }
 }
 
