@@ -454,11 +454,11 @@ public class OTWrapper {
     mSubscribers.put(subId, sub);
     sub.setSubscriberListener(mSubscriberListener);
 
-    if (stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeCamera &&
+    if (stream != null && stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeCamera &&
             mVideoRemoteRenderer != null) {
       sub.setRenderer(mVideoRemoteRenderer);
     } else {
-      if (stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeScreen &&
+      if (stream != null && stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeScreen &&
               mScreenRemoteRenderer != null) {
         sub.setRenderer(mScreenRemoteRenderer);
       }
@@ -1304,7 +1304,7 @@ public class OTWrapper {
       LOG.e(LOG_TAG, "Publisher: onError ", opentokError.getErrorCode(), ", ",
         opentokError.getMessage());
       OpentokError.ErrorCode errorCode = opentokError.getErrorCode();
-      if (publisherKit.getStream().getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeCamera) {
+      if (publisherKit.getStream() != null && publisherKit.getStream().getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeCamera) {
         addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ERROR);
       }
       else {
@@ -1319,7 +1319,7 @@ public class OTWrapper {
         case PublisherTimeout:
           //re-try publishing
           if ( mSession != null ) {
-            if (publisherKit.getStream().getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeCamera) {
+            if (publisherKit.getStream() != null && publisherKit.getStream().getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeCamera) {
               addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
             }
             else {
