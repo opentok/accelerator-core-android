@@ -58,7 +58,6 @@ android {
     }
 }
 ext.sdkVersion = 2.14
-ext.previewVersion = sdkVersion+0.01
 
 dependencies {
     repositories {
@@ -68,11 +67,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.opentok.android:opentok-solutions-logging:+'
-    if (isPreview()) {
-        compile "com.opentok.android:opentok-android-sdk-preview:$previewVersion.+"
-    } else {
-        compile "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
-    }
+    compile "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
 }
 
 if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD")) {
