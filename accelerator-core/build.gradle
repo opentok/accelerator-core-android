@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    def acceleratorCoreVersion = '1.0.20'
+    def acceleratorCoreVersion = '1.0.21'
     compileSdkVersion 27
     buildToolsVersion "27.0.2"
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0.20"
+        versionName "1.0.21"
         project.archivesBaseName = "opentok-accelerator-core"
         project.version = acceleratorCoreVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -57,8 +57,7 @@ android {
         zipBundle.dependsOn javadoc
     }
 }
-ext.sdkVersion = 2.13
-ext.previewVersion = sdkVersion+0.01
+ext.sdkVersion = 2.14
 
 dependencies {
     repositories {
@@ -68,11 +67,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.opentok.android:opentok-solutions-logging:+'
-    if (isPreview()) {
-        compile "com.opentok.android:opentok-android-sdk-preview:$previewVersion.+"
-    } else {
-        compile "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
-    }
+    compile "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
 }
 
 if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD")) {
