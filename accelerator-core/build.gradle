@@ -61,7 +61,7 @@ android {
         zipBundle.dependsOn javadoc
     }
 }
-ext.sdkVersion = 2.14
+ext.sdkVersion = 2.16
 
 dependencies {
     repositories {
