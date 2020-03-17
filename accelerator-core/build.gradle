@@ -3,16 +3,16 @@ apply plugin: 'maven'
 
 android {
     def acceleratorCoreVersion = '1.0.21'
-    compileSdkVersion 27
-    buildToolsVersion "27.0.2"
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 29
         versionCode 1
-        versionName "1.0.21"
+        versionName "1.0.22"
         project.archivesBaseName = "opentok-accelerator-core"
         project.version = acceleratorCoreVersion
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -61,17 +61,17 @@ android {
         zipBundle.dependsOn javadoc
     }
 }
-ext.sdkVersion = 2.14
+ext.sdkVersion = '2.16'
 
 dependencies {
     repositories {
         maven { url 'https://maven.google.com' }
         maven { url 'http://tokbox.bintray.com/maven' }
     }
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.opentok.android:opentok-solutions-logging:+'
-    compile "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.opentok.android:opentok-solutions-logging:+'
+    implementation "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
 }
 
 if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD")) {

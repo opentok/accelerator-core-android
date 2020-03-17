@@ -2,7 +2,7 @@ package com.tokbox.android.otsdkwrapper.wrapper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 import android.view.View;
 
 import com.opentok.android.BaseVideoRenderer;
