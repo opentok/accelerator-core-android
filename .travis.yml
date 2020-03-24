@@ -4,13 +4,13 @@ android:
   components:
   - platform-tools
   - tools
-  - build-tools-27.0.2
-  - android-27
+  - build-tools-29.0.2
+  - android-29
   - add-on
   - extra-android-m2repository
   - extra-google-m2repository
 before_install:
-- yes | sdkmanager "platforms;android-27"
+- yes | sdkmanager "platforms;android-29"
 before_script:
 - wget http://services.gradle.org/distributions/gradle-4.1-bin.zip
 - unzip gradle-4.1-bin.zip
