@@ -43,7 +43,6 @@ android {
             classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
             destinationDir = file("build/outputs/docs/")
             title = 'OpenTok Accelerator Core Android'
-            //exclude "**/config/**"
             failOnError false
         }
         def zipBundle = task("zipBundle${variant.name.capitalize()}", type: Zip) {
@@ -51,8 +50,8 @@ android {
             include '**/aar/**'
             include '**/docs/**'
             exclude '**/lint-results-debug_files/**'
-            destinationDir = file(".")
-            archiveName = "${archivesBaseName}-${version}.zip"
+            destinationDirectory = file(".")
+            archiveFileName = "${archivesBaseName}-${version}.zip"
         }
         task("printVersion${variant.name.capitalize()}") {
           println project.version
