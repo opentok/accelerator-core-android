@@ -285,7 +285,7 @@ The Accelerator Core offers a set of methods to manage the connections of the se
 	//get the total connections in the session
 	String totalParticipants = mWrapper.getConnectionsCount();
 
-	//check f the own connection is the oldest in the current session
+	//check if the own connection is the oldest in the current session
 	Boolen isTheOldest = mWrapper.isTheOldestConnection();
 
 	//compare the connections creation times between the local connection and the argument passing
