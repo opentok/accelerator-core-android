@@ -4,7 +4,7 @@ android:
   components:
   - platform-tools
   - tools
-  - build-tools-29.0.2
+  - build-tools-29.0.3
   - android-29
   - add-on
   - extra-android-m2repository
@@ -12,9 +12,9 @@ android:
 before_install:
 - yes | sdkmanager "platforms;android-29"
 before_script:
-- wget https://services.gradle.org/distributions/gradle-6.2-bin.zip
+- wget https://services.gradle.org/distributions/gradle-6.6.1-bin.zip
 - unzip gradle-6.2-bin.zip
-- export GRADLE_HOME=$PWD/gradle-6.2
+- export GRADLE_HOME=$PWD/gradle-6.6.1
 - export PATH=$GRADLE_HOME/bin:$PATH
 - gradle wrapper
 script:
