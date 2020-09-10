@@ -2,6 +2,9 @@ package com.tokbox.android.otsdkwrapper.wrapper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.hardware.Camera;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import androidx.fragment.app.FragmentActivity;
 import android.view.View;
 
@@ -752,6 +755,32 @@ public class OTWrapper {
     if ( mSession != null ){
       mSession.setOutputSignalProtocol(mOutputSignalProtol);
     }
+  }
+
+  /**
+   * Return boolean indicating whatever or nor device has multiple cameras available. This allows you to easily
+   * show/hide "swap camera" button based on current device config.
+   * @return Information about multiple available cameras
+   */
+  public boolean hasMultipleCameras() {
+    Integer numCameras = 0;
+
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+      CameraManager cameraManager;
+      cameraManager = (CameraManager)mContext.getSystemService(Context.CAMERA_SERVICE);
+      try {
+        String[] cameraIds = cameraManager.getCameraIdList();
+        numCameras = cameraIds.length;
+
+      } catch (Exception e) {
+        return false;
+      }
+    } else {
+      Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+      numCameras = Camera.getNumberOfCameras();
+    }
+
+    return numCameras > 1;
   }
 
   /**
