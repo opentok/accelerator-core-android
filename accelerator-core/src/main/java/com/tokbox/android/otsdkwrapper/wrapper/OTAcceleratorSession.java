@@ -220,7 +220,10 @@ public class OTAcceleratorSession extends Session {
     private void dispatchSignal(final SignalInfo signalInfo) {
         LOG.d(LOG_TAG, "Dispatching signal: ", signalInfo.mSignalName, " with: ", signalInfo.mData);
         dispatchSignal(mSignalListeners.get("*"), signalInfo, true);
-        dispatchSignal(mSignalListeners.get(signalInfo.mSignalName), signalInfo, false);
+
+        if(signalInfo.mSignalName != null) {
+            dispatchSignal(mSignalListeners.get(signalInfo.mSignalName), signalInfo, false);
+        }
     }
 
     private Callback<SignalInfo> mInternalSendSignal = new Callback<SignalInfo>() {
