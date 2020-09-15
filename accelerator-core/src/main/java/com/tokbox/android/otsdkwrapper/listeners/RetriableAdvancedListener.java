@@ -24,5 +24,8 @@ public interface RetriableAdvancedListener<Wrapper>
   void onVideoQualityWarningLifted(Wrapper wrapper, String remoteId);
 
   @Override
+  void onAudioLevelUpdated(float audioLevel);
+
+  @Override
   void onError(Wrapper wrapper, OpentokError error);
 }
