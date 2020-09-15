@@ -21,7 +21,7 @@ The Accelerator Core Android library gives you an easy way to integrate [OpenTok
 1. Open the **build.gradle** file for the app and ensure the following lines have been added to the `dependencies` section:
 
 ```gradle
-compile project(':accelerator-core-android')
+implementation project(':accelerator-core-android')
 
 ```
 
@@ -38,7 +38,7 @@ maven { url  "http://tokbox.bintray.com/maven" }
 b) Modify build.gradle for your module and add the following code snippet to the dependencies section:
 
 ```gradle
-compile 'com.opentok.android:opentok-accelerator-core:1.0.+’
+implementation 'com.opentok.android:opentok-accelerator-core:1.0.+’
 ```
 
 ## Exploring the Code
