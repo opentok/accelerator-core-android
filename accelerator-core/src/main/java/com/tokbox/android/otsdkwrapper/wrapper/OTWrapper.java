@@ -99,7 +99,7 @@ public class OTWrapper {
 
   //Signal protocol
   private SignalProtocol mInputSignalProtocol;
-  private SignalProtocol mOutputSignalProtol;
+  private SignalProtocol mOutputSignalProtocol;
 
   //Analytics for internal use
   private OTKAnalyticsData mAnalyticsData;
@@ -175,8 +175,8 @@ public class OTWrapper {
     if (mInputSignalProtocol != null) {
       mSession.setInputSignalProtocol(mInputSignalProtocol);
     }
-    if (mOutputSignalProtol != null) {
-      mSession.setOutputSignalProtocol(mOutputSignalProtol);
+    if (mOutputSignalProtocol != null) {
+      mSession.setOutputSignalProtocol(mOutputSignalProtocol);
     }
 
     mSession.connect(mOTConfig.getToken());
@@ -748,9 +748,9 @@ public class OTWrapper {
    * @param outputProtocol
    */
   public synchronized void setOutputSignalProtocol(SignalProtocol outputProtocol) {
-    mOutputSignalProtol = outputProtocol;
+    mOutputSignalProtocol = outputProtocol;
     if ( mSession != null ){
-      mSession.setOutputSignalProtocol(mOutputSignalProtol);
+      mSession.setOutputSignalProtocol(mOutputSignalProtocol);
     }
   }
 
