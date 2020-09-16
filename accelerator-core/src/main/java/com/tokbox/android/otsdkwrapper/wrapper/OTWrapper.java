@@ -1468,7 +1468,6 @@ public class OTWrapper {
       }
     }
 
-    @Override
     public void onAudioEnabled(SubscriberKit subscriber) {
       if ( mAdvancedListeners != null ) {
         for (AdvancedListener listener : mAdvancedListeners) {
@@ -1478,7 +1477,6 @@ public class OTWrapper {
       }
     }
 
-    @Override
     public void onAudioDisabled(SubscriberKit subscriber) {
       if ( mAdvancedListeners != null ) {
         for (AdvancedListener listener : mAdvancedListeners) {
