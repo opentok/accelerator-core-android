@@ -349,7 +349,7 @@ public class OTWrapper {
         mScreensharingFragment.stopScreenCapture();
         isScreensharingByDefault = false;
       }
-      dettachPublisherScreenView();
+      detachPublisherScreenView();
       if (mScreenPublisher != null && startSharingScreen) {
         mSession.unpublish(mScreenPublisher);
       }
@@ -982,7 +982,7 @@ public class OTWrapper {
     }
   }
 
-  private void dettachPublisherScreenView() {
+  private void detachPublisherScreenView() {
     if (mScreenPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
       for (BasicListener listener: mBasicListeners) {
         ((RetriableBasicListener)listener).onPreviewViewDestroyed(SELF, mScreenPublisher.getView());
