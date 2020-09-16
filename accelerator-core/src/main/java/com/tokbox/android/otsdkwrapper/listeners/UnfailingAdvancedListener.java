@@ -54,6 +54,32 @@ public class UnfailingAdvancedListener<Wrapper> implements RetriableAdvancedList
         }
     }
 
+    @Override
+    public void onReconnected(Wrapper wrapper, String remoteId) {
+        if (mInternalListener != null) {
+            mInternalListener.onReconnected(wrapper, remoteId);
+        }
+    }
+
+    @Override
+    public void onDisconnected(Wrapper wrapper, String remoteId) {
+        if (mInternalListener != null) {
+            mInternalListener.onDisconnected(wrapper, remoteId);
+        }
+    }
+
+    @Override
+    public void onAudioEnabled(Wrapper wrapper, String remoteId) {
+        if (mInternalListener != null) {
+            mInternalListener.onAudioEnabled(wrapper, remoteId);
+        }
+    }
+
+    @Override
+    public void onAudioDisabled(Wrapper wrapper, String remoteId) {
+
+    }
+
 
     @Override
     public void onVideoQualityWarning(Wrapper wrapper, String remoteId) {

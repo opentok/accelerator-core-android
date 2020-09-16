@@ -449,6 +449,7 @@ public class OTWrapper {
     LOG.i(LOG_TAG, "private add new remote stream != null");
     Subscriber sub = new Subscriber(mContext, stream);
     sub.setVideoListener(mVideoListener);
+    sub.setStreamListener(mStreamListener);
     sub.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
     String subId = stream.getStreamId();
     mSubscribers.put(subId, sub);
@@ -1261,7 +1262,6 @@ public class OTWrapper {
     };
 
   private Publisher.AudioLevelListener mAudioLevelListener = new Publisher.AudioLevelListener() {
-
     @Override
     public void onAudioLevelUpdated(PublisherKit publisherKit, float audioLevel) {
       for (AdvancedListener listener : mAdvancedListeners) {
@@ -1271,7 +1271,6 @@ public class OTWrapper {
   };
 
   private Publisher.PublisherListener mPublisherListener = new Publisher.PublisherListener() {
-
     @Override
     public void onStreamCreated(PublisherKit publisherKit, Stream stream) {
       boolean screensharing = false;
@@ -1375,6 +1374,7 @@ public class OTWrapper {
       }
     }
   };
+
   private SubscriberKit.VideoListener mVideoListener = new SubscriberKit.VideoListener() {
     @Override
     public void onVideoDataReceived(SubscriberKit subscriberKit) {
@@ -1446,6 +1446,49 @@ public class OTWrapper {
     }
   };
 
+  private SubscriberKit.StreamListener mStreamListener = new SubscriberKit.StreamListener() {
+
+    @Override
+    public void onReconnected(SubscriberKit subscriber) {
+      if ( mAdvancedListeners != null ) {
+        for (AdvancedListener listener : mAdvancedListeners) {
+          ((RetriableAdvancedListener) listener).
+                  onReconnected(SELF, subscriber.getStream().getStreamId());
+        }
+      }
+    }
+
+    @Override
+    public void onDisconnected(SubscriberKit subscriber) {
+      if ( mAdvancedListeners != null ) {
+        for (AdvancedListener listener : mAdvancedListeners) {
+          ((RetriableAdvancedListener) listener).
+                  onDisconnected(SELF, subscriber.getStream().getStreamId());
+        }
+      }
+    }
+
+    @Override
+    public void onAudioEnabled(SubscriberKit subscriber) {
+      if ( mAdvancedListeners != null ) {
+        for (AdvancedListener listener : mAdvancedListeners) {
+          ((RetriableAdvancedListener) listener).
+                  onAudioEnabled(SELF, subscriber.getStream().getStreamId());
+        }
+      }
+    }
+
+    @Override
+    public void onAudioDisabled(SubscriberKit subscriber) {
+      if ( mAdvancedListeners != null ) {
+        for (AdvancedListener listener : mAdvancedListeners) {
+          ((RetriableAdvancedListener) listener).
+                  onAudioDisabled(SELF, subscriber.getStream().getStreamId());
+        }
+      }
+    }
+  };
+
   ScreenSharingFragment.ScreenSharingListener screenListener = new ScreenSharingFragment.ScreenSharingListener() {
     @Override
     public void onScreenCapturerReady() {
@@ -1477,5 +1520,4 @@ public class OTWrapper {
       }
     }
   };
-
 }
