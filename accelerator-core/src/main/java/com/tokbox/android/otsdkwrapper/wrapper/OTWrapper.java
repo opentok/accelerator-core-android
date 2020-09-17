@@ -758,8 +758,7 @@ public class OTWrapper {
   }
 
   /**
-   * Return boolean indicating whatever or nor device has multiple cameras available. This allows you to easily
-   * show/hide "swap camera" button based on current device config.
+   * Returns a boolean indicating whether the device has multiple available cameras.
    * @return Information about multiple available cameras
    */
   public boolean hasMultipleCameras() {
