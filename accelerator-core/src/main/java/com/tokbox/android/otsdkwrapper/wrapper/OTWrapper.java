@@ -289,6 +289,7 @@ public class OTWrapper {
    */
   public void stopPreview() {
     if (mPublisher != null && isPreviewing) {
+      mPublisher.onStop();
       dettachPublisherView();
       mPublisher = null;
       isPreviewing = false;
