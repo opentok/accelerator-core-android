@@ -97,6 +97,16 @@ public class PausableAdvancedListener<Wrapper> implements RetriableAdvancedListe
     }
 
     @Override
+    public void onAudioLevelUpdated(final float audioLevel) {
+        runUIListenerTask(new ListenerTask() {
+            @Override
+            public void run() throws ListenerException {
+                mUnderlyingListener.onAudioLevelUpdated(audioLevel);
+            }
+        });
+    }
+
+    @Override
     public void onError(final Wrapper wrapper, final OpentokError error) {
         runUIListenerTask(new ListenerTask() {
             @Override

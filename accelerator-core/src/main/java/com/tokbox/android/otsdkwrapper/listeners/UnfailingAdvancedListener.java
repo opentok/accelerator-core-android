@@ -78,6 +78,17 @@ public class UnfailingAdvancedListener<Wrapper> implements RetriableAdvancedList
     }
 
     @Override
+    public void onAudioLevelUpdated(float audioLevel) {
+        try {
+            if (mInternalListener != null) {
+                mInternalListener.onAudioLevelUpdated(audioLevel);
+            }
+        } catch (ListenerException e) {
+            Log.d(LOG_TAG, "onAudioLevelUpdated Exception: ", e);
+        }
+    }
+
+    @Override
     public void onError(Wrapper wrapper, OpentokError error) {
         try {
             if (mInternalListener != null) {

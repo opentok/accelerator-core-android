@@ -99,7 +99,7 @@ public class OTWrapper {
 
   //Signal protocol
   private SignalProtocol mInputSignalProtocol;
-  private SignalProtocol mOutputSignalProtol;
+  private SignalProtocol mOutputSignalProtocol;
 
   //Analytics for internal use
   private OTKAnalyticsData mAnalyticsData;
@@ -175,8 +175,8 @@ public class OTWrapper {
     if (mInputSignalProtocol != null) {
       mSession.setInputSignalProtocol(mInputSignalProtocol);
     }
-    if (mOutputSignalProtol != null) {
-      mSession.setOutputSignalProtocol(mOutputSignalProtol);
+    if (mOutputSignalProtocol != null) {
+      mSession.setOutputSignalProtocol(mOutputSignalProtocol);
     }
 
     mSession.connect(mOTConfig.getToken());
@@ -349,7 +349,7 @@ public class OTWrapper {
         mScreensharingFragment.stopScreenCapture();
         isScreensharingByDefault = false;
       }
-      dettachPublisherScreenView();
+      detachPublisherScreenView();
       if (mScreenPublisher != null && startSharingScreen) {
         mSession.unpublish(mScreenPublisher);
       }
@@ -748,9 +748,9 @@ public class OTWrapper {
    * @param outputProtocol
    */
   public synchronized void setOutputSignalProtocol(SignalProtocol outputProtocol) {
-    mOutputSignalProtol = outputProtocol;
+    mOutputSignalProtocol = outputProtocol;
     if ( mSession != null ){
-      mSession.setOutputSignalProtocol(mOutputSignalProtol);
+      mSession.setOutputSignalProtocol(mOutputSignalProtocol);
     }
   }
 
@@ -924,6 +924,7 @@ public class OTWrapper {
     }
     if ( !isScreensharingByDefault ) {
       mScreenPublisher.setPublisherListener(mPublisherListener);
+      mScreenPublisher.setAudioLevelListener(mAudioLevelListener);
       mScreenPublisher.setCameraListener(mCameraListener);
       mScreenPublisher.
               setPublisherVideoType(PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeScreen);
@@ -981,7 +982,7 @@ public class OTWrapper {
     }
   }
 
-  private void dettachPublisherScreenView() {
+  private void detachPublisherScreenView() {
     if (mScreenPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
       for (BasicListener listener: mBasicListeners) {
         ((RetriableBasicListener)listener).onPreviewViewDestroyed(SELF, mScreenPublisher.getView());
@@ -1259,6 +1260,16 @@ public class OTWrapper {
       }
     };
 
+  private Publisher.AudioLevelListener mAudioLevelListener = new Publisher.AudioLevelListener() {
+
+    @Override
+    public void onAudioLevelUpdated(PublisherKit publisherKit, float audioLevel) {
+      for (AdvancedListener listener : mAdvancedListeners) {
+        ((RetriableAdvancedListener) listener).onAudioLevelUpdated(audioLevel);
+      }
+    }
+  };
+
   private Publisher.PublisherListener mPublisherListener = new Publisher.PublisherListener() {
 
     @Override
@@ -1444,6 +1455,7 @@ public class OTWrapper {
         mScreenPublisherBuilder.capturer(capturer);
         mScreenPublisher = mScreenPublisherBuilder.build();
         mScreenPublisher.setPublisherListener(mPublisherListener);
+        mScreenPublisher.setAudioLevelListener(mAudioLevelListener);
         mScreenPublisher.setCameraListener(mCameraListener);
         mScreenPublisher.
                 setPublisherVideoType(PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeScreen);

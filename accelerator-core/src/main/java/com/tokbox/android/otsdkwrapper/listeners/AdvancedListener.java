@@ -50,6 +50,14 @@ public interface AdvancedListener<Wrapper> extends BaseOTListener {
     void onVideoQualityWarningLifted(Wrapper wrapper, String remoteId) throws ListenerException;
 
     /**
+     * Invoked when the microphone audio level has changed.
+     * @param audioLevel The audio level, from 0 to 1.0. Adjust this value logarithmically for use in a user interface
+     *                  visualization (such as a volume meter)
+     * @throws ListenerException
+     */
+    void onAudioLevelUpdated(float audioLevel) throws ListenerException;
+
+    /**
      * Invoked when an error in the communication happened
      * @param wrapper
      * @param error
