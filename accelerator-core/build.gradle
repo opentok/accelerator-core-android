@@ -34,7 +34,7 @@ android {
         variant.outputs.all { output ->
             def outputFile = outputFileName
             if (outputFile != null && outputFile.endsWith('.aar')) {
-                def fileName = "${archivesBaseName}-${archiveVersion}.aar"
+                def fileName = "${archivesBaseName}-${version}.aar"
                 outputFileName = new File(outputFile, fileName)
             }
         }
@@ -51,7 +51,7 @@ android {
             include '**/docs/**'
             exclude '**/lint-results-debug_files/**'
             destinationDirectory = file(".")
-            archiveFileName = "${archivesBaseName}-${version}.zip"
+            archiveFileName = "${archivesBaseName}-${archiveVersion}.zip"
         }
         task("printVersion${variant.name.capitalize()}") {
           println project.version
