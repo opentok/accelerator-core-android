@@ -32,6 +32,14 @@ public interface AdvancedListener<Wrapper> extends BaseOTListener {
      */
     void onReconnected(Wrapper wrapper) throws ListenerException;
 
+    void onReconnected(Wrapper wrapper, String remoteId);
+
+    void onDisconnected(Wrapper wrapper, String remoteId);
+
+    void onAudioEnabled(Wrapper wrapper, String remoteId);
+
+    void onAudioDisabled(Wrapper wrapper, String remoteId);
+
     /**
      * Invoked when stream quality has degraded and the video will be disabled if the quality degrades further.
      * @param wrapper
