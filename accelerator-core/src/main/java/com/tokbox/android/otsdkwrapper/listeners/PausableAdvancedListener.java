@@ -77,6 +77,46 @@ public class PausableAdvancedListener<Wrapper> implements RetriableAdvancedListe
     }
 
     @Override
+    public void onReconnected(final Wrapper wrapper, final String remoteId) {
+        runUIListenerTask(new ListenerTask() {
+            @Override
+            public void run() throws ListenerException {
+                mUnderlyingListener.onReconnected(wrapper, remoteId);
+            }
+        });
+    }
+
+    @Override
+    public void onDisconnected(final Wrapper wrapper, final String remoteId) {
+        runUIListenerTask(new ListenerTask() {
+            @Override
+            public void run() throws ListenerException {
+                mUnderlyingListener.onDisconnected(wrapper, remoteId);
+            }
+        });
+    }
+
+    @Override
+    public void onAudioEnabled(final Wrapper wrapper, final String remoteId) {
+        runUIListenerTask(new ListenerTask() {
+            @Override
+            public void run() throws ListenerException {
+                mUnderlyingListener.onAudioEnabled(wrapper, remoteId);
+            }
+        });
+    }
+
+    @Override
+    public void onAudioDisabled(final Wrapper wrapper, final String remoteId) {
+        runUIListenerTask(new ListenerTask() {
+            @Override
+            public void run() throws ListenerException {
+                mUnderlyingListener.onAudioDisabled(wrapper, remoteId);
+            }
+        });
+    }
+
+    @Override
     public void onVideoQualityWarning(final Wrapper wrapper, final String remoteId) {
         runUIListenerTask(new ListenerTask() {
             @Override
@@ -92,6 +132,16 @@ public class PausableAdvancedListener<Wrapper> implements RetriableAdvancedListe
             @Override
             public void run() throws ListenerException {
                 mUnderlyingListener.onVideoQualityWarningLifted(wrapper, remoteId);
+            }
+        });
+    }
+
+    @Override
+    public void onAudioLevelUpdated(final float audioLevel) {
+        runUIListenerTask(new ListenerTask() {
+            @Override
+            public void run() throws ListenerException {
+                mUnderlyingListener.onAudioLevelUpdated(audioLevel);
             }
         });
     }

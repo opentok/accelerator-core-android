@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    def acceleratorCoreVersion = '1.0.22'
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    def acceleratorCoreVersion = '1.0.23'
+    compileSdkVersion 30
+    buildToolsVersion "30.0.0"
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
-        versionName "1.0.22"
+        versionName "1.0.23"
         project.archivesBaseName = "opentok-accelerator-core"
         project.version = acceleratorCoreVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -51,7 +51,7 @@ android {
             include '**/docs/**'
             exclude '**/lint-results-debug_files/**'
             destinationDirectory = file(".")
-            archiveFileName = "${archivesBaseName}-${version}.zip"
+            archiveFileName = "${archivesBaseName}-${archiveVersion}.zip"
         }
         task("printVersion${variant.name.capitalize()}") {
           println project.version
@@ -59,8 +59,11 @@ android {
         zipBundle.dependsOn build
         zipBundle.dependsOn javadoc
     }
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+    }
 }
-ext.sdkVersion = '2.16'
 
 dependencies {
     repositories {
@@ -68,9 +71,9 @@ dependencies {
         maven { url 'http://tokbox.bintray.com/maven' }
     }
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.opentok.android:opentok-solutions-logging:+'
-    implementation "com.opentok.android:opentok-android-sdk:$sdkVersion.+"
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.opentok.android:opentok-solutions-logging:1.0.3'
+    implementation "com.opentok.android:opentok-android-sdk:2.18.0"
 }
 
 if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD")) {

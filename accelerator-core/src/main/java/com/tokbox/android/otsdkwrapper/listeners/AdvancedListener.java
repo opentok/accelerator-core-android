@@ -32,6 +32,14 @@ public interface AdvancedListener<Wrapper> extends BaseOTListener {
      */
     void onReconnected(Wrapper wrapper) throws ListenerException;
 
+    void onReconnected(Wrapper wrapper, String remoteId);
+
+    void onDisconnected(Wrapper wrapper, String remoteId);
+
+    void onAudioEnabled(Wrapper wrapper, String remoteId);
+
+    void onAudioDisabled(Wrapper wrapper, String remoteId);
+
     /**
      * Invoked when stream quality has degraded and the video will be disabled if the quality degrades further.
      * @param wrapper
@@ -48,6 +56,14 @@ public interface AdvancedListener<Wrapper> extends BaseOTListener {
      * @throws ListenerException
      */
     void onVideoQualityWarningLifted(Wrapper wrapper, String remoteId) throws ListenerException;
+
+    /**
+     * Invoked when the microphone audio level has changed.
+     * @param audioLevel The audio level, from 0 to 1.0. Adjust this value logarithmically for use in a user interface
+     *                  visualization (such as a volume meter)
+     * @throws ListenerException
+     */
+    void onAudioLevelUpdated(float audioLevel) throws ListenerException;
 
     /**
      * Invoked when an error in the communication happened

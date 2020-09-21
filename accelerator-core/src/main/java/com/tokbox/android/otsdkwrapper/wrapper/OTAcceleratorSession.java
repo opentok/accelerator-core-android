@@ -220,7 +220,10 @@ public class OTAcceleratorSession extends Session {
     private void dispatchSignal(final SignalInfo signalInfo) {
         LOG.d(LOG_TAG, "Dispatching signal: ", signalInfo.mSignalName, " with: ", signalInfo.mData);
         dispatchSignal(mSignalListeners.get("*"), signalInfo, true);
-        dispatchSignal(mSignalListeners.get(signalInfo.mSignalName), signalInfo, false);
+
+        if(signalInfo.mSignalName != null) {
+            dispatchSignal(mSignalListeners.get(signalInfo.mSignalName), signalInfo, false);
+        }
     }
 
     private Callback<SignalInfo> mInternalSendSignal = new Callback<SignalInfo>() {
@@ -307,28 +310,28 @@ public class OTAcceleratorSession extends Session {
     }
 
     @Override
-    protected void onConnected() {
+    public void onConnected() {
         for (SessionListener l : mSessionListeners) {
             l.onConnected(this);
         }
     }
 
     @Override
-    protected void onReconnecting() {
+    public void onReconnecting() {
         for (ReconnectionListener l : mReconnectionListeners) {
             l.onReconnecting(this);
         }
     }
 
     @Override
-    protected void onReconnected() {
+    public void onReconnected() {
         for (ReconnectionListener l : mReconnectionListeners) {
             l.onReconnected(this);
         }
     }
 
     @Override
-    protected void onDisconnected() {
+    public void onDisconnected() {
         for (SessionListener l : mSessionListeners) {
             l.onDisconnected(this);
         }
@@ -339,77 +342,70 @@ public class OTAcceleratorSession extends Session {
     }
 
     @Override
-    protected void onError(OpentokError error) {
+    public void onError(OpentokError error) {
         for (SessionListener l : mSessionListeners) {
             l.onError(this, error);
         }
     }
 
     @Override
-    protected void onStreamReceived(Stream stream) {
+    public void onStreamReceived(Stream stream) {
         for (SessionListener l : mSessionListeners) {
             l.onStreamReceived(this, stream);
         }
     }
 
     @Override
-    protected void onStreamDropped(Stream stream) {
+    public void onStreamDropped(Stream stream) {
         for (SessionListener l : mSessionListeners) {
             l.onStreamDropped(this, stream);
         }
     }
 
     @Override
-    protected void onConnectionCreated(Connection connection) {
+    public void onConnectionCreated(Connection connection) {
         for (ConnectionListener l : mConnectionsListeners) {
             l.onConnectionCreated(this, connection);
         }
     }
 
     @Override
-    protected void onConnectionDestroyed(Connection connection) {
+    public void onConnectionDestroyed(Connection connection) {
         for (ConnectionListener l : mConnectionsListeners) {
             l.onConnectionDestroyed(this, connection);
         }
     }
 
     @Override
-    protected void onStreamHasAudioChanged(Stream stream, int hasAudio) {
+    public void onStreamHasAudioChanged(Stream stream, int hasAudio) {
         for (StreamPropertiesListener l : mStreamPropertiesListeners) {
             l.onStreamHasAudioChanged(this, stream, (hasAudio != 0));
         }
     }
 
     @Override
-    protected void onStreamHasVideoChanged(Stream stream, int hasVideo) {
+    public void onStreamHasVideoChanged(Stream stream, int hasVideo) {
         for (StreamPropertiesListener l : mStreamPropertiesListeners) {
             l.onStreamHasVideoChanged(this, stream, (hasVideo != 0));
         }
     }
 
     @Override
-    protected void onStreamVideoDimensionsChanged(Stream stream, int width, int height) {
+    public void onStreamVideoDimensionsChanged(Stream stream, int width, int height) {
         for (StreamPropertiesListener l : mStreamPropertiesListeners) {
             l.onStreamVideoDimensionsChanged(this, stream, width, height);
         }
     }
 
     @Override
-    protected void onStreamVideoTypeChanged(Stream stream, Stream.StreamVideoType videoType) {
-        for (StreamPropertiesListener l : mStreamPropertiesListeners) {
-            l.onStreamVideoTypeChanged(this, stream, videoType);
-        }
-    }
-
-    @Override
-    protected void onArchiveStarted(String id, String name) {
+    public void onArchiveStarted(String id, String name) {
         for (ArchiveListener l : mArchiveListeners) {
             l.onArchiveStarted(this, id, name);
         }
     }
 
     @Override
-    protected void onArchiveStopped(String id) {
+    public void onArchiveStopped(String id) {
         for (ArchiveListener l : mArchiveListeners) {
             l.onArchiveStopped(this, id);
         }

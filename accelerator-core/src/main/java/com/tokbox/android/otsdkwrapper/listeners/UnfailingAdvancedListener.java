@@ -54,6 +54,34 @@ public class UnfailingAdvancedListener<Wrapper> implements RetriableAdvancedList
         }
     }
 
+    @Override
+    public void onReconnected(Wrapper wrapper, String remoteId) {
+        if (mInternalListener != null) {
+            mInternalListener.onReconnected(wrapper, remoteId);
+        }
+    }
+
+    @Override
+    public void onDisconnected(Wrapper wrapper, String remoteId) {
+        if (mInternalListener != null) {
+            mInternalListener.onDisconnected(wrapper, remoteId);
+        }
+    }
+
+    @Override
+    public void onAudioEnabled(Wrapper wrapper, String remoteId) {
+        if (mInternalListener != null) {
+            mInternalListener.onAudioEnabled(wrapper, remoteId);
+        }
+    }
+
+    @Override
+    public void onAudioDisabled(Wrapper wrapper, String remoteId) {
+        if (mInternalListener != null) {
+            mInternalListener.onAudioDisabled(wrapper, remoteId);
+        }
+    }
+
 
     @Override
     public void onVideoQualityWarning(Wrapper wrapper, String remoteId) {
@@ -74,6 +102,17 @@ public class UnfailingAdvancedListener<Wrapper> implements RetriableAdvancedList
             }
         } catch (ListenerException e) {
             Log.d(LOG_TAG, "onVideoQualityWarningLifted Exception: ", e);
+        }
+    }
+
+    @Override
+    public void onAudioLevelUpdated(float audioLevel) {
+        try {
+            if (mInternalListener != null) {
+                mInternalListener.onAudioLevelUpdated(audioLevel);
+            }
+        } catch (ListenerException e) {
+            Log.d(LOG_TAG, "onAudioLevelUpdated Exception: ", e);
         }
     }
 
