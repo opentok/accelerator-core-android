@@ -264,7 +264,6 @@ public class OTWrapper {
     if (mPublisher == null && !isPreviewing) {
       createPublisher();
       attachPublisherView();
-      mPublisher.startPreview();
       isPreviewing = true;
     }
   }
@@ -290,7 +289,7 @@ public class OTWrapper {
    */
   public void stopPreview() {
     if (mPublisher != null && isPreviewing) {
-      mPublisher.destroy();
+      mPublisher.onStop();
       dettachPublisherView();
       mPublisher = null;
       isPreviewing = false;
