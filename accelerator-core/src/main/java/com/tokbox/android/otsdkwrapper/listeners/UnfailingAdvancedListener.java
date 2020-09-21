@@ -77,7 +77,9 @@ public class UnfailingAdvancedListener<Wrapper> implements RetriableAdvancedList
 
     @Override
     public void onAudioDisabled(Wrapper wrapper, String remoteId) {
-
+        if (mInternalListener != null) {
+            mInternalListener.onAudioDisabled(wrapper, remoteId);
+        }
     }
 
 
