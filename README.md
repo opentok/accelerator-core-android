@@ -1,6 +1,6 @@
 # Accelerator Core Android
 
-[![GitHub version](https://badge.fury.io/gh/opentok%2Faccelerator-core-android.svg)](https://badge.fury.io/gh/opentok%2Faccelerator-core-android) [![Build Status](https://travis-ci.org/opentok/accelerator-core-android.svg?branch=master)](https://travis-ci.org/opentok/accelerator-core-android) [![license MIT](https://img.shields.io/github/license/opentok/accelerator-core-android.svg)](./.github/LICENSE)
+[![Build Status](https://travis-ci.org/opentok/accelerator-core-android.svg?branch=master)](https://travis-ci.org/opentok/accelerator-core-android) [![GitHub release](https://img.shields.io/github/tag/opentok/accelerator-core-android.svg)](./README.md) [![license MIT](https://img.shields.io/github/license/opentok/accelerator-core-android.svg)](./.github/LICENSE)
 
 <img src="https://assets.tokbox.com/img/vonage/Vonage_VideoAPI_black.svg" height="48px" alt="Tokbox is now known as Vonage" />
 
