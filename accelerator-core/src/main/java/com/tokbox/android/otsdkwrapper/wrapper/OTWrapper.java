@@ -325,7 +325,7 @@ public class OTWrapper {
    *
    * @param screensharing Whether to indicate the camera or the screen streaming
    */
-  public void stopPublishingMedia(Boolean screensharing) {
+  public void stopPublishingMedia(boolean screensharing) {
 
     if (!screensharing) {
       addLogEvent(ClientLog.LOG_ACTION_END_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
@@ -480,7 +480,8 @@ public class OTWrapper {
     LOG.i(LOG_TAG, "Remove remote with ID: ", remoteId);
     addLogEvent(ClientLog.LOG_ACTION_REMOVE_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT);
     Subscriber sub = mSubscribers.get(remoteId);
-    mSubscribers.remove(sub);
+    mSubscribers.remove(remoteId);
+
     mStreams.put(remoteId, sub.getStream());
     mSession.unsubscribe(sub);
   }
@@ -765,9 +766,21 @@ public class OTWrapper {
   private void cleanup() {
     if ( mSession != null ) {
       mSession.cleanUpSignals();
+      if (mSubscribers.size() > 0) {
+        for (Subscriber subscriber : mSubscribers.values()) {
+          if (subscriber != null) {
+            mSession.unsubscribe(subscriber);
+          }
+        }
+      }
+      if (mPublisher != null) {
+        mSession.unpublish(mPublisher);
+      }
+      mSession.disconnect();
     }
-    mSession = null;
+
     mPublisher = null;
+    mSession = null;
     mSubscribers = new HashMap<String, Subscriber>();
     mStreams = new Hashtable<String, Stream>();
     mSessionConnection = null;
@@ -828,18 +841,17 @@ public class OTWrapper {
   private synchronized  void publishIfScreenReady(){
     LOG.d(LOG_TAG, "publishIfScreenReady: ", mSessionConnection, ", ", mScreenPublisher, ", ",
       startSharingScreen);
-    if (mSession!= null && mSessionConnection != null && mScreenPublisher != null && startSharingScreen) {
+    if (mSession!= null && mSessionConnection != null
+            && mScreenPublisher != null && startSharingScreen && !isScreensharingByDefault) {
 
-      if (!isScreensharingByDefault) {
         if (!isPreviewing) {
           attachPublisherScreenView();
         }
-        if (!isSharingScreen && !isScreensharingByDefault) {
+        if (!isSharingScreen) {
           mSession.publish(mScreenPublisher);
           // Do this as soon as possible to avoid race conditions...
           isSharingScreen = true;
         }
-      }
     }
   }
 
