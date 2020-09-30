@@ -1268,14 +1268,14 @@ public class OTWrapper {
 
     private BaseOTListener addOTListener(BaseOTListener listener,
                                          HashMap retriableMap,
-                                         HashSet listenerList) {
+                                         HashSet listenerSet) {
         boolean isWrapped = listener instanceof RetriableOTListener;
         RetriableOTListener realListener = (RetriableOTListener) retriableMap.get(listener);
         if (realListener == null) {
             realListener =
                     (RetriableOTListener) (isWrapped ? listener : getUnfailingFromBaseListener(listener));
             retriableMap.put(listener, (isWrapped ? listener : realListener));
-            listenerList.add(realListener);
+            listenerSet.add(realListener);
             refreshPeerList();
         }
         return (BaseOTListener) realListener;
@@ -1283,16 +1283,16 @@ public class OTWrapper {
     }
 
     private void removeOTListener(BaseOTListener listener, HashMap retriableMap,
-                                  HashSet listenerList) {
+                                  HashSet listenerSet) {
         if (listener != null) {
             BaseOTListener internalListener = listener instanceof RetriableOTListener ?
                     ((RetriableOTListener) listener).getInternalListener() :
                     listener;
             RetriableOTListener realListener = (RetriableOTListener) retriableMap.get(internalListener);
-            listenerList.remove(realListener);
+            listenerSet.remove(realListener);
             retriableMap.remove(internalListener);
         } else {
-            listenerList.clear();
+            listenerSet.clear();
             retriableMap.clear();
         }
     }
