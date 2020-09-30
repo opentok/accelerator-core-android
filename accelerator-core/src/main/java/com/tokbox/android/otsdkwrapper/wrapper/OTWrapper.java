@@ -76,7 +76,6 @@ public class OTWrapper {
   private HashMap<AdvancedListener, RetriableAdvancedListener> mRetriableAdvancedListeners =
           new HashMap<>();
 
-  private int mConnectionsCount;
   private int mOlderThanMe = 0;
 
   private boolean isPreviewing = false;
@@ -169,7 +168,6 @@ public class OTWrapper {
     mSession.setReconnectionListener(mReconnectionListener);
 
     mOlderThanMe = 0;
-    mConnectionsCount = 0;
 
     //check signal protocol
     if (mInputSignalProtocol != null) {
@@ -212,7 +210,7 @@ public class OTWrapper {
    * @return the number of active connections.
    */
   public int getConnectionsCount() {
-    return mConnectionsCount;
+    return mSubscribers.size();
   }
 
   /**
@@ -394,6 +392,8 @@ public class OTWrapper {
             mPublisher.getView().setVisibility(View.GONE);
           }
           break;
+        default:
+
       }
     }
   }
@@ -691,11 +691,11 @@ public class OTWrapper {
   /**
    * (Tries) to set the FPS of the shared video stream to the passed one. The FPS is rounded to
    * the nearest supported one.
-   * @param FPS
+   * @param framePerSecond
    */
-  public void setPublishingFPS(int FPS) {
+  public void setPublishingFPS(int framePerSecond) {
     LOG.d(LOG_TAG, "setSharingFPS: ", mPublisher);
-    Publisher.CameraCaptureFrameRate frameRate = getFPS(FPS);
+    Publisher.CameraCaptureFrameRate frameRate = getFPS(framePerSecond);
     if (mPublisher != null) {
       int currentCamera = mPublisher.getCameraId();
       PreviewConfig newPreview;
@@ -705,19 +705,18 @@ public class OTWrapper {
         mPreviewConfig = new PreviewConfig.PreviewConfigBuilder().framerate(frameRate).build();
       }
       newPreview = mPreviewConfig;
-      boolean isPublishing = this.isPublishing;
-      boolean isPreviewing = this.isPreviewing;
-      if (isPublishing) {
+
+      if (this.isPublishing) {
         stopPublishingMedia(false);
       }
-      if (isPreviewing) {
+      if (this.isPreviewing) {
         stopPreview();
       }
       mPublisher = null;
-      if (isPreviewing) {
+      if (this.isPreviewing) {
         startPreview(newPreview);
       }
-      if (isPublishing) {
+      if (this.isPublishing) {
         startPublishingMedia(newPreview, false);
       }
       if (mPublisher != null) {
@@ -771,7 +770,6 @@ public class OTWrapper {
     mPublisher = null;
     mSubscribers = new HashMap<String, Subscriber>();
     mStreams = new Hashtable<String, Stream>();
-    mConnectionsCount = 0;
     mSessionConnection = null;
     isPreviewing = false;
     isPublishing = false;
@@ -937,15 +935,15 @@ public class OTWrapper {
 
   /**
    * Rounds to the smallest FPS. Could round to the closest one instead!
-   * @param FPS
+   * @param framePerSecond
    */
-  private Publisher.CameraCaptureFrameRate getFPS(int FPS) {
+  private Publisher.CameraCaptureFrameRate getFPS(int framePerSecond) {
     Publisher.CameraCaptureFrameRate returnedValue;
-    if (FPS < 7) {
+    if (framePerSecond < 7) {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_1;
-    } else if (FPS < 15) {
+    } else if (framePerSecond < 15) {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_7;
-    } else if (FPS < 30) {
+    } else if (framePerSecond < 30) {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_15;
     } else {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_30;
@@ -992,7 +990,6 @@ public class OTWrapper {
 
   private void refreshPeerList() {
     if (mBasicListeners != null && !mBasicListeners.isEmpty()) {
-      if (mBasicListeners != null && !mBasicListeners.isEmpty()) {
         for (BasicListener listener: mBasicListeners) {
           if ( ((RetriableBasicListener)listener).getInternalListener() != null ){
             if (mPublisher != null) {
@@ -1011,7 +1008,6 @@ public class OTWrapper {
           }
         }
       }
-    }
   }
 
   private void enableRemoteMedia(Subscriber sub, MediaType type, boolean enabled) {
@@ -1066,13 +1062,12 @@ public class OTWrapper {
         ". listeners: ", mBasicListeners );
       addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_SUCCESS);
 
-      mConnectionsCount++;
 
       publishIfReady();
 
       if ( mBasicListeners != null ) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener)listener).onConnected(SELF, mConnectionsCount,
+          ((RetriableBasicListener)listener).onConnected(SELF, mSubscribers.size(),
                                                          mSessionConnection.getConnectionId(),
                                                          mSessionConnection.getData());
         }
@@ -1159,13 +1154,12 @@ public class OTWrapper {
     public void onConnectionCreated(Session session, Connection connection) {
       LOG.d(LOG_TAG, "onConnectionCreated: ", connection.getData());
       mSession.connections.put(connection.getConnectionId(), connection);
-      mConnectionsCount++;
       if (connection.getCreationTime().compareTo(mSessionConnection.getCreationTime()) <= 0) {
         mOlderThanMe++;
       }
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener) listener).onConnected(SELF, mConnectionsCount,
+          ((RetriableBasicListener) listener).onConnected(SELF, mSubscribers.size(),
                                                           connection.getConnectionId(),
                                                           connection.getData());
         }
@@ -1176,13 +1170,12 @@ public class OTWrapper {
     public void onConnectionDestroyed(Session session, Connection connection) {
       LOG.d(LOG_TAG, "onConnectionDestroyed: ", connection.getData());
       mSession.connections.remove(connection.getConnectionId());
-      mConnectionsCount--;
       if (connection.getCreationTime().compareTo(mSessionConnection.getCreationTime()) <= 0) {
         mOlderThanMe--;
       }
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener) listener).onDisconnected(SELF, mConnectionsCount,
+          ((RetriableBasicListener) listener).onDisconnected(SELF, mSubscribers.size(),
                                                              connection.getConnectionId(),
                                                              connection.getData());
         }
@@ -1230,6 +1223,7 @@ public class OTWrapper {
             //TODO: Add client logs for the different subscribers errors
             LOG.e(LOG_TAG, "Subscriber error: SubscriberInternalError");
             mSubscribers.remove(id);
+            break;
           case ConnectionTimedOut:
             addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ERROR);
             // Just try again
@@ -1241,6 +1235,7 @@ public class OTWrapper {
           case SubscriberWebRTCError:
             LOG.e(LOG_TAG, "Subscriber error: SubscriberWebRTCError");
             mSubscribers.remove(id);
+            break;
           case SubscriberServerCannotFindStream:
             LOG.e(LOG_TAG, "Subscriber error: SubscriberServerCannotFindStream");
             mSubscribers.remove(id);
@@ -1325,6 +1320,7 @@ public class OTWrapper {
           //TODO: Add client logs for the different publisher errors
           LOG.e(LOG_TAG, "Publisher error: PublisherInternalError");
           mPublisher = null;
+          break;
         case PublisherTimeout:
           //re-try publishing
           if ( mSession != null ) {
@@ -1340,6 +1336,7 @@ public class OTWrapper {
         case PublisherWebRTCError:
           LOG.e(LOG_TAG, "Publisher error: PublisherWebRTCError");
           mPublisher = null;
+          break;
         default:
           LOG.e(LOG_TAG, "Publisher error: default");
           mPublisher = null;
@@ -1467,6 +1464,7 @@ public class OTWrapper {
       }
     }
 
+    @Override
     public void onAudioEnabled(SubscriberKit subscriber) {
       if ( mAdvancedListeners != null ) {
         for (AdvancedListener listener : mAdvancedListeners) {
@@ -1476,6 +1474,7 @@ public class OTWrapper {
       }
     }
 
+    @Override
     public void onAudioDisabled(SubscriberKit subscriber) {
       if ( mAdvancedListeners != null ) {
         for (AdvancedListener listener : mAdvancedListeners) {
