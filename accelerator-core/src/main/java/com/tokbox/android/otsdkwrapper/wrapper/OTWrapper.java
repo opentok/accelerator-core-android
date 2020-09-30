@@ -75,7 +75,7 @@ public class OTWrapper {
   private HashMap<BasicListener, RetriableBasicListener> mRetriableBasicListeners = new HashMap<>();
   private HashMap<AdvancedListener, RetriableAdvancedListener> mRetriableAdvancedListeners =
           new HashMap<>();
-
+  private int mConnectionsCount;
   private int mOlderThanMe = 0;
 
   private boolean isPreviewing = false;
@@ -142,7 +142,7 @@ public class OTWrapper {
     if (mSession != null) {
       mSession.onResume();
     }
-    if (resumeEvents && mBasicListeners != null && !mBasicListeners.isEmpty()) {
+    if (resumeEvents && !isNullOrEmpty(mBasicListeners)) {
       for (BasicListener listener : mBasicListeners
               ) {
         ((RetriableBasicListener) listener).resume();
@@ -210,7 +210,7 @@ public class OTWrapper {
    * @return the number of active connections.
    */
   public int getConnectionsCount() {
-    return mSubscribers.size();
+    return mConnectionsCount;
   }
 
   /**
@@ -692,11 +692,11 @@ public class OTWrapper {
   /**
    * (Tries) to set the FPS of the shared video stream to the passed one. The FPS is rounded to
    * the nearest supported one.
-   * @param framePerSecond
+   * @param framesPerSecond
    */
-  public void setPublishingFPS(int framePerSecond) {
+  public void setPublishingFPS(int framesPerSecond) {
     LOG.d(LOG_TAG, "setSharingFPS: ", mPublisher);
-    Publisher.CameraCaptureFrameRate frameRate = getFPS(framePerSecond);
+    Publisher.CameraCaptureFrameRate frameRate = getFPS(framesPerSecond);
     if (mPublisher != null) {
       int currentCamera = mPublisher.getCameraId();
       PreviewConfig newPreview;
@@ -706,18 +706,20 @@ public class OTWrapper {
         mPreviewConfig = new PreviewConfig.PreviewConfigBuilder().framerate(frameRate).build();
       }
       newPreview = mPreviewConfig;
+      boolean isPublishingCurrent = this.isPublishing;
+      boolean isPreviewingCurrent = this.isPreviewing;
 
-      if (this.isPublishing) {
+      if (isPublishingCurrent) {
         stopPublishingMedia(false);
       }
-      if (this.isPreviewing) {
+      if (isPreviewingCurrent) {
         stopPreview();
       }
       mPublisher = null;
-      if (this.isPreviewing) {
+      if (isPreviewingCurrent) {
         startPreview(newPreview);
       }
-      if (this.isPublishing) {
+      if (isPublishingCurrent) {
         startPublishingMedia(newPreview, false);
       }
       if (mPublisher != null) {
@@ -778,7 +780,7 @@ public class OTWrapper {
       }
       mSession.disconnect();
     }
-
+    mConnectionsCount = 0;
     mPublisher = null;
     mSession = null;
     mSubscribers = new HashMap<String, Subscriber>();
@@ -926,12 +928,10 @@ public class OTWrapper {
         mScreenPublisherBuilder.renderer(config.getRenderer());
       }
 
-      mScreenPublisher = mScreenPublisherBuilder.build();
-
     } else {
       LOG.d(LOG_TAG, "createPublisher: Creating DefaultPublisher");
-      mScreenPublisher = mScreenPublisherBuilder.build();
     }
+    mScreenPublisher = mScreenPublisherBuilder.build();
     if ( !isScreensharingByDefault ) {
       mScreenPublisher.setPublisherListener(mPublisherListener);
       mScreenPublisher.setAudioLevelListener(mAudioLevelListener);
@@ -947,15 +947,15 @@ public class OTWrapper {
 
   /**
    * Rounds to the smallest FPS. Could round to the closest one instead!
-   * @param framePerSecond
+   * @param framesPerSecond
    */
-  private Publisher.CameraCaptureFrameRate getFPS(int framePerSecond) {
+  private Publisher.CameraCaptureFrameRate getFPS(int framesPerSecond) {
     Publisher.CameraCaptureFrameRate returnedValue;
-    if (framePerSecond < 7) {
+    if (framesPerSecond < 7) {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_1;
-    } else if (framePerSecond < 15) {
+    } else if (framesPerSecond < 15) {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_7;
-    } else if (framePerSecond < 30) {
+    } else if (framesPerSecond < 30) {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_15;
     } else {
       returnedValue = Publisher.CameraCaptureFrameRate.FPS_30;
@@ -964,7 +964,7 @@ public class OTWrapper {
   }
 
   private void attachPublisherView() {
-    if (mPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
+    if (mPublisher != null && !isNullOrEmpty(mBasicListeners)) {
       for (BasicListener listener: mBasicListeners) {
           ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mPublisher.getView());
       }
@@ -972,7 +972,7 @@ public class OTWrapper {
   }
 
   private void attachPublisherScreenView() {
-    if (mScreenPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
+    if (mScreenPublisher != null && !isNullOrEmpty(mBasicListeners)) {
       for (BasicListener listener: mBasicListeners) {
         if (isScreensharingByDefault) {
           ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mScreensharingFragment.getScreen());
@@ -985,7 +985,7 @@ public class OTWrapper {
   }
 
   private void dettachPublisherView() {
-    if (mPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
+    if (mPublisher != null && !isNullOrEmpty(mBasicListeners)) {
       for (BasicListener listener: mBasicListeners) {
         ((RetriableBasicListener)listener).onPreviewViewDestroyed(SELF, mPublisher.getView());
       }
@@ -993,7 +993,7 @@ public class OTWrapper {
   }
 
   private void detachPublisherScreenView() {
-    if (mScreenPublisher != null && mBasicListeners != null && !mBasicListeners.isEmpty()) {
+    if (mScreenPublisher != null && !isNullOrEmpty(mBasicListeners)) {
       for (BasicListener listener: mBasicListeners) {
         ((RetriableBasicListener)listener).onPreviewViewDestroyed(SELF, mScreenPublisher.getView());
       }
@@ -1001,7 +1001,7 @@ public class OTWrapper {
   }
 
   private void refreshPeerList() {
-    if (mBasicListeners != null && !mBasicListeners.isEmpty()) {
+      if(!isNullOrEmpty(mBasicListeners)){
         for (BasicListener listener: mBasicListeners) {
           if ( ((RetriableBasicListener)listener).getInternalListener() != null ){
             if (mPublisher != null) {
@@ -1011,15 +1011,18 @@ public class OTWrapper {
               ((RetriableBasicListener)listener).onPreviewViewReady(SELF,
                                                                     mScreenPublisher.getView());
             }
-            for(Subscriber sub: mSubscribers.values()) {
-              Stream stream = sub.getStream();
-              ((RetriableBasicListener)listener).
-                onRemoteViewReady(SELF, sub.getView(), stream.getStreamId(),
-                                  stream.getConnection().getData());
-            }
+            notifyRemoteViewReady((RetriableBasicListener)listener);
           }
         }
       }
+  }
+
+  private void notifyRemoteViewReady(RetriableBasicListener listener){
+    for(Subscriber sub: mSubscribers.values()) {
+      Stream stream = sub.getStream();
+      listener.onRemoteViewReady(SELF, sub.getView(), stream.getStreamId(),
+                      stream.getConnection().getData());
+    }
   }
 
   private void enableRemoteMedia(Subscriber sub, MediaType type, boolean enabled) {
@@ -1060,6 +1063,19 @@ public class OTWrapper {
     }
   }
 
+  /**
+   * Null-safe check if the specified collection is empty.
+   * <p>
+   * Null returns true.
+   *
+   * @param coll  the collection to check, may be null
+   * @return true if empty or null
+   *
+   */
+  public static boolean isNullOrEmpty(Collection coll) {
+    return (coll == null || coll.isEmpty());
+  }
+
   //Implements Basic listeners: Session.SessionListener, Session.ConnectionListener,
   // Session.SignalListener, Publisher.PublisherListener
   private Session.SessionListener mSessionListener = new Session.SessionListener() {
@@ -1074,12 +1090,12 @@ public class OTWrapper {
         ". listeners: ", mBasicListeners );
       addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_SUCCESS);
 
-
+      mConnectionsCount++;
       publishIfReady();
 
       if ( mBasicListeners != null ) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener)listener).onConnected(SELF, mSubscribers.size(),
+          ((RetriableBasicListener)listener).onConnected(SELF, mConnectionsCount,
                                                          mSessionConnection.getConnectionId(),
                                                          mSessionConnection.getData());
         }
@@ -1166,12 +1182,13 @@ public class OTWrapper {
     public void onConnectionCreated(Session session, Connection connection) {
       LOG.d(LOG_TAG, "onConnectionCreated: ", connection.getData());
       mSession.connections.put(connection.getConnectionId(), connection);
+      mConnectionsCount++;
       if (connection.getCreationTime().compareTo(mSessionConnection.getCreationTime()) <= 0) {
         mOlderThanMe++;
       }
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener) listener).onConnected(SELF, mSubscribers.size(),
+          ((RetriableBasicListener) listener).onConnected(SELF, mConnectionsCount,
                                                           connection.getConnectionId(),
                                                           connection.getData());
         }
@@ -1182,12 +1199,13 @@ public class OTWrapper {
     public void onConnectionDestroyed(Session session, Connection connection) {
       LOG.d(LOG_TAG, "onConnectionDestroyed: ", connection.getData());
       mSession.connections.remove(connection.getConnectionId());
+      mConnectionsCount--;
       if (connection.getCreationTime().compareTo(mSessionConnection.getCreationTime()) <= 0) {
         mOlderThanMe--;
       }
       if (mBasicListeners != null) {
         for (BasicListener listener : mBasicListeners) {
-          ((RetriableBasicListener) listener).onDisconnected(SELF, mSubscribers.size(),
+          ((RetriableBasicListener) listener).onDisconnected(SELF, mConnectionsCount,
                                                              connection.getConnectionId(),
                                                              connection.getData());
         }
