@@ -748,7 +748,6 @@ public class OTWrapper {
      */
     public void stopPreview() {
         if (mPublisher != null && isPreviewing) {
-            mPublisher.onStop();
             detachPublisherView();
             mPublisher = null;
             isPreviewing = false;
