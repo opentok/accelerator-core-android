@@ -749,7 +749,7 @@ public class OTWrapper {
     public void stopPreview() {
         if (mPublisher != null && isPreviewing) {
             mPublisher.onStop();
-            dettachPublisherView();
+            detachPublisherView();
             mPublisher = null;
             isPreviewing = false;
             startPublishing = false;
@@ -797,8 +797,7 @@ public class OTWrapper {
             isPublishing = false;
             startPublishing = false;
             if (!isPreviewing) {
-                mPublisher.onStop();
-                dettachPublisherView();
+                detachPublisherView();
                 mPublisher = null;
             }
         } else {
@@ -1455,8 +1454,9 @@ public class OTWrapper {
         }
     }
 
-    private void dettachPublisherView() {
+    private void detachPublisherView() {
         if (mPublisher != null && !isNullOrEmpty(mBasicListeners)) {
+            mPublisher.onStop();
             for (BasicListener listener : mBasicListeners) {
                 ((RetriableBasicListener) listener).onPreviewViewDestroyed(SELF, mPublisher.getView());
             }
@@ -1465,6 +1465,7 @@ public class OTWrapper {
 
     private void detachPublisherScreenView() {
         if (mScreenPublisher != null && !isNullOrEmpty(mBasicListeners)) {
+            mScreenPublisher.onStop();
             for (BasicListener listener : mBasicListeners) {
                 ((RetriableBasicListener) listener).onPreviewViewDestroyed(SELF, mScreenPublisher.getView());
             }
