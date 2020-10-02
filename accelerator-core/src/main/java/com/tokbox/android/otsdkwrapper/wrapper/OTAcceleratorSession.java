@@ -16,42 +16,66 @@ import com.tokbox.android.otsdkwrapper.utils.ThreadPool;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents an OpenTok Session
  */
 public class OTAcceleratorSession extends Session {
-    Hashtable<String, Connection> connections = new Hashtable<String, Connection>();
-
-    private final String LOG_TAG = this.getClass().getSimpleName();
     private static final short LOCAL_LOG_LEVEL = 0xFF;
     private static final LogWrapper LOG =
-      new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
-    public static void setLogLevel(short logLevel) {
-        LOG.setLogLevel(logLevel);
-    }
-
-    private ArrayList<SessionListener> mSessionListeners = new ArrayList<>();
-    private ArrayList<ConnectionListener> mConnectionsListeners = new ArrayList<>();
-    private ArrayList<ArchiveListener> mArchiveListeners = new ArrayList<>();
-    private ArrayList<StreamPropertiesListener> mStreamPropertiesListeners = new ArrayList<>();
-    private ArrayList<ReconnectionListener> mReconnectionListeners = new ArrayList<>();
-    private Hashtable<String, ArrayList<com.tokbox.android.otsdkwrapper.listeners.SignalListener>>
-      mSignalListeners =
-      new Hashtable<String, ArrayList<com.tokbox.android.otsdkwrapper.listeners.SignalListener>>();
-
+            new LogWrapper((short) (GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+    private final String LOG_TAG = this.getClass().getSimpleName();
+    ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+    private HashSet<SessionListener> mSessionListeners = new HashSet<>();
+    private HashSet<ConnectionListener> mConnectionsListeners = new HashSet<>();
+    private HashSet<ArchiveListener> mArchiveListeners = new HashSet<>();
+    private HashSet<StreamPropertiesListener> mStreamPropertiesListeners = new HashSet<>();
+    private HashSet<ReconnectionListener> mReconnectionListeners = new HashSet<>();
+    private ConcurrentHashMap<String, ArrayList<com.tokbox.android.otsdkwrapper.listeners.SignalListener>>
+            mSignalListeners =
+            new ConcurrentHashMap<>();
     //signal protocol
     private SignalProtocol mInputSignalProtocol;
     private SignalProtocol mOutputSignalProtocol;
     private SignalProcessorThread mInputSignalProcessor;
     private SignalProcessorThread mOutputSignalProcessor;
     private ThreadPool mSignalThreadPool;
-
+    private Callback<SignalInfo> mInternalSendSignal = new Callback<SignalInfo>() {
+        @Override
+        public void run(SignalInfo signalInfo) {
+            Connection connection = null;
+            if (signalInfo.mDstConnId != null) {
+                connection = connections.get(signalInfo.mDstConnId);
+            }
+            internalSendSignal(signalInfo, connection);
+        }
+    };
+    private Callback<SignalInfo> mDispatchSignal = new Callback<SignalInfo>() {
+        @Override
+        public void run(SignalInfo signalInfo) {
+            dispatchSignal(signalInfo);
+        }
+    };
+    private Session.SignalListener mSignalListener = new Session.SignalListener() {
+        @Override
+        public void onSignalReceived(Session session, String signalName, String data,
+                                     Connection connection) {
+            String connId = connection != null ? connection.getConnectionId() : null;
+            SignalInfo inputSignal = new SignalInfo(connId, OTAcceleratorSession.this.getConnection().getConnectionId(), signalName, data);
+            if (mInputSignalProtocol != null) {
+                mInputSignalProtocol.write(inputSignal);
+            } else {
+                dispatchSignal(inputSignal);
+            }
+        }
+    };
 
     /**
      * Creates an OTAcceleratorSession instance
+     *
      * @param context
      * @param apiKey
      * @param sessionId
@@ -60,11 +84,16 @@ public class OTAcceleratorSession extends Session {
         super(context, apiKey, sessionId);
     }
 
+    public static void setLogLevel(short logLevel) {
+        LOG.setLogLevel(logLevel);
+    }
+
     /**
      * Registers a signal listener for a given signal.
+     *
      * @param signalName Name of the signal this listener will listen to. Pass "*" if the listener
      *                   is to be invoked for all signals.
-     * @param listener Listener that will be invoked when a signal is received.
+     * @param listener   Listener that will be invoked when a signal is received.
      */
     public void addSignalListener(String signalName,
                                   com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
@@ -73,7 +102,7 @@ public class OTAcceleratorSession extends Session {
             mSignalThreadPool = new ThreadPool();
         }
         ArrayList<com.tokbox.android.otsdkwrapper.listeners.SignalListener> perNameListeners =
-          mSignalListeners.get(signalName);
+                mSignalListeners.get(signalName);
         if (perNameListeners == null) {
             perNameListeners = new ArrayList<>();
             mSignalListeners.put(signalName, perNameListeners);
@@ -89,6 +118,7 @@ public class OTAcceleratorSession extends Session {
      * common cases where an activity (or some object that depends on an activity) is used as a
      * listene but the activity can be destroyed at some points (which would cause the app to crash
      * if the signal was delivered).
+     *
      * @param listener Listener to be removed
      */
     public void removeSignalListener(com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
@@ -102,14 +132,15 @@ public class OTAcceleratorSession extends Session {
 
     /**
      * Removes a signal listener.
+     *
      * @param signalName Name of the signal this listener will listen to. Pass "*" if the listener
      *                   is to be invoked for all signals.
-     * @param listener Listener to be removed.
+     * @param listener   Listener to be removed.
      */
     public void removeSignalListener(String signalName,
                                      com.tokbox.android.otsdkwrapper.listeners.SignalListener listener) {
         ArrayList<com.tokbox.android.otsdkwrapper.listeners.SignalListener> perNameListeners =
-          mSignalListeners.get(signalName);
+                mSignalListeners.get(signalName);
         if (perNameListeners == null) {
             return;
         }
@@ -121,6 +152,7 @@ public class OTAcceleratorSession extends Session {
 
     /**
      * Sends a new signal
+     *
      * @param signalInfo {@link SignalInfo} of the signal to be sent
      * @param connection Destiantion connection. If null, the signal will be sent to all.
      */
@@ -138,6 +170,7 @@ public class OTAcceleratorSession extends Session {
 
     /**
      * Internal method to sends a new signal. Called from {@link OTWrapper}
+     *
      * @param signalInfo {@link SignalInfo} of the signal to be sent
      * @param connection Destiantion connection. If null, the signal will be sent to all.
      */
@@ -161,6 +194,7 @@ public class OTAcceleratorSession extends Session {
 
     /**
      * Get the signal listener
+     *
      * @return the signalListener
      */
     public Session.SignalListener getSignalListener() {
@@ -171,22 +205,22 @@ public class OTAcceleratorSession extends Session {
                                 final SignalInfo signalInfo, boolean global) {
         if (listeners != null) {
             Iterator<com.tokbox.android.otsdkwrapper.listeners.SignalListener> listenerIterator =
-              listeners.iterator();
+                    listeners.iterator();
             while (listenerIterator.hasNext()) {
                 LOG.d(LOG_TAG, "Starting thread to process: ", signalInfo.mSignalName,
-                      " : ", signalInfo.mData );
+                        " : ", signalInfo.mData);
                 final com.tokbox.android.otsdkwrapper.listeners.SignalListener listener =
-                  listenerIterator.next();
+                        listenerIterator.next();
                 mSignalThreadPool.runAsync(new Runnable() {
                     @Override
                     public void run() {
                         LOG.d(LOG_TAG, "Dispatching signal: ", signalInfo.mSignalName,
-                              " : ", signalInfo.mData,
-                              " on thread: ", Thread.currentThread().getId());
+                                " : ", signalInfo.mData,
+                                " on thread: ", Thread.currentThread().getId());
                         listener.
-                          onSignalReceived(signalInfo,
-                                           OTAcceleratorSession.this.getConnection().
-                                             getConnectionId().equals(signalInfo.mSrcConnId));
+                                onSignalReceived(signalInfo,
+                                        OTAcceleratorSession.this.getConnection().
+                                                getConnectionId().equals(signalInfo.mSrcConnId));
                     }
                 });
             }
@@ -198,6 +232,7 @@ public class OTAcceleratorSession extends Session {
 
     /**
      * Sets an input signal processor.
+     *
      * @param inputProtocol The input protocol you want to enforce. Pass null if you wish to receive
      *                      raw signals.
      */
@@ -209,104 +244,57 @@ public class OTAcceleratorSession extends Session {
 
     /**
      * Sets an output signal protocol.
+     *
      * @param outputProtocol
      */
     public synchronized void setOutputSignalProtocol(SignalProtocol outputProtocol) {
         mOutputSignalProtocol = outputProtocol;
         mOutputSignalProcessor =
-          refreshSignalProcessor(mOutputSignalProcessor, mOutputSignalProtocol, mInternalSendSignal);
+                refreshSignalProcessor(mOutputSignalProcessor, mOutputSignalProtocol, mInternalSendSignal);
     }
 
     private void dispatchSignal(final SignalInfo signalInfo) {
         LOG.d(LOG_TAG, "Dispatching signal: ", signalInfo.mSignalName, " with: ", signalInfo.mData);
         dispatchSignal(mSignalListeners.get("*"), signalInfo, true);
 
-        if(signalInfo.mSignalName != null) {
+        if (signalInfo.mSignalName != null) {
             dispatchSignal(mSignalListeners.get(signalInfo.mSignalName), signalInfo, false);
         }
     }
-
-    private Callback<SignalInfo> mInternalSendSignal = new Callback<SignalInfo>() {
-        @Override
-        public void run(SignalInfo signalInfo) {
-            Connection connection = null;
-            if (signalInfo.mDstConnId != null) {
-                connection = connections.get(signalInfo.mDstConnId);
-            }
-            internalSendSignal(signalInfo, connection);
-        }
-    };
-
-    private Callback<SignalInfo> mDispatchSignal = new Callback<SignalInfo>() {
-        @Override
-        public void run(SignalInfo signalInfo) {
-            dispatchSignal(signalInfo);
-        }
-    };
 
     private SignalProcessorThread refreshSignalProcessor(SignalProcessorThread currentProcessor,
                                                          SignalProtocol signalProtocol,
                                                          Callback<SignalInfo> cb) {
         if (currentProcessor != null) {
             return currentProcessor.switchPipe(signalProtocol);
-        } else  {
+        } else {
             return new SignalProcessorThread(signalProtocol, cb);
         }
     }
 
-
-    private Session.SignalListener mSignalListener = new Session.SignalListener() {
-        @Override
-        public void onSignalReceived(Session session, String signalName, String data,
-                                     Connection connection) {
-            String connId = connection != null ? connection.getConnectionId() : null;
-            SignalInfo inputSignal = new SignalInfo(connId, OTAcceleratorSession.this.getConnection().getConnectionId(), signalName, data);
-            if (mInputSignalProtocol != null) {
-                mInputSignalProtocol.write(inputSignal);
-            } else {
-                dispatchSignal(inputSignal);
-            }
-        }
-    };
-
     @Override
     public void setSessionListener(SessionListener listener) {
-        super.setSessionListener(listener);
-        if (!mSessionListeners.contains(listener)) {
-            mSessionListeners.add(listener);
-        }
+        mSessionListeners.add(listener);
     }
 
     @Override
     public void setConnectionListener(ConnectionListener listener) {
-        super.setConnectionListener(listener);
-        if (!mConnectionsListeners.contains(listener)) {
-            mConnectionsListeners.add(listener);
-        }
+        mConnectionsListeners.add(listener);
     }
 
     @Override
     public void setStreamPropertiesListener(StreamPropertiesListener listener) {
-        super.setStreamPropertiesListener(listener);
-        if (!mStreamPropertiesListeners.contains(listener)) {
-            mStreamPropertiesListeners.add(listener);
-        }
+        mStreamPropertiesListeners.add(listener);
     }
 
     @Override
     public void setArchiveListener(ArchiveListener listener) {
-        super.setArchiveListener(listener);
-        if (!mArchiveListeners.contains(listener)) {
-            mArchiveListeners.add(listener);
-        }
+        mArchiveListeners.add(listener);
     }
 
     @Override
     public void setReconnectionListener(ReconnectionListener listener) {
-        super.setReconnectionListener(listener);
-        if (!mReconnectionListeners.contains(listener)) {
-            mReconnectionListeners.add(listener);
-        }
+        mReconnectionListeners.add(listener);
     }
 
     @Override
@@ -336,8 +324,8 @@ public class OTAcceleratorSession extends Session {
             l.onDisconnected(this);
         }
         if (mSignalThreadPool != null) {
-          mSignalThreadPool.finish();
-          mSignalThreadPool = null;
+            mSignalThreadPool.finish();
+            mSignalThreadPool = null;
         }
     }
 
