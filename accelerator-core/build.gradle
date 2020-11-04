@@ -2,9 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    def acceleratorCoreVersion = '1.0.24'
+    def acceleratorCoreVersion = '2.0.0'
     compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+
+    buildToolsVersion "30.0.2"
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 30
@@ -14,6 +15,7 @@ android {
         project.version = acceleratorCoreVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -25,11 +27,13 @@ android {
             buildConfigField 'String', 'acceleratorCoreVersion', '\"'+acceleratorCoreVersion+'\"'
         }
     }
+
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
         disable 'OldTargetApi'
     }
+
     libraryVariants.all { variant ->
         variant.outputs.all { output ->
             def outputFile = outputFileName
@@ -59,6 +63,12 @@ android {
         zipBundle.dependsOn build
         zipBundle.dependsOn javadoc
     }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
     packagingOptions {
         exclude 'META-INF/ASL2.0'
         exclude 'META-INF/LICENSE'
@@ -66,14 +76,16 @@ android {
 }
 
 dependencies {
-    repositories {
-        maven { url 'https://maven.google.com' }
-        maven { url 'http://tokbox.bintray.com/maven' }
-    }
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.opentok.android:opentok-solutions-logging:1.0.3'
-    implementation "com.opentok.android:opentok-android-sdk:2.18.0"
+    implementation "com.opentok.android:opentok-android-sdk:2.18.1"
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.google.android.material:material:1.2.1'
+
+    androidTestImplementation 'junit:junit:4.13.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 
 if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD")) {
@@ -91,6 +103,7 @@ if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD
         }
    }
 }
+
 def checkMaven = task("checkUploadArchivesDeps") {
     doFirst {
         if (!project.hasProperty("MAVEN_USERNAME")) {
@@ -101,6 +114,7 @@ def checkMaven = task("checkUploadArchivesDeps") {
         }
     }
 }
+
 uploadArchives.dependsOn checkMaven
 def getRevisionAndTime() {
     def date = new Date()
@@ -116,7 +130,7 @@ def isEnvVarNotEmptyOrNull(envVar) {
 }
 
 def isPreview() {
-    return isEnvVarNotEmptyOrNull("PREVIEW") && '1'.equals(System.getenv('PREVIEW'));
+    return isEnvVarNotEmptyOrNull("PREVIEW") && '1' == System.getenv('PREVIEW');
 }
 
 def getArtifactId() {
