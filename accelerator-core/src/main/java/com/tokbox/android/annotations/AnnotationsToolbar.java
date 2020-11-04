@@ -100,16 +100,16 @@ public class AnnotationsToolbar extends LinearLayout {
 
     private void init() {
         rootView = inflate(mContext, R.layout.annotations_toolbar, this);
-        mMainToolbar = (RelativeLayout) rootView.findViewById(R.id.main_toolbar);
+        mMainToolbar = rootView.findViewById(R.id.main_toolbar);
 
-        mColorToolbar = (LinearLayout) rootView.findViewById(R.id.color_toolbar);
-        mColorScrollView = (HorizontalScrollView) rootView.findViewById(R.id.color_view);
-        mFreeHandBtn = (ImageButton) mMainToolbar.findViewById(R.id.draw_freehand);
-        mPickerColorBtn = (ImageButton) mMainToolbar.findViewById(R.id.picker_color);
-        mTypeBtn = (ImageButton) mMainToolbar.findViewById(R.id.type_tool);
-        mScreenshotBtn = (ImageButton) mMainToolbar.findViewById(R.id.screenshot);
-        mEraseBtn = (ImageButton) mMainToolbar.findViewById(R.id.erase);
-        mDoneBtn = (ImageButton) mMainToolbar.findViewById(R.id.done);
+        mColorToolbar = rootView.findViewById(R.id.color_toolbar);
+        mColorScrollView = rootView.findViewById(R.id.color_view);
+        mFreeHandBtn = mMainToolbar.findViewById(R.id.draw_freehand);
+        mPickerColorBtn = mMainToolbar.findViewById(R.id.picker_color);
+        mTypeBtn = mMainToolbar.findViewById(R.id.type_tool);
+        mScreenshotBtn = mMainToolbar.findViewById(R.id.screenshot);
+        mEraseBtn = mMainToolbar.findViewById(R.id.erase);
+        mDoneBtn = mMainToolbar.findViewById(R.id.done);
 
         final int mCount = mColorToolbar.getChildCount();
 
