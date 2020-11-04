@@ -1,6 +1,7 @@
 package com.tokbox.android.accpack.textchat.testbase;
 
 
+import android.app.Instrumentation;
 import android.content.Context;
 import android.util.Log;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -23,9 +24,10 @@ public abstract class BaseTest {
 
     protected final static int WAIT_TIME = 75;
 
-    protected Context context;
-    protected String sessionId = APIConfig.SESSION_ID;
+    protected Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+    protected Context context = instrumentation.getContext();
     protected String apiKey = APIConfig.API_KEY;
+    protected String sessionId = APIConfig.SESSION_ID;
     protected String token = APIConfig.TOKEN;
 
     protected OTAcceleratorSession session;
@@ -69,10 +71,6 @@ public abstract class BaseTest {
             sessionConnectedLock.countDown();
         }
     };
-
-    protected Context getContext() {
-        return InstrumentationRegistry.getInstrumentation().getContext();
-    }
 
     @After
     public void tearDown() throws Exception {

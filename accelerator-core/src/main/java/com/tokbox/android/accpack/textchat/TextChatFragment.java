@@ -227,16 +227,16 @@ public class TextChatFragment extends Fragment implements SignalListener {
      *
      * @param length The maximum length of a text chat message (in characters).
      */
-    public void setMaxTextLength(int length) throws Exception {
+    public void setMaxTextLength(int length) throws IllegalArgumentException {
         addLogEvent(OpenTokConfig.LOG_ACTION_SET_MAX_LENGTH, OpenTokConfig.LOG_VARIATION_ATTEMPT);
         if (length > MAX_OPENTOK_LENGTH) {
             onError("Your maximum length is over size limit on the OpenTok platform (maximum length 8196)");
             addLogEvent(OpenTokConfig.LOG_ACTION_SET_MAX_LENGTH, OpenTokConfig.LOG_VARIATION_ERROR);
-            throw new Exception("The maximum length cannot be over size limit on the OpenTok platform (maximum length 8196)");
+            throw new IllegalArgumentException("The maximum length cannot be over size limit on the OpenTok platform (maximum length 8196)");
         } else {
             if (length <= 0) {
-                onError("Your maximum length should be less than 0");
-                throw new Exception("The maximum length cannot be less than 0");
+                onError("Your maximum length must be greater than 0");
+                throw new IllegalArgumentException("The maximum length must be greater than 0");
             }
             maxTextLength = length;
             mMsgCharsView.setText(String.valueOf(maxTextLength));
@@ -258,11 +258,11 @@ public class TextChatFragment extends Fragment implements SignalListener {
      *
      * @param senderAlias The alias for the sender.
      */
-    public void setSenderAlias(String senderAlias) throws Exception {
+    public void setSenderAlias(String senderAlias) throws IllegalArgumentException {
 
         if (senderAlias == null || senderAlias.length() == 0) {
             onError("The alias cannot be null or empty");
-            throw new Exception("Sender allias cannot be null or empty");
+            throw new IllegalArgumentException("Sender allias cannot be null or empty");
         }
         this.senderAlias = senderAlias;
         senders.put(senderId, senderAlias);
@@ -290,9 +290,9 @@ public class TextChatFragment extends Fragment implements SignalListener {
      *
      * @param actionBar The customized action bar.
      */
-    public void setActionBar(ViewGroup actionBar) throws Exception {
+    public void setActionBar(ViewGroup actionBar) throws IllegalArgumentException {
         if (actionBar == null) {
-            throw new Exception("ActionBar cannot be null");
+            throw new IllegalArgumentException("ActionBar cannot be null");
         }
         mActionBarView = actionBar;
     }
@@ -311,10 +311,10 @@ public class TextChatFragment extends Fragment implements SignalListener {
      *
      * @param sendMessageView The customized send message area view.
      */
-    public void setSendMessageView(ViewGroup sendMessageView) throws Exception {
+    public void setSendMessageView(ViewGroup sendMessageView) throws IllegalArgumentException {
 
         if (sendMessageView == null) {
-            throw new Exception("MessageView cannot be null");
+            throw new IllegalArgumentException("MessageView cannot be null");
         }
         mSendMessageView = sendMessageView;
     }
@@ -364,7 +364,7 @@ public class TextChatFragment extends Fragment implements SignalListener {
 
     //Private methods
     //Add a message to the message list.
-    private void addMessage(final ChatMessage msg) throws Exception {
+    private void addMessage(final ChatMessage msg) throws IllegalArgumentException {
         Log.i(LOG_TAG, "New message " + msg.getText() + " is ready to be added.");
 
         if (msg != null) {
@@ -378,7 +378,11 @@ public class TextChatFragment extends Fragment implements SignalListener {
             //generate message timestamp
             Date date = new Date();
             if (msg.getTimestamp() == 0) {
-                msg.setTimestamp(date.getTime());
+                try {
+                    msg.setTimestamp(date.getTime());
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(e.getMessage());
+                }
             }
 
             getActivity().runOnUiThread(new Runnable() {
@@ -386,7 +390,6 @@ public class TextChatFragment extends Fragment implements SignalListener {
                 public void run() {
                     if (!checkMessageGroup(msg)) {
                         messagesList.add(msg);
-                        mMessageAdapter.notifyDataSetChanged();
                     } else {
                         //concat text for the messages group
                         String msgText = messagesList.get(messagesList.size() - 1).getText() + "\r\n" + msg.getText();
@@ -396,9 +399,9 @@ public class TextChatFragment extends Fragment implements SignalListener {
                             e.printStackTrace();
                         }
                         messagesList.set(messagesList.size() - 1, msg);
-                        mMessageAdapter.notifyDataSetChanged();
                     }
 
+                    mMessageAdapter.notifyDataSetChanged();
                     mRecyclerView.smoothScrollToPosition(mMessageAdapter.getItemCount() - 1); //update based on adapter
 
                 }
