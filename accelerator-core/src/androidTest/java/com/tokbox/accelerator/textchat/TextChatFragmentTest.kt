@@ -17,7 +17,7 @@ class TextChatFragmentTest {
     private var session: OTAcceleratorSession? = null
 
     @Test
-    fun `throw_exception_when_session_is_null`() {
+    fun creating_new_instance_with_null_session_throws_exception() {
         // when
         val func = { TextChatFragment.newInstance(null, "apiKey") }
 
@@ -26,7 +26,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `throw_exception_when_apiKey_is_null`() {
+    fun creating_new_instance_with_null_apiKey_throws_exception() {
         // given
         instrumentation.runOnMainSync {
             session = OTAcceleratorSession(context, null, "sessionId")
@@ -40,7 +40,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `throw_exception_when_apiKey_is_empty`() {
+    fun creating_new_instance_with_empty_apiKey_throws_exception() {
         // given
         instrumentation.runOnMainSync {
             session = OTAcceleratorSession(context, null, "sessionId")
@@ -54,7 +54,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `set_max_length_when_maxTextLength_is_greater_than_opentok_max`() {
+    fun setting_maxTextLength_greater_than_opentok_max_will_set_opentok_max() {
         // given
         val textChatFragment = getTextChatFragment()
 
@@ -66,7 +66,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `throw_exception_when_maxTextLength_is_zero`() {
+    fun setting_maxTextLength_to_zero_throws_exception() {
         // given
         val textChatFragment = getTextChatFragment()
 
@@ -78,7 +78,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `throw_exception_when_maxTextLength_is_lower_than_zero`() {
+    fun setting_maxTextLength_lower_than_zero_throws_exception() {
         // given
         val textChatFragment = getTextChatFragment()
 
@@ -90,7 +90,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `throw_exception_when_senderAlias_is_null`() {
+    fun setting_null_senderAlias_throws_exception() {
         // given
         val textChatFragment = getTextChatFragment()
 
@@ -102,7 +102,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `throw_exception_when_senderAlias_is_empty`() {
+    fun setting_empty_senderAlias_throws_exception() {
         // given
         val textChatFragment = getTextChatFragment()
 
@@ -114,7 +114,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `set_actionBar`() {
+    fun setting_actionBar_sets_action_bar() {
         // given
         val textChatFragment = getTextChatFragment()
 
@@ -126,7 +126,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `throw_exception_when_set_actionBar_is_null`() {
+    fun setting_null_actionBar_throw_exception() {
         // given
         val textChatFragment = getTextChatFragment()
 
@@ -138,7 +138,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `set_sendMessageView`() {
+    fun setting_sendMessageView_sets_sendMessageView() {
         // given
         val textChatFragment = getTextChatFragment()
 
@@ -150,7 +150,7 @@ class TextChatFragmentTest {
     }
 
     @Test
-    fun `throw_exception_when_set_sendMessageView_is_null`() {
+    fun setting_null_sendMessageView_throw_exception() {
         // given
         val textChatFragment = getTextChatFragment()
 
