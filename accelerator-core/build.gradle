@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven'
 
 android {
-    def acceleratorCoreVersion = '2.0.0'
+    def acceleratorCoreVersion = '2.0.0-alpha.1'
 
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
