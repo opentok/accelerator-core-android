@@ -2,7 +2,9 @@ package com.tokbox.accelerator.textchat;
 
 
 import android.util.Log;
+import androidx.annotation.NonNull;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
@@ -104,29 +106,35 @@ public class ChatMessage {
 
     /**
      * Set the message timestamp.
+     *
      * @param timestamp The message timestamp.
      */
-    public void setTimestamp(long timestamp) throws Exception {
+    public void setTimestamp(long timestamp) throws IllegalArgumentException {
 
-        long MIN_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd").parse(RELEASE_DATE).getTime();
+        long MIN_TIMESTAMP = 0;
+        try {
+            MIN_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd").parse(RELEASE_DATE).getTime();
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Unable to parse timestamp");
+        }
 
-        if ( timestamp < MIN_TIMESTAMP ){
-            throw new Exception("Timestamp cannot be less than" + MIN_TIMESTAMP);
+        if (timestamp < MIN_TIMESTAMP) {
+            throw new IllegalArgumentException("Timestamp cannot be less than" + MIN_TIMESTAMP);
         }
         this.timestamp = timestamp;
     }
 
     /**
      * Set the sender alias.
+     *
      * @param senderAlias The sender alias.
      */
-    public void setSenderAlias(String senderAlias) throws Exception {
-        if ( senderAlias.length() > MAX_ALIAS_LENGTH ){
-            throw new Exception("Sender alias string cannot be greater than "+MAX_ALIAS_LENGTH);
-        }
-        else {
-            if ( senderAlias == null || senderAlias.length() == 0 || senderAlias.trim().length() == 0 ){
-                throw new Exception("Sender alias cannot be null or empty");
+    public void setSenderAlias(@NonNull String senderAlias) throws IllegalArgumentException {
+        if (senderAlias.length() > MAX_ALIAS_LENGTH) {
+            throw new IllegalArgumentException("Sender alias string cannot be greater than " + MAX_ALIAS_LENGTH);
+        } else {
+            if (senderAlias.length() == 0 || senderAlias.trim().length() == 0) {
+                throw new IllegalArgumentException("Sender alias cannot be null or empty");
             }
         }
         this.senderAlias = senderAlias;
@@ -134,15 +142,15 @@ public class ChatMessage {
 
     /**
      * Set the message text.
+     *
      * @param text The message text.
      */
-    public void setText(String text) throws Exception {
-        if ( text.length() > MAX_TEXT_LENGTH ){
-            throw new Exception("Text string cannot be greater than "+MAX_TEXT_LENGTH);
-        }
-        else {
-            if ( text == null || text.length() == 0 || text.trim().length() == 0 ){
-                throw new Exception("Text cannot be null or empty");
+    public void setText(@NonNull String text) throws IllegalArgumentException {
+        if (text.length() > MAX_TEXT_LENGTH) {
+            throw new IllegalArgumentException("Text string cannot be greater than " + MAX_TEXT_LENGTH);
+        } else {
+            if (text.length() == 0 || text.trim().length() == 0) {
+                throw new IllegalArgumentException("Text cannot be null or empty");
             }
         }
         this.text = text;
@@ -177,15 +185,15 @@ public class ChatMessage {
 
         /**
          * Set a sender alias on the ChatMessage that has to be build by this ChatMessageBuilder
+         *
          * @param senderAlias The sender alias.
          */
-        public ChatMessageBuilder senderAlias(String senderAlias) throws Exception {
-            if ( senderAlias.length() > MAX_ALIAS_LENGTH ){
-                throw new Exception("Sender alias string cannot be greater than "+MAX_ALIAS_LENGTH);
-            }
-            else {
-                if ( senderAlias == null || senderAlias.length() == 0 || senderAlias.trim().length() == 0 ){
-                    throw new Exception("Sender alias cannot be null or empty");
+        public ChatMessageBuilder senderAlias(String senderAlias) throws IllegalArgumentException {
+            if (senderAlias.length() > MAX_ALIAS_LENGTH) {
+                throw new IllegalArgumentException("Sender alias string cannot be greater than " + MAX_ALIAS_LENGTH);
+            } else {
+                if (senderAlias == null || senderAlias.length() == 0 || senderAlias.trim().length() == 0) {
+                    throw new IllegalArgumentException("Sender alias cannot be null or empty");
                 }
             }
             this.senderAlias = senderAlias;
@@ -194,15 +202,15 @@ public class ChatMessage {
 
         /**
          * Set a text message string on the ChatMessage that has to be build by this ChatMessageBuilder
+         *
          * @param text The message text.
          */
-        public ChatMessageBuilder text(String text) throws Exception {
-            if ( text.length() > MAX_TEXT_LENGTH ){
-                throw new Exception("Text string cannot be greater than "+MAX_TEXT_LENGTH);
-            }
-            else {
-                if ( text == null || text.length() == 0 || text.trim().length() == 0 ){
-                    throw new Exception("Text cannot be null or empty");
+        public ChatMessageBuilder text(@NonNull String text) throws IllegalArgumentException {
+            if (text.length() > MAX_TEXT_LENGTH) {
+                throw new IllegalArgumentException("Text string cannot be greater than " + MAX_TEXT_LENGTH);
+            } else {
+                if (text.length() == 0 || text.trim().length() == 0) {
+                    throw new IllegalArgumentException("Text cannot be null or empty");
                 }
             }
             this.text = text;
@@ -211,13 +219,19 @@ public class ChatMessage {
 
         /**
          * Set a timestamp on the ChatMessage that has to be build by this ChatMessageBuilder
+         *
          * @param timestamp The message timestamp.
          */
-        public ChatMessageBuilder timestamp(long timestamp) throws Exception {
-            long MIN_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd").parse(RELEASE_DATE).getTime();
+        public ChatMessageBuilder timestamp(@NonNull long timestamp) throws IllegalArgumentException {
+            long MIN_TIMESTAMP = 0;
+            try {
+                MIN_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd").parse(RELEASE_DATE).getTime();
+            } catch (ParseException e) {
+                throw new IllegalArgumentException("Unable to parse timestamp");
+            }
 
-            if ( timestamp < MIN_TIMESTAMP ){
-                throw new Exception("Timestamp cannot be less than" + MIN_TIMESTAMP);
+            if (timestamp < MIN_TIMESTAMP) {
+                throw new IllegalArgumentException("Timestamp cannot be less than" + MIN_TIMESTAMP);
             }
 
             this.timestamp = timestamp;

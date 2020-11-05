@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import com.tokbox.accelerator.annotations.config.OpenTokConfig;
 import com.tokbox.accelerator.annotations.utils.AnnotationsVideoRenderer;
 import com.tokbox.android.logging.OTKAnalytics;
@@ -160,23 +161,22 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
     }
 
     /**
-     * Creates a new AnnotationView instance for local screensharing. isScreensharing should be true
+     * Creates a new AnnotationView instance for local screensharing. isScreenSharing should be true
      *
      * @param context
      * @param session
      * @param partnerId
-     * @param isScreensharing
+     * @param isScreenSharing
      * @throws Exception
      */
-    public AnnotationsView(Context context, OTAcceleratorSession session, String partnerId, boolean isScreensharing) throws Exception {
+    public AnnotationsView(Context context, @NonNull OTAcceleratorSession session, String partnerId,
+                           boolean isScreenSharing) throws IllegalArgumentException {
         super(context);
 
-        if (session == null) {
-            throw new Exception("Session cannot be null in the annotations");
-        }
         if (session.getConnection() == null) {
-            throw new Exception("Session is not connected");
+            throw new IllegalArgumentException("Session is not connected");
         }
+
         this.mContext = context;
         this.mSession = session;
         this.mPartnerId = partnerId;
@@ -186,7 +186,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
         this.mSession.addSignalListener(Mode.Undo.toString(), this);
         this.mSession.addSignalListener(Mode.Clear.toString(), this);
 
-        this.isScreensharing = isScreensharing;
+        this.isScreensharing = isScreenSharing;
 
         init();
     }
@@ -200,14 +200,14 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
      * @param remoteConnId
      * @throws Exception
      */
-    public AnnotationsView(Context context, OTAcceleratorSession session, String partnerId, String remoteConnId) throws Exception {
+    public AnnotationsView(Context context, @NonNull OTAcceleratorSession session, String partnerId,
+                           String remoteConnId) throws IllegalArgumentException {
         super(context);
-        if (session == null) {
-            throw new Exception("Wrapper cannot be null in the annotations");
-        }
+
         if (session.getConnection() == null) {
-            throw new Exception("Session is not connected");
+            throw new IllegalArgumentException("Session is not connected");
         }
+
         this.mContext = context;
         this.mSession = session;
         this.mPartnerId = partnerId;
@@ -227,11 +227,8 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
      *
      * @param toolbar AnnotationsToolbar
      */
-    public void attachToolbar(AnnotationsToolbar toolbar) throws Exception {
+    public void attachToolbar(@NonNull AnnotationsToolbar toolbar) throws Exception {
         addLogEvent(OpenTokConfig.LOG_ACTION_USE_TOOLBAR, OpenTokConfig.LOG_VARIATION_ATTEMPT);
-        if (toolbar == null) {
-            throw new Exception("AnnotationsToolbar cannot be null");
-        }
         mToolbar = toolbar;
         mToolbar.setActionListener(this);
 
@@ -250,10 +247,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
      *
      * @param videoRenderer AnnotationsVideoRenderer
      */
-    public void setVideoRenderer(AnnotationsVideoRenderer videoRenderer) throws Exception {
-        if (videoRenderer == null) {
-            throw new Exception("VideoRenderer cannot be null");
-        }
+    public void setVideoRenderer(@NonNull AnnotationsVideoRenderer videoRenderer) {
         this.videoRenderer = videoRenderer;
     }
 
@@ -563,7 +557,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
         }
     }
 
-    private void addAnnotatable(String cid) throws Exception {
+    private void addAnnotatable(String cid) {
         Log.i(LOG_TAG, "Add Annotatable");
         if (mode != null) {
             if (mode.equals(Mode.Pen)) {
@@ -878,7 +872,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
         }
     }
 
-    private void textAnnotation(String connectionId, String data) throws Exception {
+    private void textAnnotation(String connectionId, String data) {
 
         mode = Mode.Text;
         // Build object from JSON array

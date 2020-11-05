@@ -2,15 +2,25 @@ package com.tokbox.accelerator.textchat
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tokbox.accelerator.textchat.ChatMessage.MessageStatus
+import io.mockk.MockKAnnotations
+import io.mockk.mockk
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBe
 import org.amshove.kluent.shouldThrow
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class MessagesAdapterTest {
+
+    @Before
+    fun settUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+//        cut = NavManager()
+    }
 
     @Test
     fun creating_new_instance_with_null_list_throws_exception() {
@@ -36,9 +46,7 @@ class MessagesAdapterTest {
     @Test
     fun creating_new_instance_with_list_containing_one_item() {
         // given
-        val chatMessage = ChatMessage
-            .ChatMessageBuilder("1", UUID.randomUUID(), MessageStatus.SENT_MESSAGE)
-            .build()
+        val chatMessage = mockk<ChatMessage>();
 
         val messagesList = ArrayList<ChatMessage>()
         messagesList.add(chatMessage)

@@ -1,6 +1,7 @@
 package com.tokbox.accelerator.annotations;
 
 import android.graphics.Paint;
+import androidx.annotation.NonNull;
 
 /**
  * Defines an object to be added to the annotations view.
@@ -27,16 +28,14 @@ public class Annotatable {
 
     /**
      * Constructor
-     * @param mode The AnnotationsView.Mode
-     * @param path The path to be added
+     *
+     * @param mode  The AnnotationsView.Mode
+     * @param path  The path to be added
      * @param paint the style of the annotation
-     * @param cid the connection id
+     * @param cid   the connection id
      */
-    public Annotatable(AnnotationsView.Mode mode, AnnotationsPath path, Paint paint, String cid) throws Exception{
-        if ( cid == null || paint == null || path == null || mode == null || cid.isEmpty() ) {
-            throw  new Exception ("Parameters (cid, paint, path or mode) cannot be null.");
-        }
-
+    public Annotatable(@NonNull AnnotationsView.Mode mode, @NonNull AnnotationsPath path, @NonNull Paint paint,
+                       @NonNull String cid) {
         this.cid = cid;
         this.mode = mode;
         this.path = path;
@@ -45,16 +44,14 @@ public class Annotatable {
 
     /**
      * Constructor
-     * @param mode The AnnotationsView.Mode
-     * @param text The text to be added
+     *
+     * @param mode  The AnnotationsView.Mode
+     * @param text  The text to be added
      * @param paint the style of the annotation
-     * @param cid the connection id
+     * @param cid   the connection id
      */
-    public Annotatable(AnnotationsView.Mode mode, AnnotationsText text, Paint paint, String cid) throws Exception {
-        if ( cid == null || paint == null || text == null || mode == null || cid.isEmpty() ) {
-            throw  new Exception ("Parameters (cid, paint, text or mode) cannot be null.");
-        }
-
+    public Annotatable(@NonNull AnnotationsView.Mode mode, @NonNull AnnotationsText text, @NonNull Paint paint,
+                       @NonNull String cid) {
         this.cid = cid;
         this.mode = mode;
         this.text = text;
@@ -63,31 +60,27 @@ public class Annotatable {
 
     /**
      * Sets the AnnotationsView.Mode of the annotatable object
+     *
      * @param mode
      * @throws Exception
      */
-    public void setMode(AnnotationsView.Mode mode) throws Exception{
-
-        if (mode == null ) {
-            throw  new Exception ("Mode cannot be null.");
-        }
+    public void setMode(@NonNull AnnotationsView.Mode mode) {
         this.mode = mode;
     }
 
     /**
      * Sets the data of the annotatable object
+     *
      * @param data
      * @throws Exception
      */
-    public void setData(String data) throws Exception{
-        if (data == null ) {
-            throw  new Exception ("Data cannot be null.");
-        }
+    public void setData(@NonNull String data) {
         this.data = data;
     }
 
     /**
      * Sets the AnnotatableType of the annotatable object
+     *
      * @param type
      */
     public void setType(AnnotatableType type) {

@@ -20,16 +20,15 @@ public class AnnotationsManager {
     /**
      * Adds a new Annotatable object to the list
      */
-    public void addAnnotatable(Annotatable annotatable) throws Exception{
-        if ( annotatable == null ) {
-            throw new Exception("Annotatable cannot be null.");
+    public void addAnnotatable(Annotatable annotatable) throws IllegalArgumentException {
+        if (annotatable == null) {
+            throw new IllegalArgumentException("Annotatable cannot be null.");
         }
         mAnnotatableList.add(annotatable);
-        if ( annotatable.getPath() != null){
-            annotatable.setType (Annotatable.AnnotatableType.PATH);
-        }
-        else  {
-            if ( annotatable.getText() != null ){
+        if (annotatable.getPath() != null) {
+            annotatable.setType(Annotatable.AnnotatableType.PATH);
+        } else {
+            if (annotatable.getText() != null) {
                 annotatable.setType(Annotatable.AnnotatableType.TEXT);
             }
         }
