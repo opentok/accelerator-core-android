@@ -4,10 +4,8 @@ import com.tokbox.otsdkwrapper.BuildConfig;
 
 public class OpenTokConfig {
 
-    // For internal use only. Please do not modify or remove this code.
-    public static final String LOGGING_BASE_URL = "https://hlg.tokbox.com/prod/logging/ClientEvent";
     public static final String LOG_CLIENT_VERSION = BuildConfig.acceleratorCoreVersion;
-    public static final String LOG_COMPONENTID = "textChatAccPack";
+    public static final String LOG_COMPONENT_ID = "textChatAccPack";
     public static final String LOG_ACTION_INITIALIZE = "Init";
     public static final String LOG_ACTION_OPEN = "OpenTC";
     public static final String LOG_ACTION_CLOSE = "CloseTC";

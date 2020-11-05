@@ -4,9 +4,8 @@ import com.tokbox.otsdkwrapper.BuildConfig;
 
 public class OpenTokConfig {
 
-    // For internal use only. Please do not modify or remove this code.
     public static final String LOG_CLIENT_VERSION = BuildConfig.acceleratorCoreVersion;
-    public static final String LOG_COMPONENTID = "annotationsAccPack";
+    public static final String LOG_COMPONENT_ID = "annotationsAccPack";
     public static final String LOG_ACTION_INITIALIZE = "Init";
     public static final String LOG_ACTION_DESTROY = "Destroy";
     public static final String LOG_ACTION_FREEHAND = "FreeHand";
@@ -14,7 +13,7 @@ public class OpenTokConfig {
     public static final String LOG_ACTION_END_DRAWING = "EndDrawing";
     public static final String LOG_ACTION_PICKER_COLOR = "PickerColor";
     public static final String LOG_ACTION_TEXT = "Text";
-    public static final String LOG_ACTION_SCREENCAPTURE = "ScreenCapture";
+    public static final String LOG_ACTION_SCREEN_CAPTURE = "ScreenCapture";
     public static final String LOG_ACTION_ERASE = "Erase";
     public static final String LOG_ACTION_DONE = "DONE";
     public static final String LOG_ACTION_USE_TOOLBAR = "UseToolbar";

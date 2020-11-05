@@ -346,7 +346,7 @@ public class TextChatFragment extends Fragment implements SignalListener {
             prefs.edit().putString("guidVSol", guidVSol).apply();
         }
 
-        mAnalyticsData = new OTKAnalyticsData.Builder(OpenTokConfig.LOG_CLIENT_VERSION, source, OpenTokConfig.LOG_COMPONENTID, guidVSol).build();
+        mAnalyticsData = new OTKAnalyticsData.Builder(OpenTokConfig.LOG_CLIENT_VERSION, source, OpenTokConfig.LOG_COMPONENT_ID, guidVSol).build();
         if (mSession.getConnection() != null) {
             //session is connected
             mAnalyticsData.setConnectionId(mSession.getConnection().getConnectionId());

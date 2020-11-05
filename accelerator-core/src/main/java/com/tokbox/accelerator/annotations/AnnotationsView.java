@@ -293,7 +293,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
         }
 
         //init analytics
-        mAnalyticsData = new OTKAnalyticsData.Builder(OpenTokConfig.LOG_CLIENT_VERSION, source, OpenTokConfig.LOG_COMPONENTID, guidVSol).build();
+        mAnalyticsData = new OTKAnalyticsData.Builder(OpenTokConfig.LOG_CLIENT_VERSION, source, OpenTokConfig.LOG_COMPONENT_ID, guidVSol).build();
         mAnalytics = new OTKAnalytics(mAnalyticsData);
         if (mSession != null) {
             mAnalyticsData.setSessionId(mSession.getSessionId());
@@ -1233,7 +1233,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
                     addLogEvent(OpenTokConfig.LOG_ACTION_ERASE, OpenTokConfig.LOG_VARIATION_SUCCESS);
                 }
                 if (v.getId() == R.id.screenshot) {
-                    addLogEvent(OpenTokConfig.LOG_ACTION_SCREENCAPTURE, OpenTokConfig.LOG_VARIATION_ATTEMPT);
+                    addLogEvent(OpenTokConfig.LOG_ACTION_SCREEN_CAPTURE, OpenTokConfig.LOG_VARIATION_ATTEMPT);
                     //screenshot capture
                     mode = Mode.Capture;
                     if (videoRenderer != null) {
@@ -1243,7 +1243,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
                             if (mListener != null) {
                                 mListener.onScreencaptureReady(bmp);
                             }
-                            addLogEvent(OpenTokConfig.LOG_ACTION_SCREENCAPTURE, OpenTokConfig.LOG_VARIATION_SUCCESS);
+                            addLogEvent(OpenTokConfig.LOG_ACTION_SCREEN_CAPTURE, OpenTokConfig.LOG_VARIATION_SUCCESS);
                         }
                     }
                 }
