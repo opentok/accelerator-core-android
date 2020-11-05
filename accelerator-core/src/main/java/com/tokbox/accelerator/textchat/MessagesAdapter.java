@@ -17,9 +17,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     private List<ChatMessage> messagesList = new ArrayList<ChatMessage>();
     private View messageView;
 
-    public MessagesAdapter(List<ChatMessage> messagesList) throws Exception{
+    public MessagesAdapter(List<ChatMessage> messagesList) throws IllegalArgumentException {
         if (messagesList == null) {
-            throw new Exception("MessageList cannot be null");
+            throw new IllegalArgumentException("MessageList cannot be null");
         }
         this.messagesList = messagesList;
     }
