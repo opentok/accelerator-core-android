@@ -2,6 +2,7 @@ package com.tokbox.accelerator.textchat
 
 import android.widget.LinearLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.tokbox.otsdkwrapper.wrapper.OTAcceleratorSession
 import org.amshove.kluent.shouldNotBe
 import org.amshove.kluent.shouldThrow
@@ -9,22 +10,26 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class TextChatFragmentTest : BaseTest() {
+class TextChatFragmentTest {
+
+    private var instrumentation = InstrumentationRegistry.getInstrumentation()
+    private var context = instrumentation.context
+    private var session: OTAcceleratorSession? = null
 
     @Test
-    fun `throw exception when session is null`() {
+    fun `throw_exception_when_session_is_null`() {
         // when
-        val func = { TextChatFragment.newInstance(null, apiKey) }
+        val func = { TextChatFragment.newInstance(null, "apiKey") }
 
         // then
         func shouldThrow IllegalArgumentException::class
     }
 
     @Test
-    fun `throw exception when apiKey is null`() {
+    fun `throw_exception_when_apiKey_is_null`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, null, sessionId)
+            session = OTAcceleratorSession(context, null, "sessionId")
         }
 
         // when
@@ -35,10 +40,10 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `throw exception when apiKey is empty`() {
+    fun `throw_exception_when_apiKey_is_empty`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, null, sessionId)
+            session = OTAcceleratorSession(context, null, "sessionId")
         }
 
         // when
@@ -49,13 +54,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `set max length when maxTextLength is greater than opentok max`() {
+    fun `set_max_length_when_maxTextLength_is_greater_than_opentok_max`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         val func = { textChatFragment?.maxTextLength = 8197 } // Max open tok length 8195
@@ -65,13 +70,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `throw exception when maxTextLength is zero`() {
+    fun `throw_exception_when_maxTextLength_is_zero`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         val func = { textChatFragment?.maxTextLength = 0 }
@@ -81,13 +86,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `throw exception when maxTextLength is lower than zero`() {
+    fun `throw_exception_when_maxTextLength_is_lower_than_zero`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         val func = { textChatFragment?.maxTextLength = -1 }
@@ -97,13 +102,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `throw exception when senderAlias is null`() {
+    fun `throw_exception_when_senderAlias_is_null`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         val func = { textChatFragment?.senderAlias = null }
@@ -113,13 +118,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `throw exception when senderAlias is empty`() {
+    fun `throw_exception_when_senderAlias_is_empty`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         val func = { textChatFragment?.senderAlias = "" }
@@ -129,13 +134,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `set actionBar`() {
+    fun `set_actionBar`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         textChatFragment.actionBar = LinearLayout(context)
@@ -145,13 +150,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `throw exception when set actionBar is null`() {
+    fun `throw_exception_when_set_actionBar_is_null`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         val func = { textChatFragment.actionBar = null }
@@ -161,13 +166,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `set sendMessageView`() {
+    fun `set_sendMessageView`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         textChatFragment.sendMessageView = LinearLayout(context)
@@ -177,13 +182,13 @@ class TextChatFragmentTest : BaseTest() {
     }
 
     @Test
-    fun `throw exception when set sendMessageView is null`() {
+    fun `throw_exception_when_set_sendMessageView_is_null`() {
         // given
         instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, apiKey, sessionId)
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
         }
 
-        val textChatFragment = TextChatFragment.newInstance(session, apiKey)
+        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
 
         // when
         val func = { textChatFragment.sendMessageView = null }

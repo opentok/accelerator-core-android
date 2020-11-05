@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @RunWith(AndroidJUnit4.class)
-public class ChatMessageTest extends BaseTest {
+public class ChatMessageTest {
 
     private ChatMessage chatMessage;
     private ChatMessage.ChatMessageBuilder chatMessageBuilder;

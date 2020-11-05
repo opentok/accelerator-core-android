@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.UUID;
 
 @RunWith(AndroidJUnit4.class)
-public class MessagesAdapterTest extends BaseTest {
+public class MessagesAdapterTest {
 
     private List<ChatMessage> messagesList;
     private MessagesAdapter messagesAdapter;
 
     @Test
-    public void testGetItemCountWhenMessagesListIsNull()  {
+    public void testGetItemCountWhenMessagesListIsNull() {
         try {
             messagesAdapter = new MessagesAdapter(null);
             Assert.fail("Should have thrown an exception with null messages list");
