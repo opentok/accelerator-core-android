@@ -56,14 +56,10 @@ class TextChatFragmentTest {
     @Test
     fun `set_max_length_when_maxTextLength_is_greater_than_opentok_max`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
-        val func = { textChatFragment?.maxTextLength = 8197 } // Max open tok length 8195
+        val func = { textChatFragment.maxTextLength = 8197 } // Max open tok length 8195
 
         // then
         func shouldThrow IllegalArgumentException::class
@@ -72,14 +68,10 @@ class TextChatFragmentTest {
     @Test
     fun `throw_exception_when_maxTextLength_is_zero`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
-        val func = { textChatFragment?.maxTextLength = 0 }
+        val func = { textChatFragment.maxTextLength = 0 }
 
         // then
         func shouldThrow IllegalArgumentException::class
@@ -88,14 +80,10 @@ class TextChatFragmentTest {
     @Test
     fun `throw_exception_when_maxTextLength_is_lower_than_zero`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
-        val func = { textChatFragment?.maxTextLength = -1 }
+        val func = { textChatFragment.maxTextLength = -1 }
 
         // then
         func shouldThrow IllegalArgumentException::class
@@ -104,14 +92,10 @@ class TextChatFragmentTest {
     @Test
     fun `throw_exception_when_senderAlias_is_null`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
-        val func = { textChatFragment?.senderAlias = null }
+        val func = { textChatFragment.senderAlias = null }
 
         // then
         func shouldThrow IllegalArgumentException::class
@@ -120,14 +104,10 @@ class TextChatFragmentTest {
     @Test
     fun `throw_exception_when_senderAlias_is_empty`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
-        val func = { textChatFragment?.senderAlias = "" }
+        val func = { textChatFragment.senderAlias = "" }
 
         // then
         func shouldThrow IllegalArgumentException::class
@@ -136,11 +116,7 @@ class TextChatFragmentTest {
     @Test
     fun `set_actionBar`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
         textChatFragment.actionBar = LinearLayout(context)
@@ -152,11 +128,7 @@ class TextChatFragmentTest {
     @Test
     fun `throw_exception_when_set_actionBar_is_null`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
         val func = { textChatFragment.actionBar = null }
@@ -168,11 +140,7 @@ class TextChatFragmentTest {
     @Test
     fun `set_sendMessageView`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
         textChatFragment.sendMessageView = LinearLayout(context)
@@ -184,16 +152,20 @@ class TextChatFragmentTest {
     @Test
     fun `throw_exception_when_set_sendMessageView_is_null`() {
         // given
-        instrumentation.runOnMainSync {
-            session = OTAcceleratorSession(context, "apiKey", "sessionId")
-        }
-
-        val textChatFragment = TextChatFragment.newInstance(session, "apiKey")
+        val textChatFragment = getTextChatFragment()
 
         // when
         val func = { textChatFragment.sendMessageView = null }
 
         // then
         func shouldThrow java.lang.IllegalArgumentException::class
+    }
+
+    private fun getTextChatFragment(): TextChatFragment {
+        instrumentation.runOnMainSync {
+            session = OTAcceleratorSession(context, "apiKey", "sessionId")
+        }
+
+        return TextChatFragment.newInstance(session, "apiKey")
     }
 }
