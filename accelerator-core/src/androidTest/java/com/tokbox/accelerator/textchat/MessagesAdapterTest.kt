@@ -13,7 +13,7 @@ import java.util.UUID
 class MessagesAdapterTest {
 
     @Test
-    fun create_new_instance_with_null_list_throws_exception() {
+    fun creating_new_instance_with_null_list_throws_exception() {
         // when
         val func = { MessagesAdapter(null) }
 
@@ -22,7 +22,7 @@ class MessagesAdapterTest {
     }
 
     @Test
-    fun create_new_instance_with_empty_list_creates_instance() {
+    fun creating_new_instance_with_empty_list_creates_instance() {
         // given
         val messagesList = ArrayList<ChatMessage>()
 
@@ -34,7 +34,7 @@ class MessagesAdapterTest {
     }
 
     @Test
-    fun create_new_instance_with_list_containing_one_item() {
+    fun creating_new_instance_with_list_containing_one_item() {
         // given
         val chatMessage = ChatMessage
             .ChatMessageBuilder("1", UUID.randomUUID(), MessageStatus.SENT_MESSAGE)
@@ -51,7 +51,7 @@ class MessagesAdapterTest {
     }
 
     @Test
-    fun get_view_type_for_existing_item_returns_view_type() {
+    fun getting_view_type_for_existing_item_returns_view_type() {
         // given
         val chatMessage = ChatMessage
             .ChatMessageBuilder("1", UUID.randomUUID(), MessageStatus.SENT_MESSAGE)
@@ -67,7 +67,7 @@ class MessagesAdapterTest {
     }
 
     @Test
-    fun get_view_type_for_non_existing_item_throws_exception() {
+    fun getting_view_type_for_non_existing_item_throws_exception() {
         // given
         val messagesList = ArrayList<ChatMessage>()
         val messagesAdapter = MessagesAdapter(messagesList)
