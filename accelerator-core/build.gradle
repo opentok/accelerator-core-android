@@ -4,6 +4,7 @@ apply plugin: 'maven'
 
 android {
     def acceleratorCoreVersion = '2.0.0'
+
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
