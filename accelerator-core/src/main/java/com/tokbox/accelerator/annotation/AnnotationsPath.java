@@ -1,4 +1,4 @@
-package com.tokbox.accelerator.annotations;
+package com.tokbox.accelerator.annotation;
 
 import android.graphics.Path;
 import android.graphics.PointF;

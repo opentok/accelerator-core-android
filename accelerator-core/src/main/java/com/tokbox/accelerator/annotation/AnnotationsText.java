@@ -1,4 +1,4 @@
-package com.tokbox.accelerator.annotations;
+package com.tokbox.accelerator.annotation;
 
 import android.view.View;
 import android.widget.EditText;

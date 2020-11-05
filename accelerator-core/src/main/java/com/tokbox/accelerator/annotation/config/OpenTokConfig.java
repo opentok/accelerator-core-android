@@ -1,4 +1,4 @@
-package com.tokbox.accelerator.annotations.config;
+package com.tokbox.accelerator.annotation.config;
 
 import com.tokbox.otsdkwrapper.BuildConfig;
 

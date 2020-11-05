@@ -1,4 +1,4 @@
-package com.tokbox.accelerator.annotations.utils;
+package com.tokbox.accelerator.annotation.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;

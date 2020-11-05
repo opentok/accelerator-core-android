@@ -1,4 +1,4 @@
-package com.tokbox.accelerator.annotations;
+package com.tokbox.accelerator.annotation;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,8 +19,8 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import com.tokbox.accelerator.annotations.config.OpenTokConfig;
-import com.tokbox.accelerator.annotations.utils.AnnotationsVideoRenderer;
+import com.tokbox.accelerator.annotation.config.OpenTokConfig;
+import com.tokbox.accelerator.annotation.utils.AnnotationsVideoRenderer;
 import com.tokbox.android.logging.OTKAnalytics;
 import com.tokbox.android.logging.OTKAnalyticsData;
 import com.tokbox.otsdkwrapper.R;
