@@ -3,7 +3,7 @@ package com.opentok.accelerator.textchat
 import android.widget.LinearLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.opentok.otsdkwrapper.wrapper.OTAcceleratorSession
+import com.opentok.accelerator.core.wrapper.OTAcceleratorSession
 import org.amshove.kluent.shouldNotBe
 import org.amshove.kluent.shouldThrow
 import org.junit.Test
