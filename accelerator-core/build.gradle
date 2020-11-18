@@ -82,7 +82,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.opentok.android:opentok-solutions-logging:1.0.3'
 
-    implementation "com.opentok.android:opentok-android-sdk:2.18.1"
+    implementation ("com.opentok.android:opentok-android-sdk:2.18.1") {
+        transitive = true
+    }
 
     implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.multidex:multidex:2.0.1"
