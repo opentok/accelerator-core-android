@@ -1492,7 +1492,7 @@ public class OTWrapper {
         String guidVSol = prefs.getString("guidVSol", null);
         if (null == guidVSol) {
             guidVSol = UUID.randomUUID().toString();
-            prefs.edit().putString("guidVSol", guidVSol).commit();
+            prefs.edit().putString("guidVSol", guidVSol).apply();
         }
 
         mAnalyticsData = new OTKAnalyticsData.
