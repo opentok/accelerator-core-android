@@ -16,10 +16,8 @@ import java.util.UUID
 class MessagesAdapterTest {
 
     @Before
-    fun settUp() {
+    fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
-//        cut = NavManager()
     }
 
     @Test
