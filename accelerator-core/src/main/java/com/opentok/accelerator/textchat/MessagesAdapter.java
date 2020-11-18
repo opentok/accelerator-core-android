@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
-import com.tokbox.otsdkwrapper.R;
+import com.opentok.accelerator.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

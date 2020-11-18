@@ -11,8 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
-import com.tokbox.otsdkwrapper.R;
-
+import com.opentok.accelerator.R;
 /**
  * Defines the layout for the annotations toolbar
  */

@@ -1,6 +1,6 @@
 package com.opentok.accelerator.textchat.config;
 
-import com.tokbox.otsdkwrapper.BuildConfig;
+import com.opentok.accelerator.BuildConfig;
 
 public class OpenTokConfig {
 
