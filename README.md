@@ -232,13 +232,13 @@ private BasicListener mBasicListener =
 
     @Override
     public void onRemoteJoined(OTWrapper otWrapper, String remoteId) throws ListenerException {
-      Log.i(LOGTAG, "A new remote joined.");
+      Log.i(LOG_TAG, "A new remote joined.");
       //...
     }
 
     @Override
     public void onRemoteLeft(OTWrapper otWrapper, String remoteId) throws ListenerException {
-      Log.i(LOGTAG, "A new remote left.");
+      Log.i(LOG_TAG, "A new remote left.");
       //...    
     }
 });
@@ -252,13 +252,13 @@ private BasicListener mBasicListener =
 
   @Override
       public void onRemoteViewReady(OTWrapper otWrapper, View remoteView, String remoteId, String data) throws ListenerException {
-          Log.i(LOGTAG, "Remove view is ready");
+          Log.i(LOG_TAG, "Remove view is ready");
           //...
     }
 
     @Override
     public void onRemoteViewDestroyed(OTWrapper otWrapper, View remoteView, String remoteId) throws ListenerException {
-      Log.i(LOGTAG, "Remote view is destroyed");
+      Log.i(LOG_TAG, "Remote view is destroyed");
       //...
     }
   });
