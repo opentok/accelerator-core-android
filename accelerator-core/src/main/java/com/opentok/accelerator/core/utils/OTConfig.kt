@@ -14,18 +14,18 @@ import kotlin.experimental.and
  * @property subscribeAutomatically subscribe automatically
  */
 data class OTConfig(
+    val apiKey: String,
     val sessionId: String,
     val token: String,
-    val apiKey: String,
     val sessionName: String? = null,
     val subscribeToSelf: Boolean = false,
     val subscribeAutomatically: Boolean = true
 ) {
 
     init {
+        check(apiKey.isNotBlank()) { "apiKey can't be blank" }
         check(sessionId.isNotBlank()) { "sessionId can't be blank" }
         check(token.isNotBlank()) { "token can't be blank" }
-        check(apiKey.isNotBlank()) { "apiKey can't be blank" }
 
         if (sessionName != null) {
             check(sessionName.length <= MAX_LENGTH_NAME) { "Name length can't be greater than $MAX_LENGTH_NAME" }
