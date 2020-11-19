@@ -367,7 +367,7 @@ public class OTWrapper {
             if (mStreams != null) {
                 mStreams.put(stream.getStreamId(), stream);
             }
-            if (mOTConfig.shouldSubscribeAutomatically()) {
+            if (mOTConfig.getSubscribeAutomatically()) {
                 addRemote(stream.getStreamId());
             }
 
@@ -430,7 +430,7 @@ public class OTWrapper {
             }
 
             //check subscribe to self
-            if (mOTConfig.shouldSubscribeToSelf()) {
+            if (mOTConfig.getSubscribeToSelf()) {
                 addRemote(stream.getStreamId());
             }
         }
