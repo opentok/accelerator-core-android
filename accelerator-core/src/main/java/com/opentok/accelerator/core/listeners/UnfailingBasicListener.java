@@ -65,10 +65,10 @@ public class UnfailingBasicListener<Wrapper> implements RetriableBasicListener<W
     }
 
     @Override
-    public void onStartedPublishingMedia(Wrapper wrapper, boolean screensharing) {
+    public void onStartedPublishingMedia(Wrapper wrapper, boolean screenSharing) {
         try {
             if (mInternalListener != null) {
-                mInternalListener.onStartedPublishingMedia(wrapper, screensharing);
+                mInternalListener.onStartedPublishingMedia(wrapper, screenSharing);
             }
         } catch (ListenerException e) {
             Log.d(LOG_TAG, "onStartedSharingMedia Exception: ", e);
@@ -76,10 +76,10 @@ public class UnfailingBasicListener<Wrapper> implements RetriableBasicListener<W
     }
 
     @Override
-    public void onStoppedPublishingMedia(Wrapper wrapper, boolean screensharing) {
+    public void onStoppedPublishingMedia(Wrapper wrapper, boolean screenSharing) {
         try {
             if (mInternalListener != null) {
-                mInternalListener.onStoppedPublishingMedia(wrapper, screensharing);
+                mInternalListener.onStoppedPublishingMedia(wrapper, screenSharing);
             }
         } catch (ListenerException e) {
             Log.d(LOG_TAG, "onStoppedSharingMedia Exception: ", e);

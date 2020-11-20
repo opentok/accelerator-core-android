@@ -417,17 +417,17 @@ public class OTWrapper {
     private Publisher.PublisherListener mPublisherListener = new Publisher.PublisherListener() {
         @Override
         public void onStreamCreated(PublisherKit publisherKit, Stream stream) {
-            boolean screensharing = false;
+            boolean screenSharing = false;
 
             if (stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeScreen) {
                 addLogEvent(ClientLog.LOG_ACTION_START_SCREEN_COMM, ClientLog.LOG_VARIATION_SUCCESS);
-                screensharing = true;
+                screenSharing = true;
             } else {
                 addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_SUCCESS);
                 isPublishing = true;
             }
             for (BasicListener listener : mBasicListeners) {
-                ((RetriableBasicListener) listener).onStartedPublishingMedia(SELF, screensharing);
+                ((RetriableBasicListener) listener).onStartedPublishingMedia(SELF, screenSharing);
             }
 
             //check subscribe to self
@@ -438,16 +438,16 @@ public class OTWrapper {
 
         @Override
         public void onStreamDestroyed(PublisherKit publisherKit, Stream stream) {
-            boolean screensharing = false;
+            boolean screenSharing = false;
             if (stream.getStreamVideoType() == Stream.StreamVideoType.StreamVideoTypeScreen) {
                 addLogEvent(ClientLog.LOG_ACTION_END_SCREEN_COMM, ClientLog.LOG_VARIATION_SUCCESS);
-                screensharing = true;
+                screenSharing = true;
             } else {
                 addLogEvent(ClientLog.LOG_ACTION_END_COMM, ClientLog.LOG_VARIATION_SUCCESS);
                 isPublishing = false;
             }
             for (BasicListener listener : mBasicListeners) {
-                ((RetriableBasicListener) listener).onStoppedPublishingMedia(SELF, screensharing);
+                ((RetriableBasicListener) listener).onStoppedPublishingMedia(SELF, screenSharing);
             }
         }
 
@@ -737,12 +737,12 @@ public class OTWrapper {
      * Starts the local streaming video
      *
      * @param config        The configuration of the preview
-     * @param screensharing Whether to indicate the camera or the screen streaming.
+     * @param screenSharing Whether to indicate the camera or the screen streaming.
      */
-    public void startPublishingMedia(PreviewConfig config, boolean screensharing) {
+    public void startPublishingMedia(PreviewConfig config, boolean screenSharing) {
         addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
 
-        if (!screensharing) {
+        if (!screenSharing) {
             mPreviewConfig = config;
             startPublishing = true;
             if (mPublisher == null) {
@@ -761,11 +761,11 @@ public class OTWrapper {
     /**
      * Stops the local streaming video.
      *
-     * @param screensharing Whether to indicate the camera or the screen streaming
+     * @param screenSharing Whether to indicate the camera or the screen streaming
      */
-    public void stopPublishingMedia(boolean screensharing) {
+    public void stopPublishingMedia(boolean screenSharing) {
 
-        if (!screensharing) {
+        if (!screenSharing) {
             addLogEvent(ClientLog.LOG_ACTION_END_COMM, ClientLog.LOG_VARIATION_ATTEMPT);
 
             if (mPublisher != null && startPublishing) {

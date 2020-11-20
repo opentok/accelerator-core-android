@@ -146,21 +146,21 @@ public class PausableBasicListener<Wrapper> implements RetriableBasicListener<Wr
     }
 
     @Override
-    public void onStartedPublishingMedia(final Wrapper wrapper, final boolean screensharing) {
+    public void onStartedPublishingMedia(final Wrapper wrapper, final boolean screenSharing) {
         runUIListenerTask(new ListenerTask() {
             @Override
             public void run() throws ListenerException {
-                mUnderlyingListener.onStartedPublishingMedia(wrapper, screensharing);
+                mUnderlyingListener.onStartedPublishingMedia(wrapper, screenSharing);
             }
         });
     }
 
     @Override
-    public void onStoppedPublishingMedia(final Wrapper wrapper, final boolean screensharing) {
+    public void onStoppedPublishingMedia(final Wrapper wrapper, final boolean screenSharing) {
         runUIListenerTask(new ListenerTask() {
             @Override
             public void run() throws ListenerException {
-                mUnderlyingListener.onStoppedPublishingMedia(wrapper, screensharing);
+                mUnderlyingListener.onStoppedPublishingMedia(wrapper, screenSharing);
             }
         });
     }

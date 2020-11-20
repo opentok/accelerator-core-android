@@ -209,7 +209,7 @@ private BasicListener mBasicListener =
           new PausableBasicListener(new BasicListener<OTWrapper>() {
 
     @Override
-    public void onStartedSharingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
+    public void onStartedSharingMedia(OTWrapper otWrapper, boolean screenSharing) throws ListenerException {
       Log.i(LOG_TAG, "Local started streaming video.");
       //....
     }

@@ -73,19 +73,21 @@ public interface BasicListener<Wrapper> extends BaseOTListener {
 
     /**
      * Invoked when the local camera or screensharing streaming started
+     *
      * @param wrapper
-     * @param screensharing
+     * @param screenSharing
      * @throws ListenerException
      */
-    void onStartedPublishingMedia(Wrapper wrapper, boolean screensharing) throws ListenerException;
+    void onStartedPublishingMedia(Wrapper wrapper, boolean screenSharing) throws ListenerException;
 
     /**
      * Invoked when the local camera or screensharing streaming stopped
+     *
      * @param wrapper
-     * @param screensharing
+     * @param screenSharing
      * @throws ListenerException
      */
-    void onStoppedPublishingMedia(Wrapper wrapper, boolean screensharing) throws ListenerException;
+    void onStoppedPublishingMedia(Wrapper wrapper, boolean screenSharing) throws ListenerException;
 
     /**
      * Invoked when a new remote participant joined and started to share video/screen.
