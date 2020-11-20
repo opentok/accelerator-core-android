@@ -84,11 +84,11 @@ public class PausableBasicListener<Wrapper> implements RetriableBasicListener<Wr
     }
 
     @Override
-    public void onPreviewViewDestroyed(final Wrapper wrapper, final View localView) {
+    public void onPreviewViewDestroyed(final Wrapper wrapper) {
         runUIListenerTask(new ListenerTask() {
             @Override
             public void run() throws ListenerException {
-                mUnderlyingListener.onPreviewViewDestroyed(wrapper, localView);
+                mUnderlyingListener.onPreviewViewDestroyed(wrapper);
             }
         });
     }
@@ -105,12 +105,11 @@ public class PausableBasicListener<Wrapper> implements RetriableBasicListener<Wr
     }
 
     @Override
-    public void onRemoteViewDestroyed(final Wrapper wrapper, final View remoteView,
-                                      final String remoteId) {
+    public void onRemoteViewDestroyed(final Wrapper wrapper, final String remoteId) {
         runUIListenerTask(new ListenerTask() {
             @Override
             public void run() throws ListenerException {
-                mUnderlyingListener.onRemoteViewDestroyed(wrapper, remoteView, remoteId);
+                mUnderlyingListener.onRemoteViewDestroyed(wrapper, remoteId);
             }
         });
     }

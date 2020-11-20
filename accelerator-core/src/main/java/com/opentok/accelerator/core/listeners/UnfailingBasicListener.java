@@ -98,10 +98,10 @@ public class UnfailingBasicListener<Wrapper> implements RetriableBasicListener<W
     }
 
     @Override
-    public void onPreviewViewDestroyed(Wrapper wrapper, View localView) {
+    public void onPreviewViewDestroyed(Wrapper wrapper) {
         try {
             if (mInternalListener != null) {
-                mInternalListener.onPreviewViewDestroyed(wrapper, localView);
+                mInternalListener.onPreviewViewDestroyed(wrapper);
             }
         } catch (ListenerException e) {
             Log.d(LOG_TAG, "onPreviewViewDestroyed Exception: ", e);
@@ -120,10 +120,10 @@ public class UnfailingBasicListener<Wrapper> implements RetriableBasicListener<W
     }
 
     @Override
-    public void onRemoteViewDestroyed(Wrapper wrapper, View remoteView, String remoteId) {
+    public void onRemoteViewDestroyed(Wrapper wrapper, String remoteId) {
         try {
             if (mInternalListener != null) {
-                mInternalListener.onRemoteViewDestroyed(wrapper, remoteView, remoteId);
+                mInternalListener.onRemoteViewDestroyed(wrapper, remoteId);
             }
         } catch (ListenerException e) {
             Log.d(LOG_TAG, "onRemoteViewDestroyed Exception: ", e);

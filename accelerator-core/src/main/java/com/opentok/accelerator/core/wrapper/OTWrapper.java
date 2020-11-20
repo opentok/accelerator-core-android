@@ -128,7 +128,7 @@ public class OTWrapper {
                     if (mBasicListeners != null) {
                         for (BasicListener listener : mBasicListeners) {
                             ((RetriableBasicListener) listener).
-                                    onRemoteViewDestroyed(SELF, null, sub.getStream().getStreamId());
+                                    onRemoteViewDestroyed(SELF, sub.getStream().getStreamId());
                         }
                     }
                 }
@@ -393,7 +393,7 @@ public class OTWrapper {
             if (mBasicListeners != null) {
                 for (BasicListener listener : mBasicListeners) {
                     ((RetriableBasicListener) listener).onRemoteLeft(SELF, subId);
-                    ((RetriableBasicListener) listener).onRemoteViewDestroyed(SELF, null, subId);
+                    ((RetriableBasicListener) listener).onRemoteViewDestroyed(SELF, subId);
                 }
             }
         }
@@ -1435,7 +1435,7 @@ public class OTWrapper {
         if (mPublisher != null && !isNullOrEmpty(mBasicListeners)) {
             mPublisher.onStop();
             for (BasicListener listener : mBasicListeners) {
-                ((RetriableBasicListener) listener).onPreviewViewDestroyed(SELF, mPublisher.getView());
+                ((RetriableBasicListener) listener).onPreviewViewDestroyed(SELF);
             }
         }
     }
@@ -1444,7 +1444,7 @@ public class OTWrapper {
         if (mScreenPublisher != null && !isNullOrEmpty(mBasicListeners)) {
             mScreenPublisher.onStop();
             for (BasicListener listener : mBasicListeners) {
-                ((RetriableBasicListener) listener).onPreviewViewDestroyed(SELF, mScreenPublisher.getView());
+                ((RetriableBasicListener) listener).onPreviewViewDestroyed(SELF);
             }
         }
     }

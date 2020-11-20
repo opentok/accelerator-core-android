@@ -46,11 +46,11 @@ public interface BasicListener<Wrapper> extends BaseOTListener {
 
     /**
      * Invoked when the local preview view has been destroyed
+     *
      * @param wrapper
-     * @param localView
      * @throws ListenerException
      */
-    void onPreviewViewDestroyed(Wrapper wrapper, View localView) throws ListenerException;
+    void onPreviewViewDestroyed(Wrapper wrapper) throws ListenerException;
 
     /**
      * Invoke when the remote view is ready to be attached
@@ -64,12 +64,12 @@ public interface BasicListener<Wrapper> extends BaseOTListener {
 
     /**
      * Invoked when the remote view has been destroyed
+     *
      * @param wrapper
-     * @param remoteView
      * @param remoteId
      * @throws ListenerException
      */
-    void onRemoteViewDestroyed(Wrapper wrapper, View remoteView, String remoteId) throws ListenerException;
+    void onRemoteViewDestroyed(Wrapper wrapper, String remoteId) throws ListenerException;
 
     /**
      * Invoked when the local camera or screensharing streaming started

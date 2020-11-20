@@ -16,7 +16,7 @@ public interface RetriableBasicListener<Wrapper>
   void onPreviewViewReady(Wrapper wrapper, View localView);
 
   @Override
-  void onPreviewViewDestroyed(Wrapper wrapper, View localView);
+  void onPreviewViewDestroyed(Wrapper wrapper);
 
   @Override
   void onStartedPublishingMedia(Wrapper wrapper, boolean screensharing);
@@ -28,7 +28,7 @@ public interface RetriableBasicListener<Wrapper>
   void onRemoteViewReady(Wrapper wrapper, View remoteView, String remoteId, String data);
 
   @Override
-  void onRemoteViewDestroyed(Wrapper wrapper, View remoteView, String remoteId);
+  void onRemoteViewDestroyed(Wrapper wrapper, String remoteId);
 
   @Override
   void onRemoteJoined(Wrapper wrapper, String remoteId);
