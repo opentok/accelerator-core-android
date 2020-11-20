@@ -68,6 +68,7 @@ public class OTWrapper {
     //Analytics for internal use
     private OTKAnalyticsData mAnalyticsData;
     private OTKAnalytics mAnalytics;
+
     private Session.ConnectionListener mConnectionListener = new Session.ConnectionListener() {
         @Override
         public void onConnectionCreated(Session session, Connection connection) {

@@ -14,24 +14,26 @@ public interface BasicListener<Wrapper> extends BaseOTListener {
 
     /**
      * Invoked when there is a new connection (participant) in the communication, included our own connection
+     *
      * @param wrapper
      * @param participantsCount
-     * @param connId
+     * @param connectionId
      * @param data
      * @throws ListenerException
      */
-    void onConnected(Wrapper wrapper, int participantsCount, String connId, String data)
+    void onConnected(Wrapper wrapper, int participantsCount, String connectionId, String data)
             throws ListenerException;
 
     /**
      * Invoked when a connection left the communication, included our own connection
+     *
      * @param wrapper
      * @param participantsCount
-     * @param connId
+     * @param connectionId
      * @param data
      * @throws ListenerException
      */
-    void onDisconnected(Wrapper wrapper, int participantsCount, String connId, String data)
+    void onDisconnected(Wrapper wrapper, int participantsCount, String connectionId, String data)
             throws ListenerException;
 
     /**
