@@ -528,13 +528,13 @@ public class OTWrapper {
     /**
      * Creates an OTWrapper instance.
      *
-     * @param context Activity context. Needed by the Opentok APIs
-     * @param config  OTConfig: Information about the OpenTok session. This includes all the needed
-     *                data to connect.
+     * @param context  Activity context. Needed by the Opentok APIs
+     * @param otConfig OTConfig: Information about the OpenTok session. This includes all the needed
+     *                 data to connect.
      */
-    public OTWrapper(Context context, OTConfig config) {
+    public OTWrapper(Context context, OTConfig otConfig) {
         this.mContext = context;
-        this.mOTConfig = config;
+        this.mOTConfig = otConfig;
         mSubscribers = new HashMap<>();
         mStreams = new ConcurrentHashMap<>();
         mBasicListeners = new HashSet<>();
