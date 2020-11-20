@@ -57,7 +57,7 @@ public class OTWrapper {
     private PreviewConfig mPreviewConfig;
     //Screensharing by default
     private ScreenSharingFragment mScreensharingFragment;
-    private boolean isScreensharingByDefault = false;
+    private boolean isScreenSharingByDefault = false;
     private Publisher.Builder mScreenPublisherBuilder;
     //Custom renderer
     private BaseVideoRenderer mVideoRemoteRenderer;
@@ -782,7 +782,7 @@ public class OTWrapper {
 
             if (mScreensharingFragment != null) {
                 mScreensharingFragment.stopScreenCapture();
-                isScreensharingByDefault = false;
+                isScreenSharingByDefault = false;
             }
             detachPublisherScreenView();
             if (mScreenPublisher != null && startSharingScreen) {
@@ -1239,7 +1239,7 @@ public class OTWrapper {
         isPreviewing = false;
         isPublishing = false;
         isSharingScreen = false;
-        isScreensharingByDefault = false;
+        isScreenSharingByDefault = false;
         mScreensharingFragment = null;
     }
 
@@ -1294,7 +1294,7 @@ public class OTWrapper {
         LOG.d(LOG_TAG, "publishIfScreenReady: ", mSessionConnection, ", ", mScreenPublisher, ", ",
                 startSharingScreen);
         if (mSession != null && mSessionConnection != null
-                && mScreenPublisher != null && startSharingScreen && !isScreensharingByDefault) {
+                && mScreenPublisher != null && startSharingScreen && !isScreenSharingByDefault) {
 
             if (!isPreviewing) {
                 attachPublisherScreenView();
@@ -1363,8 +1363,8 @@ public class OTWrapper {
                 //custom video capturer
                 mScreenPublisherBuilder.capturer(config.getCapturer());
             } else {
-                //create screensharing by default
-                isScreensharingByDefault = true;
+                //create screenSharing by default
+                isScreenSharingByDefault = true;
                 mScreensharingFragment = ScreenSharingFragment.newInstance();
                 ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
                         .add(mScreensharingFragment, "screensharing-fragment").commit();
@@ -1379,7 +1379,7 @@ public class OTWrapper {
             LOG.d(LOG_TAG, "createPublisher: Creating DefaultPublisher");
         }
         mScreenPublisher = mScreenPublisherBuilder.build();
-        if (!isScreensharingByDefault) {
+        if (!isScreenSharingByDefault) {
             mScreenPublisher.setPublisherListener(mPublisherListener);
             mScreenPublisher.setAudioLevelListener(mAudioLevelListener);
             mScreenPublisher.setCameraListener(mCameraListener);
@@ -1422,7 +1422,7 @@ public class OTWrapper {
     private void attachPublisherScreenView() {
         if (mScreenPublisher != null && !isNullOrEmpty(mBasicListeners)) {
             for (BasicListener listener : mBasicListeners) {
-                if (isScreensharingByDefault) {
+                if (isScreenSharingByDefault) {
                     ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mScreensharingFragment.getScreen());
                 } else {
                     ((RetriableBasicListener) listener).onPreviewViewReady(SELF, mScreenPublisher.getView());

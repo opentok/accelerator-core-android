@@ -81,7 +81,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
     private OTKAnalyticsData mAnalyticsData;
     private OTKAnalytics mAnalytics;
 
-    private boolean isScreensharing = false;
+    private boolean isScreenSharing = false;
 
     private boolean mSignalMirrored = false;
     private boolean isStartPoint = false;
@@ -186,7 +186,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
         this.mSession.addSignalListener(Mode.Undo.toString(), this);
         this.mSession.addSignalListener(Mode.Clear.toString(), this);
 
-        this.isScreensharing = isScreenSharing;
+        this.isScreenSharing = isScreenSharing;
 
         init();
     }
@@ -217,7 +217,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
         this.mSession.addSignalListener(Mode.Undo.toString(), this);
         this.mSession.addSignalListener(Mode.Clear.toString(), this);
 
-        this.isScreensharing = false;
+        this.isScreenSharing = false;
         this.mRemoteConnId = remoteConnId;
         init();
     }
@@ -500,7 +500,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
                 }
                 invalidate();
             }
-            if (!incoming && !isScreensharing) {
+            if (!incoming && !isScreenSharing) {
                 sendAnnotation(mode.toString(), null);
             }
         }
@@ -523,7 +523,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
             }
             invalidate();
 
-            if (!incoming && !isScreensharing) {
+            if (!incoming && !isScreenSharing) {
                 JSONArray jsonArray = new JSONArray();
                 jsonArray.put(cid);
                 sendAnnotation(mode.toString(), jsonArray.toString());
@@ -581,7 +581,7 @@ public class AnnotationsView extends ViewGroup implements AnnotationsToolbar.Act
     }
 
     private void sendAnnotation(String type, String annotation) {
-        if (mSession != null && !isScreensharing) {
+        if (mSession != null && !isScreenSharing) {
             mSession.sendSignal(new SignalInfo(mSession.getConnection().getConnectionId(), null, type, annotation), null);
         }
     }

@@ -215,7 +215,7 @@ private BasicListener mBasicListener =
     }
 
     @Override
-    public void onStoppedSharingMedia(OTWrapper otWrapper, boolean isScreensharing) throws ListenerException {
+    public void onStoppedSharingMedia(OTWrapper otWrapper, boolean isScreenSharing) throws ListenerException {
       Log.i(LOG_TAG, "Local stopped streaming video.");
     }
 });
