@@ -138,7 +138,7 @@ public class TextChatFragment extends Fragment implements SignalListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        rootView = (ViewGroup) inflater.inflate(R.layout.main_layout, container, false);
+        rootView = (ViewGroup) inflater.inflate(R.layout.fragment_text_chat, container, false);
 
         mMsgEditText = rootView.findViewById(R.id.edit_msg);
         mTitleBar = rootView.findViewById(R.id.titlebar);
