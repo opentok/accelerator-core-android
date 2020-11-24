@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="secondary_dark">#b3b3b3</color>
+    <color name="secondary">#f2f2f2</color>
+    <color name="primary_dark">#5cacbd</color>
+    <color name="primary">#3352abbd</color>
+    <color name="white">#ffffff</color>
+    <color name="accent">#043742</color>
+    <color name="primary_text">#888888</color>
+    <color name="input_text">#828286</color>
+    <color name="info_text">#afafaf</color>
+    <color name="alert">#fefac7</color>
+    <color name="alert_text">#ad7212</color>
+    <color name="info">#AAAAAA</color>
+
+    <color name="toolbar_bckg">#666666</color>
+    <color name="done_btn">#7ED321</color>
+    <color name="selected">#3E3E3E</color>
+    <color name="picker_color_blue">#2196F3</color>
+    <color name="picker_color_purple">#9C27B0</color>
+    <color name="picker_color_red">#F44336</color>
+    <color name="picker_color_orange">#FFC107</color>
+    <color name="picker_color_yellow">#FFEB3B</color>
+    <color name="picker_color_green">#76FF03</color>
+    <color name="picker_color_black">#000000</color>
+    <color name="picker_color_gray">#BDBDBD</color>
+    <color name="picker_color_white">#FFFFFF</color>
+</resources>

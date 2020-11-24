@@ -1,10 +1,13 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'maven'
 
 android {
-    def acceleratorCoreVersion = '1.0.24'
+    def acceleratorCoreVersion = '2.0.0-alpha.1'
+
     compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    buildToolsVersion "30.0.2"
+
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 30
@@ -13,7 +16,9 @@ android {
         project.archivesBaseName = "opentok-accelerator-core"
         project.version = acceleratorCoreVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -25,11 +30,13 @@ android {
             buildConfigField 'String', 'acceleratorCoreVersion', '\"'+acceleratorCoreVersion+'\"'
         }
     }
+
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
         disable 'OldTargetApi'
     }
+
     libraryVariants.all { variant ->
         variant.outputs.all { output ->
             def outputFile = outputFileName
@@ -59,6 +66,16 @@ android {
         zipBundle.dependsOn build
         zipBundle.dependsOn javadoc
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
     packagingOptions {
         exclude 'META-INF/ASL2.0'
         exclude 'META-INF/LICENSE'
@@ -66,14 +83,23 @@ android {
 }
 
 dependencies {
-    repositories {
-        maven { url 'https://maven.google.com' }
-        maven { url 'http://tokbox.bintray.com/maven' }
-    }
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.opentok.android:opentok-solutions-logging:1.0.3'
-    implementation "com.opentok.android:opentok-android-sdk:2.18.0"
+
+    implementation ("com.opentok.android:opentok-android-sdk:2.18.1") {
+        transitive = true
+    }
+
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation "androidx.multidex:multidex:2.0.1"
+    implementation "androidx.annotation:annotation:1.1.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+
+    androidTestImplementation 'junit:junit:4.13.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'org.amshove.kluent:kluent-android:1.63'
+    androidTestImplementation "io.mockk:mockk-android:1.10.2"
 }
 
 if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD")) {
@@ -91,6 +117,7 @@ if (project.hasProperty("MAVEN_USERNAME") && project.hasProperty("MAVEN_PASSWORD
         }
    }
 }
+
 def checkMaven = task("checkUploadArchivesDeps") {
     doFirst {
         if (!project.hasProperty("MAVEN_USERNAME")) {
@@ -101,7 +128,13 @@ def checkMaven = task("checkUploadArchivesDeps") {
         }
     }
 }
+
 uploadArchives.dependsOn checkMaven
+
+repositories {
+    mavenCentral()
+}
+
 def getRevisionAndTime() {
     def date = new Date()
     def hash = 'git rev-parse --verify HEAD'.execute().text.trim()
@@ -116,7 +149,7 @@ def isEnvVarNotEmptyOrNull(envVar) {
 }
 
 def isPreview() {
-    return isEnvVarNotEmptyOrNull("PREVIEW") && '1'.equals(System.getenv('PREVIEW'));
+    return isEnvVarNotEmptyOrNull("PREVIEW") && '1' == System.getenv('PREVIEW');
 }
 
 def getArtifactId() {
