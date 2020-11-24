@@ -15,8 +15,8 @@ The Accelerator Core Android library gives you an easy way to integrate [OpenTok
 ### Using the repository
 
 1. Clone the [accelerator core android repository](https://github.com/opentok/accelerator-core-android).
-1. Start Android Studio and create a new project.
-1. From the new project, right-click the app name and select New > Module > Import Gradle Project.
+1. Start Android Studio and create a project.
+1. From the project, right-click the app name and select > Module > Import Gradle Project.
 1. Navigate to the directory in which you cloned **OpenTok Accelerator Core Android**, select **accelerator-core**, and click **Finish**.
 1. Open the **build.gradle** file for the app and ensure the following lines have been added to the `dependencies` section:
 
@@ -32,13 +32,15 @@ Download it from http://tokbox.bintray.com/maven. For example:
 a) Edit the build.gradle for your project and add the following code snippet to the all projects/repositories section:
 
 ```gradle
-maven { url  "http://tokbox.bintray.com/maven" }
+maven { 
+  url  "http://tokbox.bintray.com/maven" 
+}
 ```
 
 b) Modify build.gradle for your module and add the following code snippet to the dependencies section:
 
 ```gradle
-implementation 'com.opentok.android:opentok-accelerator-core:1.0.+’
+implementation 'com.opentok.android:opentok-accelerator-core:x.y.z’
 ```
 
 ## Exploring the Code
@@ -55,7 +57,7 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 | `PreviewConfig`         | Defines the configuration of the local preview.                                                                                                                                |
 | `BasicListener`         | Monitors basic state changes in the OpenTok communication.                                                                                                                     |
 | `AdvancedListener`      | Monitors advanced state changes in the OpenTok communication.                                                                                                                  |
-| `SignalListener`        | Monitors a new signal received in the OpenTok communication.                                                                                                                   |
+| `SignalListener`        | Monitors a signal received in the OpenTok communication.                                                                                                                   |
 | `MediaType`             | Defines the Audio and Video media type.                                                                                                                                        |
 | `StreamStatus`          | Defines the current status of the Stream properties.                                                                                                                           |
 | `VideoScale`            | Defines the FIT and FILL modes setting for the renderer.                                                                                                                       |
@@ -64,45 +66,43 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 
 ## Using Accelerator Core Android
 
-You can start testing a basic multiparty  application using the Accelerator Core with best-practices for Android.
+You can start testing a basic multiparty application using the Accelerator Core with best-practices for Android.
  - [OpenTok Accelerator Sample Application](https://github.com/opentok/accelerator-sample-apps-android).
 
 ### Initialization
 
 The first step in using the OTWrapper is to initialize it by calling the constructor with the OpenTokConfig parameter.
 
-```java
-OTConfig config =
-            new OTConfig.OTConfigBuilder(SESSION_ID, TOKEN,
-                    API_KEY).name("core-sample").subscribeAutomatically(true).subscribeToSelf(false).build();
+```kotlin
+OTConfig config = OTConfig.OTConfigBuilder(SESSION_ID, TOKEN, API_KEY)
+  .name("core-sample")
+  .subscribeAutomatically(true)
+  .subscribeToSelf(false)
+  .build();
 
-OTWrapper mWrapper = new OTWrapper(MainActivity.this, config);
-
+OTWrapper wrapper = OTWrapper(this, config);
 ```
 
 #### Obtaining OpenTok Credentials
 
-To use OpenTok's framework you need a Session ID, Token, and API Key you can get these values at the [OpenTok Developer Dashboard](https://dashboard.tokbox.com/) . For production deployment, you must generate the Session ID and Token values using one of the [OpenTok Server SDKs](https://tokbox.com/developer/sdks/server/).
+To use OpenTok's framework you need a Session ID, Token, and API Key you can get these values at the [OpenTok Developer Dashboard](https://dashboard.tokbox.com/). For production deployment, you must generate the Session ID and Token values using one of the [OpenTok Server SDKs](https://tokbox.com/developer/sdks/server/).
 
 
 ### Set and define listeners
 
-```java
+```kotlin
 
-mWrapper.addBasicListener(mBasicListener);
-mWrapper.addAdvancedListener(mAdvancedListener);
+wrapper.addBasicListener(mBasicListener);
+wrapper.addAdvancedListener(mAdvancedListener);
 
 ....
+val basicListener = PausableBasicListener<OTWrapper>(object : BasicListener<OTWrapper> {
+  //...
+});
 
-private BasicListener mBasicListener =
-        new PausableBasicListener(new BasicListener<OTWrapper>() {
-            //.......
-        });
-
-private AdvancedListener mAdvancedListener =
-        new PausableAdvancedListener(new AdvancedListener<OTWrapper>() {
-        //.......
-    });
+val advancedListener = PausableAdvancedListener<OTWrapper>(object : AdvancedListener<OTWrapper> {
+  //...
+});
 ```
 
 ### Connect and disconnect from an OpenTok session
@@ -110,74 +110,65 @@ private AdvancedListener mAdvancedListener =
 Call to connect or disconnect from an OpenTok session. When the OTWrapper is connected, the BasicListener.onConnected(...) event is called.
 If the OTWrapper failed to connect, the BasicListener.onError(...) event is called.
 
-```java
+```kotlin
 
-mWrapper.connect();
+wrapper.connect();
 
 //.....
 
-mWrapper.disconnect();
+wrapper.disconnect();
 
 ```
 
-Each time a new participant connects to the same session, the BasicListener.onConnected(...) event is called.
-This event offers the information about the new connection id of the participant who connected, the total connections count in the session and the data of the connection.
+Each time a participant connects to the same session, the `BasicListener.onConnected(...)` event is called.
+This event offers the information about the connection id of the participant who connected, the total connections count in the session and the data of the connection.
 
-To check if the new connection is our own connection or not, use OTWrapper.getOwnConnId().
+To check if the connection is our own connection or not, use OTWrapper.getOwnConnId().
 
-```java
+```kotlin
+  val isConnected: Boolean = false;
+  val remoteConnId: String;
 
-  private boolean isConnected = false;
-  private String mRemoteConnId;
+  val basicListener = PausableBasicListener<OTWrapper>(object : BasicListener<OTWrapper> {
 
-  private BasicListener mBasicListener =
-            new PausableBasicListener(new BasicListener<OTWrapper>() {
+      override fun onConnected(otWrapper: OTWrapper, participantsCount: Int, connId: String, data: String) {
+          Log.i(LOG_TAG, "Connected to the session. Number of participants: $participantsCount, connId: $connId")
 
-                @Override
-                public void onConnected(OTWrapper otWrapper, int participantsCount, String connId, String data) throws ListenerException {
-                    Log.i(LOG_TAG, "Connected to the session. Number of participants: " + participantsCount);
-
-                    if (mWrapper.getOwnConnId() == connId) {
-                        isConnected = true;
-                    }
-                    else {
-                        mRemoteConnId = connId;
-                    }
-                }
-              //....
-    });
+          if (wrapper.ownConnId == connId) {
+              isConnected = true;
+          }
+          else {
+              remoteConnId = connId;
+          }
+      }
+    //....
+});
 ```
 
 ### Start and stop preview
 
 Call to start and stop displaying the camera's video in the Preview's view before it starts streaming video. Therefore, the other participants are not going to receive this video stream.
 
-```java
+```kotlin
+val previewConfig = PreviewConfig.PreviewConfigBuilder()
+                        .name("Tokboxer")
+                        .build()
 
-  mWrapper.startPreview(new PreviewConfig.PreviewConfigBuilder().
-                        name("Tokboxer").build());
-
-  //.....
-
-  mWrapper.stopPreview();
-
+wrapper.startPreview(previewConfig);
+//.....
+wrapper.stopPreview();
 ```
 
-When the OTWrapper started the preview, the BasicListener.onPreviewViewReady(...) event is called. And when the OTWrapper stopped the preview, the BasicListener.onPreviewViewDestroyed(...) event is called.
+When the OTWrapper started the preview, the `BasicListener.onPreviewViewReady(...)` event is called. And when the OTWrapper stopped the preview, the BasicListener.onPreviewViewDestroyed(...) event is called.
 
-```java
-private BasicListener mBasicListener =
-          new PausableBasicListener(new BasicListener<OTWrapper>() {
-    @Override
-    public void onPreviewViewReady(OTWrapper otWrapper, View localView) throws ListenerException {
-      Log.i(LOG_TAG, "Local preview view is ready");
-      //....
+```kotlin
+val basicListener = PausableBasicListener<OTWrapper>(object : BasicListener<OTWrapper> {
+
+    override fun onPreviewViewReady(otWrapper: OTWrapper, localView: View) {
+      Log.i(LOG_TAG, "Local preview view is ready")
     }
-
-    @Override
-    public void onPreviewViewDestroyed(OTWrapper otWrapper, View localView) throws ListenerException {
-      Log.i(LOG_TAG, "Local preview view is destroyed");
-      //....
+    override fun onPreviewViewDestroyed(otWrapper: OTWrapper) {
+      Log.i(LOG_TAG, "Local preview view is destroyed")
     }
 });
 ```
@@ -186,81 +177,69 @@ private BasicListener mBasicListener =
 
 Call to start and stop the local streaming video. The source of the stream can be the camera or the screen. To indicate the screen source, it is necessary to set the screen-sharing parameter to TRUE.
 
-```java
-
-PreviewConfig config;
+```kotlin
+val config: PreviewConfig;
 
 //camera streaming
-config = new PreviewConfig.PreviewConfigBuilder().
-                      name("Tokboxer").build();
-mWrapper.startPublishingMedia(config, false);
+config = PreviewConfig.PreviewConfigBuilder()
+                      .name("Tokboxer")
+                      .build();
+
+wrapper.startPublishingMedia(config, false);
 
 //or screen streaming, using a custom screen capturer
-config = new PreviewConfig.PreviewConfigBuilder().
-                  name("screenPublisher").capturer(screenCapturer).build();
-mWrapper.startSharingMedia(config, true);
+config = PreviewConfig.PreviewConfigBuilder().
+                  name("screenPublisher")
+                  .capturer(screenCapturer)
+                  .build();
+
+wrapper.startSharingMedia(config, true);
 
 ```
 
-When the OTWrapper started the publishing media, the BasicListener.onStartedPublishingMedia(...) event is called. And when the OTWrapper stopped the publishing media, the BasicListener.onStoppedPublishingMedia(...) event is called.
+When the OTWrapper started the publishing media, the `BasicListener.onStartedPublishingMedia(...)` event is called. And when the OTWrapper stopped the publishing media, the BasicListener.onStoppedPublishingMedia(...) event is called.
 
-```java
-private BasicListener mBasicListener =
-          new PausableBasicListener(new BasicListener<OTWrapper>() {
+```kotlin
+val basicListener = PausableBasicListener<OTWrapper>(object : BasicListener<OTWrapper> {
 
-    @Override
-    public void onStartedSharingMedia(OTWrapper otWrapper, boolean screenSharing) throws ListenerException {
-      Log.i(LOG_TAG, "Local started streaming video.");
-      //....
-    }
+  override fun onStartedPublishingMedia(otWrapper: OTWrapper, screenSharing: Boolean) {
+    Log.i(LOG_TAG, "Local started streaming video.")
+  }
 
-    @Override
-    public void onStoppedSharingMedia(OTWrapper otWrapper, boolean isScreenSharing) throws ListenerException {
-      Log.i(LOG_TAG, "Local stopped streaming video.");
-    }
+  override fun onStoppedPublishingMedia(otWrapper: OTWrapper, screenSharing: Boolean) {
+    Log.i(LOG_TAG, "Local stopped streaming video.")
+  }
 });
 ```
 
 ### Remote participants management
 
-To subscribe automatically to a new participant connected to the session, the `subscribeAutomatically` property in the OTConfig has to be TRUE.
-Then, when a new remote participant connected to the session, the BasicListener.onRemoteJoined(...) event is called. And the BasicListener.onRemoteLeft(...) event is called. These callbacks contain the identifier for the remote participant, which is equals to the stream id of them.
+To subscribe automatically to a participant connected to the session, the `subscribeAutomatically` property in the OTConfig has to be TRUE.
+Then, when a remote participant connected to the session, the BasicListener.onRemoteJoined(...) event is called. And the BasicListener.onRemoteLeft(...) event is called. These callbacks contain the identifier for the remote participant, which is equals to the stream id of them.
 
-```java
-private BasicListener mBasicListener =
-          new PausableBasicListener(new BasicListener<OTWrapper>() {
-
-    @Override
-    public void onRemoteJoined(OTWrapper otWrapper, String remoteId) throws ListenerException {
-      Log.i(LOG_TAG, "A new remote joined.");
-      //...
+```kotlin
+val basicListener = PausableBasicListener<OTWrapper>(object : BasicListener<OTWrapper> {
+   override fun onRemoteJoined(otWrapper: OTWrapper, remoteId: String) {
+      Log.i(LOG_TAG, "A remote joined.")
     }
 
-    @Override
-    public void onRemoteLeft(OTWrapper otWrapper, String remoteId) throws ListenerException {
-      Log.i(LOG_TAG, "A new remote left.");
-      //...    
+    override fun onRemoteLeft(otWrapper: OTWrapper, remoteId: String) {
+      Log.i(LOG_TAG, "A remote left.")
     }
 });
 ```
 
-When the remote participant view is ready, the BasicListener.onRemoteViewReady(...) event is called. And when the remote participant view is destroyed, the BasicListener.onRemoteViewDestroyed(....) event is called.
+When the remote participant view is ready, the `BasicListener.onRemoteViewReady(...)` event is called. And when the remote participant view is destroyed, the BasicListener.onRemoteViewDestroyed(....) event is called.
 
-```java
-private BasicListener mBasicListener =
-          new PausableBasicListener(new BasicListener<OTWrapper>() {
+```kotlin
+val basicListener = PausableBasicListener<OTWrapper>(object : BasicListener<OTWrapper> {
 
-  @Override
-      public void onRemoteViewReady(OTWrapper otWrapper, View remoteView, String remoteId, String data) throws ListenerException {
-          Log.i(LOG_TAG, "Remove view is ready");
-          //...
-    }
+  override fun onRemoteViewReady(otWrapper: OTWrapper, remoteView: View, remoteId: String, data: String) {
+    Log.i(LOG_TAG, "Participant remote view is ready")
+  }
 
-    @Override
-    public void onRemoteViewDestroyed(OTWrapper otWrapper, View remoteView, String remoteId) throws ListenerException {
-      Log.i(LOG_TAG, "Remote view is destroyed");
-      //...
-    }
+  override fun onPreviewViewDestroyed(otWrapper: OTWrapper) {
+    Log.i(LOG_TAG, "Local preview view is destroyed")
   });
 ```
 
@@ -269,30 +248,30 @@ private BasicListener mBasicListener =
 Call these methods when the app's activity pauses or resumes. These pause or resume the video for the local preview and remotes.
 The Accelerator Core offers the possibility to resume the events setting the `resumeEvents` parameter to TRUE in the `resume` method.
 
-```java
-mWrapper.pause();
+```kotlin
+wrapper.pause();
 
 //.....
 
-mWrapper.resume(true);  
+wrapper.resume(true);  
 ```
 
 ### Connections management
 
 The Accelerator Core offers a set of methods to manage the connections of the session.
 
-```java
+```kotlin
 //get our own connection Id
-String myConnectionId = mWrapper.getOwnConnId();
+wrapper.ownConnId
 
 //get the total connections in the session
-String totalParticipants = mWrapper.getConnectionsCount();
+wrapper.connectionsCount
 
 //check if the own connection is the oldest in the current session
-Boolen isTheOldest = mWrapper.isTheOldestConnection();
+wrapper.isTheOldestConnection;
 
 //compare the connections creation times between the local connection and the argument passing
-int older = mWrapper.compareConnectionsTimes(remoteConnId);
+int older = wrapper.compareConnectionsTimes(remoteConnId);
 
 ```
 
@@ -300,18 +279,18 @@ int older = mWrapper.compareConnectionsTimes(remoteConnId);
 
 To enable or disable the publishing audio or video.
 
-```java
+```kotlin
 //check the current status of the publishing video
-boolean videoEnabled = mWrapper.isPublishingMediaEnabled(MediaType.Video);
+wrapper.isPublishingMediaEnabled(MediaType.Video);
 
 //check the current status of the publishing audio
-boolean audioEnabled = mWrapper.isPublishingMediaEnabled(MediaType.Audio);
+wrapper.isPublishingMediaEnabled(MediaType.Audio);
 
 //enable the video
-mWrapper.enablePublishingMedia(MediaType.Video, true);
+wrapper.enablePublishingMedia(MediaType.Video, true);
 
 //disable the audio
-mWrapper.enablePublishingMedia(MediaType.Audio, false);
+wrapper.enablePublishingMedia(MediaType.Audio, false);
 
 ```
 
@@ -319,12 +298,12 @@ mWrapper.enablePublishingMedia(MediaType.Audio, false);
 
 The status of a stream includes the media status, the stream type, the status of the media containers and the stream dimensions.
 
-```java
+```kotlin
 //to get the publishing stream status
-StreamStatus localStreamStatus = mWrapper.getPublishingStreamStatus();
+wrapper.getPublishingStreamStatus();
 
 //to get the remote stream status
-StreamStatus remoteStreamStatus = mWrapper.getRemoteStremStatus(remoteId);
+wrapper.getRemoteStremStatus(remoteId);
 
 ```
 
@@ -332,109 +311,81 @@ StreamStatus remoteStreamStatus = mWrapper.getRemoteStremStatus(remoteId);
 
 The Accelerator Core includes a complete Signaling protocol to register a signal listener for a given type.
 
-```java
-mWrapper.addSignalListener(SIGNAL_TYPE, this);
+```kotlin
+wrapper.addSignalListener(SIGNAL_TYPE, this);
 
 //send a signal to all the participants
-mWrapper.sendSignal(new SignalInfo(mWrapper.getOwnConnId(), null, SIGNAL_TYPE, "hello"));
+wrapper.sendSignal(SignalInfo(wrapper.ownConnId, null, SIGNAL_TYPE, "hello"));
 
 //send a signal to a specific participant, using the participant connection id.
-mWrapper.sendSignal(new SignalInfo(mWrapper.getOwnConnId(), participantConnId, SIGNAL_TYPE, "hello"));
+wrapper.sendSignal(SignalInfo(wrapper.ownConnId, participantConnId, SIGNAL_TYPE, "hello"));
 
 //manage the received signals. All the received signals will be of the registered type: SIGNAL_TYPE
-public void onSignalReceived(SignalInfo signalInfo, boolean isSelfSignal) {
-    //....
-}
+public void onSignalReceived(signalInfo: SignalInfo, isSelfSignal: Boolean) { }
 ```
 
 ### Customize capturer and renderers
 
 A custom video capturer or renderer can be used in the OpenTok communication for the publishing media.
 
-```java
-CustomRenderer myCustomRenderer = new CustomRenderer(...);
-CustomCapturer myCustomCapturer = new CustomCapturer(...);
+```kotlin
+val myCustomRenderer = CustomRenderer(...);
+val myCustomCapturer = CustomCapturer(...);
 
-PreviewConfig config = new PreviewConfig.PreviewConfigBuilder().
+val config = PreviewConfig.PreviewConfigBuilder().
                   name("screenPublisher").capturer(myCustomCapturer).renderer(myCustomRenderer).build();
 
-mWrapper.startPublishingMedia(config, false);
+wrapper.startPublishingMedia(config, false);
 ```
 
 A custom video renderer can be used in the OpenTok communication for the received media. Please note, this should be set before to start the communication.
 
-```java
-CustomRenderer myCustomRenderer = new CustomRenderer(...);
+```kotlin
+val myCustomRenderer = CustomRenderer(...);
+
 //set a custom renderer dor the received video stream
-mWrapper.setRemoteVideoRenderer(myCustomRenderer);
+wrapper.setRemoteVideoRenderer(myCustomRenderer);
 
 //or set a custom renderer for the received screen stream
-mWrapper.setRemoteScreenRenderer(myCustomRenderer);
+wrapper.setRemoteScreenRenderer(myCustomRenderer);
 ```
 
 ### Set Video Renderer styles
 
 The video scale mode can be modified to FILL or FIT value for the publishing video or for the received video from the remotes.
 
-```java
-mWrapper.setPublishingStyle(VideoScalse.FIT);
-mWrapper.setRemoteStyle(remoteId, VideoScale.FILL);
+```kotlin
+wrapper.setPublishingStyle(VideoScalse.FIT);
+wrapper.setRemoteStyle(remoteId, VideoScale.FILL);
 ```
 
 ### Cycle the camera
 
 Cycle between cameras, if there are multiple cameras on the device. Then, the AdvancedListener.onCameraChanged(...) event is called.
 
-```java
-mWrapper.cycleCamera();
-```
-
-### Advanced Events
-
-The SDK Wrapper include an AdvancedListener to define some events like when the video changed by quality reasons, or when the communication tries to reconnect,...etc.
-
-```java
-private AdvancedListener mAdvancedListener =
-  new PausableAdvancedListener(new AdvancedListener<OTWrapper>() {
-
-    @Override
-    public void onReconnecting(OTWrapper otWrapper) throws ListenerException {
-      Log.i(LOG_TAG, "The session is reconnecting.");
-    }
-
-    @Override
-    public void onReconnected(OTWrapper otWrapper) throws ListenerException {
-      Log.i(LOG_TAG, "The session reconnected.");
-    }
-
-    @Override
-    public void onVideoQualityWarning(OTWrapper otWrapper, String remoteId) throws ListenerException {
-      Log.i(LOG_TAG, "The quality has degraded");
-    }
-
-    @Override
-    public void onVideoQualityWarningLifted(OTWrapper otWrapper, String remoteId) throws ListenerException {
-      Log.i(LOG_TAG, "The quality has improved");
-    }
-
-    //...
-  });
+```kotlin
+wrapper.cycleCamera();
 ```
 
 ### Screen-sharing
 
 According to [start and stop publishing media](#start-and-stop-publishing-media), you can start screensharing using OTWrapper
 
-```java
-mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
-                       name("Tokboxer").build(), true);
+```kotlin
+wrapper.startPublishingMedia(PreviewConfig.PreviewConfigBuilder()
+                       .name("Tokboxer")
+                       .build(), true);
 ```
 
 Scree-sharing with a customer capturer can be achieved using:
 
-```java
-mWrapper.startPublishingMedia(new PreviewConfig.PreviewConfigBuilder().
-                       name("Tokboxer”).capturer(myCapturer).build(), true);
+```kotlin
+val previewConfig = PreviewConfig.PreviewConfigBuilder()
+                       .name("Tokboxer")
+                       .capturer(myCapturer)
+                       .build()
+
+wrapper.startPublishingMedia(previewConfig, true);
 ```
 
 ### Using OTAcceleratorSession
@@ -443,23 +394,23 @@ The Accelerator Core library uses the `OTAcceleratorSession` to manage the OpenT
 
 In the case, you don't need the audio/video communication, you can start by creating an OTAcceleratorSession instance, an apiKey and sessionID are requires. For more visit [Obtaining OpenTok Credentials](obtaining-pentok-redentials)
 
-```java
-OTAcceleratorSession mSession = new OTAcceleratorSession(context, apikey, sessionId);
-mSession.addSignalListener("CHAT", this);
+```kotlin
+OTAcceleratorSession session = OTAcceleratorSession(context, apikey, sessionId);
+session.addSignalListener("CHAT", this);
 
-//send a new signal
-JSONObject messageObj = new JSONObject();
+//send a signal
+val messageObj = JSONObject();
 messageObj.put("sender", "Tokbox");
 messageObj.put("text", "hi!");
 messageObj.put("sentOn", System.currentTimeMillis());
 
-mSession.sendSignal(new SignalInfo(mSession.getConnection().getConnectionId(), null, "CHAT", messageObj.toString()), null);
+session.sendSignal(SignalInfo(mSession.getConnection().getConnectionId(), null, "CHAT", messageObj.toString()), null);
 ```
 
 To get the OTAcceleratorSession instance used in the audio/video communication, call to:
 
-```java
-OTAcceleratorSession mSession = mWrapper.getSession();
+```kotlin
+OTAcceleratorSession session = wrapper.session;
 ```
 
 ## Development and Contributing
