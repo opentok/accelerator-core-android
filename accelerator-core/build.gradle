@@ -130,6 +130,7 @@ def checkMaven = task("checkUploadArchivesDeps") {
 }
 
 uploadArchives.dependsOn checkMaven
+
 repositories {
     mavenCentral()
 }
