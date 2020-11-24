@@ -79,6 +79,7 @@
                         android:paddingLeft="15dp"
                         android:textColor="@color/input_text"
                         android:textSize="@dimen/input_text"
+                        android:maxLength="1000"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/characteres_msg"
