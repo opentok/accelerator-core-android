@@ -14,39 +14,40 @@
         <TextView
                 android:id="@+id/titlebar"
                 android:layout_width="wrap_content"
-            android:layout_height="@dimen/title_bar_height"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_size"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:layout_centerHorizontal="true"></TextView>
+                android:layout_height="@dimen/title_bar_height"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size" />
 
         <ImageButton
             android:id="@+id/close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="14.9dp"
-            android:layout_marginTop="14.5dp"
-            android:background="@drawable/close"
-            android:clickable="true" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="14.9dp"
+                android:layout_marginTop="14.5dp"
+                android:background="@drawable/close"
+                android:clickable="true" />
 
     </RelativeLayout>
 
-    <include layout="@layout/content_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/action_bar"
-        android:layout_above="@+id/send_msg"></include>
+    <include
+            layout="@layout/content_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/send_msg"
+            android:layout_below="@+id/action_bar" />
 
     <RelativeLayout
-        android:id="@+id/send_msg"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:background="@color/accent">
+            android:id="@+id/send_msg"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="@color/accent">
 
         <RelativeLayout
                 android:layout_width="match_parent"
