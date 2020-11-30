@@ -112,7 +112,7 @@ public class ChatMessageTest {
 
     @Test
     public void testChatMessageWhenSenderIDIsMAXString() throws Exception {
-        senderID = TestUtils.INSTANCE.generateString(60);
+        senderID = TestUtils.INSTANCE.getRandomString(60);
         messageID = UUID.randomUUID();
         chatMessageBuilder = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE);
         chatMessage = chatMessageBuilder.build();
@@ -122,7 +122,7 @@ public class ChatMessageTest {
 
     @Test
     public void testChatMessageWhenSenderIDIsLongString() throws Exception {
-        senderID = TestUtils.INSTANCE.generateString(1001);
+        senderID = TestUtils.INSTANCE.getRandomString(1001);
         messageID = UUID.randomUUID();
         chatMessageBuilder = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE);
         chatMessage = chatMessageBuilder.build();
@@ -217,7 +217,7 @@ public class ChatMessageTest {
         senderID = "1234";
         messageID = UUID.randomUUID();
         chatMessage = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE).build();
-        String senderAlias = TestUtils.INSTANCE.generateString(50);
+        String senderAlias = TestUtils.INSTANCE.getRandomString(50);
         chatMessage.setSenderAlias(senderAlias);
 
         Assert.assertTrue(chatMessage.getSenderAlias().equals(senderAlias));
@@ -229,7 +229,7 @@ public class ChatMessageTest {
         senderID = "1234";
         messageID = UUID.randomUUID();
         chatMessageBuilder = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE);
-        String senderAlias = TestUtils.INSTANCE.generateString(50);
+        String senderAlias = TestUtils.INSTANCE.getRandomString(50);
         chatMessageBuilder.senderAlias(senderAlias);
         chatMessage = chatMessageBuilder.build();
 
@@ -242,7 +242,7 @@ public class ChatMessageTest {
             senderID = "1234";
             messageID = UUID.randomUUID();
             chatMessage = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE).build();
-            chatMessage.setSenderAlias(TestUtils.INSTANCE.generateString(51));
+            chatMessage.setSenderAlias(TestUtils.INSTANCE.getRandomString(51));
 
             Assert.fail("Should have thrown an exception with a long string for the sender alias");
 
@@ -257,7 +257,7 @@ public class ChatMessageTest {
             senderID = "1234";
             messageID = UUID.randomUUID();
             chatMessageBuilder = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE);
-            chatMessageBuilder.senderAlias(TestUtils.INSTANCE.generateString(51));
+            chatMessageBuilder.senderAlias(TestUtils.INSTANCE.getRandomString(51));
             chatMessage = chatMessageBuilder.build();
 
             Assert.fail("Should have thrown an exception with a long string for the sender alias");
@@ -365,7 +365,7 @@ public class ChatMessageTest {
         senderID = "1234";
         messageID = UUID.randomUUID();
         chatMessage = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE).build();
-        String text = TestUtils.INSTANCE.generateString(8196);
+        String text = TestUtils.INSTANCE.getRandomString(8196);
         chatMessage.setText(text);
 
         Assert.assertTrue(chatMessage.getText().equals(text));
@@ -376,7 +376,7 @@ public class ChatMessageTest {
         senderID = "1234";
         messageID = UUID.randomUUID();
         chatMessageBuilder = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE);
-        String text = TestUtils.INSTANCE.generateString(8196);
+        String text = TestUtils.INSTANCE.getRandomString(8196);
         chatMessageBuilder.text(text);
         chatMessage = chatMessageBuilder.build();
 
@@ -389,7 +389,7 @@ public class ChatMessageTest {
             senderID = "1234";
             messageID = UUID.randomUUID();
             chatMessage = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE).build();
-            String text = TestUtils.INSTANCE.generateString(8197);
+            String text = TestUtils.INSTANCE.getRandomString(8197);
             chatMessage.setText(text);
 
             Assert.fail("Should have thrown an exception with a long string for the text message");
@@ -405,7 +405,7 @@ public class ChatMessageTest {
             senderID = "1234";
             messageID = UUID.randomUUID();
             chatMessageBuilder = new ChatMessage.ChatMessageBuilder(senderID, messageID, ChatMessage.MessageStatus.SENT_MESSAGE);
-            chatMessageBuilder.text(TestUtils.INSTANCE.generateString(8197));
+            chatMessageBuilder.text(TestUtils.INSTANCE.getRandomString(8197));
             chatMessage = chatMessageBuilder.build();
 
             Assert.fail("Should have thrown an exception with a long string for the text message");
