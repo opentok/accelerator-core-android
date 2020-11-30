@@ -58,9 +58,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         if ( messagesList != null ) {
             ChatMessage item = messagesList.get(position);
 
-            if(item.getMessageStatus() == ChatMessage.MessageStatus.SENT_MESSAGE) {
+            if (item.getStatus() == ChatMessage.MessageStatus.SENT_MESSAGE) {
                 return R.layout.sent_row;
-            }else {
+            } else {
                 return R.layout.received_row;
             }
         }

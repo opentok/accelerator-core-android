@@ -362,43 +362,48 @@ public class TextChatFragment extends Fragment implements SignalListener {
         addLogEvent(OpenTokConfig.LOG_ACTION_INITIALIZE, OpenTokConfig.LOG_VARIATION_SUCCESS);
     }
 
-    //Private methods
     //Add a message to the message list.
-    private void addMessage(final ChatMessage msg) throws IllegalArgumentException {
-        Log.i(LOG_TAG, "New message " + msg.getText() + " is ready to be added.");
+    private void addMessage(final ChatMessage message) throws IllegalArgumentException {
+        Log.i(LOG_TAG, "New message " + message.getText() + " is ready to be added.");
 
-        if (msg != null) {
-            if (!senders.containsKey(msg.getSenderId())) {
-                if (msg.getSenderAlias() != null && !msg.getSenderAlias().isEmpty()) {
-                    senders.put(msg.getSenderId(), msg.getSenderAlias());
-                    updateTitle(defaultTitle());
-                }
+        if (message != null) {
+            if (!senders.containsKey(message.getSenderId())) {
+                senders.put(message.getSenderId(), message.getSenderAlias());
+                updateTitle(defaultTitle());
             }
 
             //generate message timestamp
             Date date = new Date();
-            if (msg.getTimestamp() == 0) {
-                try {
-                    msg.setTimestamp(date.getTime());
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(e.getMessage());
-                }
+            if (message.getTimestamp() == 0) {
+                throw new IllegalArgumentException("Timestamp is 0");
             }
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (!checkMessageGroup(msg)) {
-                        messagesList.add(msg);
+                    if (!checkMessageGroup(message)) {
+                        messagesList.add(message);
                     } else {
                         //concat text for the messages group
-                        String msgText = messagesList.get(messagesList.size() - 1).getText() + "\r\n" + msg.getText();
+                        String msgText = messagesList.get(messagesList.size() - 1).getText() + "\r\n" + message.getText();
+
+
                         try {
-                            msg.setText(msgText);
+                            ChatMessage newMessage = new ChatMessage(
+                                    message.getId(),
+                                    message.getStatus(),
+                                    msgText,
+                                    message.getTimestamp(),
+                                    message.getSenderId(),
+                                    message.getSenderAlias()
+                            );
+
+                            Collections.replaceAll(messagesList, message, newMessage);
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        messagesList.set(messagesList.size() - 1, msg);
+                        messagesList.set(messagesList.size() - 1, message);
                     }
 
                     mMessageAdapter.notifyDataSetChanged();
@@ -572,7 +577,6 @@ public class TextChatFragment extends Fragment implements SignalListener {
         String senderAlias = null;
         String text = null;
         Long date = null;
-        ChatMessage msg;
         JSONObject json;
         JSONObject sender;
 
@@ -605,12 +609,13 @@ public class TextChatFragment extends Fragment implements SignalListener {
         } else {
             if (signalInfo.mSrcConnId.equals(signalInfo.mDstConnId)) {
                 try {
-                    msg = new ChatMessage.ChatMessageBuilder(senderId, UUID.randomUUID(), ChatMessage.MessageStatus.SENT_MESSAGE)
-                            .senderAlias(senderAlias)
-                            .text(text)
-                            .build();
-                    msg.setTimestamp(Long.valueOf(date).longValue());
-                    final ChatMessage sentMessage = msg;
+                    final ChatMessage sentMessage = new ChatMessage(
+                            UUID.randomUUID(),
+                            ChatMessage.MessageStatus.SENT_MESSAGE,
+                            text,
+                            date,
+                            senderId,
+                            senderAlias);
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -627,7 +632,7 @@ public class TextChatFragment extends Fragment implements SignalListener {
                         }
                     });
 
-                    onNewSentMessage(msg);
+                    onNewSentMessage(sentMessage);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -635,11 +640,14 @@ public class TextChatFragment extends Fragment implements SignalListener {
                 Log.i(LOG_TAG, "A new message has been received " + signalInfo.mData);
                 addLogEvent(OpenTokConfig.LOG_ACTION_RECEIVE_MESSAGE, OpenTokConfig.LOG_VARIATION_ATTEMPT);
                 try {
-                    ChatMessage receivedMsg = new ChatMessage.ChatMessageBuilder(senderId, UUID.randomUUID(), ChatMessage.MessageStatus.RECEIVED_MESSAGE)
-                            .senderAlias(senderAlias)
-                            .text(text)
-                            .build();
-                    receivedMsg.setTimestamp(Long.valueOf(date).longValue());
+                    ChatMessage receivedMsg = new ChatMessage(
+                            UUID.randomUUID(),
+                            ChatMessage.MessageStatus.RECEIVED_MESSAGE,
+                            text,
+                            date,
+                            senderId,
+                            senderAlias);
+
                     addMessage(receivedMsg);
                     onNewReceivedMessage(receivedMsg);
                 } catch (Exception e) {

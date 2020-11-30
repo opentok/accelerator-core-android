@@ -4,7 +4,7 @@ import com.opentok.accelerator.core.GlobalLogLevel
 import kotlin.experimental.and
 
 /**
- * Defines the OpenTok Configuration to be used in the communication.
+ * Defines the OpenTok configuration to be used in the communication.
  *
  * @property sessionId the OpenTok session id
  * @property token the OpenTok token
