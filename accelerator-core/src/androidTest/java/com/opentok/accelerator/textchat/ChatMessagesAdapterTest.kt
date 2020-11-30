@@ -13,7 +13,7 @@ import org.junit.runner.RunWith
 import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
-class MessagesAdapterTest {
+class ChatMessagesAdapterTest {
 
     @Before
     fun setUp() {
@@ -23,7 +23,7 @@ class MessagesAdapterTest {
     @Test
     fun creating_new_instance_with_null_list_throws_exception() {
         // when
-        val func = { MessagesAdapter(null) }
+        val func = { ChatMessagesAdapter(null) }
 
         // then
         func shouldThrow IllegalArgumentException::class
@@ -35,7 +35,7 @@ class MessagesAdapterTest {
         val messagesList = ArrayList<ChatMessage>()
 
         // when
-        val messagesAdapter = MessagesAdapter(messagesList)
+        val messagesAdapter = ChatMessagesAdapter(messagesList)
 
         // then
         messagesAdapter.itemCount shouldBeEqualTo 0
@@ -50,7 +50,7 @@ class MessagesAdapterTest {
         messagesList.add(chatMessage)
 
         // when
-        val messagesAdapter = MessagesAdapter(messagesList)
+        val messagesAdapter = ChatMessagesAdapter(messagesList)
 
         // then
         messagesAdapter.itemCount shouldBeEqualTo 1
@@ -59,13 +59,20 @@ class MessagesAdapterTest {
     @Test
     fun getting_view_type_for_existing_item_returns_view_type() {
         // given
-        val chatMessage = ChatMessage.ChatMessageBuilder("1", UUID.randomUUID(), MessageStatus.SENT_MESSAGE)
-            .build()
+        val chatMessage = ChatMessage(
+            UUID.randomUUID(),
+            MessageStatus.SENT_MESSAGE,
+            "abc",
+            1,
+            "senderId",
+            "senderAlias"
+        )
+
         val messagesList = ArrayList<ChatMessage>()
         messagesList.add(chatMessage)
 
         // when
-        val messagesAdapter = MessagesAdapter(messagesList)
+        val messagesAdapter = ChatMessagesAdapter(messagesList)
 
         // then
         messagesAdapter.getItemViewType(0) shouldNotBe null
@@ -75,7 +82,7 @@ class MessagesAdapterTest {
     fun getting_view_type_for_non_existing_item_throws_exception() {
         // given
         val messagesList = ArrayList<ChatMessage>()
-        val messagesAdapter = MessagesAdapter(messagesList)
+        val messagesAdapter = ChatMessagesAdapter(messagesList)
 
         // when
         val f = { messagesAdapter.getItemViewType(0) }

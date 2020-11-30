@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.MessageViewHolder>{
+public class ChatMessagesAdapter extends RecyclerView.Adapter<ChatMessagesAdapter.MessageViewHolder> {
 
     private List<ChatMessage> messagesList = new ArrayList<ChatMessage>();
     private View messageView;
 
-    public MessagesAdapter(List<ChatMessage> messagesList) throws IllegalArgumentException {
+    public ChatMessagesAdapter(List<ChatMessage> messagesList) throws IllegalArgumentException {
         if (messagesList == null) {
             throw new IllegalArgumentException("MessageList cannot be null");
         }
