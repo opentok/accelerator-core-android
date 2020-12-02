@@ -80,7 +80,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     private var screenPublisher: Publisher? = null
 
     //indexed by streamId, *not* per subscriber Id
-    private var mSubscribers = HashMap<String, Subscriber>()
+    private var subscribers = HashMap<String, Subscriber>()
     private var streams = ConcurrentHashMap<String, Stream>()
 
     //listeners
@@ -96,7 +96,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      */
     val connectionCount get() = otAcceleratorSession?.connectionCount ?: 0
 
-    private var mOlderThanMe = 0
+    private var olderThanMe = 0
 
     /**
      * Whether the local is previewing (`true`) or not (
@@ -147,7 +147,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             otAcceleratorSession?.addConnection(connection.connectionId, connection)
 
             if (connection.creationTime <= sessionConnection?.creationTime) {
-                mOlderThanMe++
+                olderThanMe++
             }
 
             for (listener in basicListeners) {
@@ -164,7 +164,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             otAcceleratorSession?.removeConnection(connection.connectionId)
 
             if (connection.creationTime <= sessionConnection?.creationTime) {
-                mOlderThanMe--
+                olderThanMe--
             }
 
             basicListeners.forEach {
@@ -172,7 +172,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             }
         }
     }
-    private val mSubscriberListener: SubscriberListener = object : SubscriberListener {
+    private val subscriberListener: SubscriberListener = object : SubscriberListener {
         override fun onConnected(sub: SubscriberKit) {
             LOG.i(LOG_TAG, "Subscriber is connected")
             addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_SUCCESS)
@@ -203,7 +203,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 ErrorCode.SubscriberInternalError -> {
                     //TODO: Add client logs for the different subscribers errors
                     LOG.e(LOG_TAG, "Subscriber error: SubscriberInternalError")
-                    mSubscribers.remove(id)
+                    subscribers.remove(id)
                 }
                 ErrorCode.ConnectionTimedOut -> {
                     addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ERROR)
@@ -215,15 +215,15 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 }
                 ErrorCode.SubscriberWebRTCError -> {
                     LOG.e(LOG_TAG, "Subscriber error: SubscriberWebRTCError")
-                    mSubscribers.remove(id)
+                    subscribers.remove(id)
                 }
                 ErrorCode.SubscriberServerCannotFindStream -> {
                     LOG.e(LOG_TAG, "Subscriber error: SubscriberServerCannotFindStream")
-                    mSubscribers.remove(id)
+                    subscribers.remove(id)
                 }
                 else -> {
                     LOG.e(LOG_TAG, "Subscriber error: default ")
-                    mSubscribers.remove(id)
+                    subscribers.remove(id)
 
                     if (!streams.containsKey(id)) {
                         streams[id] = subscriberKit.stream
@@ -236,14 +236,14 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             }
         }
     }
-    private val mAudioLevelListener = PublisherKit.AudioLevelListener { publisherKit, audioLevel ->
+    private val audioLevelListener = PublisherKit.AudioLevelListener { publisherKit, audioLevel ->
         advancedListeners.forEach {
             it.onAudioLevelUpdated(audioLevel)
         }
     }
 
     //Implements Advanced listeners
-    private val mReconnectionListener: ReconnectionListener = object : ReconnectionListener {
+    private val reconnectionListener: ReconnectionListener = object : ReconnectionListener {
         override fun onReconnecting(session: Session) {
             advancedListeners.forEach {
                 it.onReconnecting(SELF)
@@ -257,7 +257,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    private val mVideoListener: VideoListener = object : VideoListener {
+    private val videoListener: VideoListener = object : VideoListener {
         override fun onVideoDataReceived(subscriberKit: SubscriberKit) {
             //todo: review: a new listener to indicate the first frame received
         }
@@ -296,7 +296,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    private val mCameraListener: CameraListener = object : CameraListener {
+    private val cameraListener: CameraListener = object : CameraListener {
         override fun onCameraChanged(publisher: Publisher, i: Int) {
             advancedListeners.forEach {
                 it.onCameraChanged(SELF)
@@ -312,7 +312,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    private val mStreamListener: StreamListener = object : StreamListener {
+    private val streamListener: StreamListener = object : StreamListener {
         override fun onReconnected(subscriber: SubscriberKit) {
             advancedListeners.forEach {
                 it.onReconnected(SELF, subscriber.stream.streamId)
@@ -340,7 +340,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
     //Implements Basic listeners: Session.SessionListener, Session.ConnectionListener,
     // Session.SignalListener, Publisher.PublisherListener
-    private val mSessionListener: SessionListener = object : SessionListener {
+    private val sessionListener: SessionListener = object : SessionListener {
 
         override fun onConnected(session: Session) {
             val connection = session.connection
@@ -403,8 +403,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 streams.remove(stream.streamId)
             }
 
-            if (mSubscribers.containsKey(subId)) {
-                mSubscribers.remove(stream.streamId)
+            if (subscribers.containsKey(subId)) {
+                subscribers.remove(stream.streamId)
             }
 
             basicListeners.forEach {
@@ -429,7 +429,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             }
         }
     }
-    private val mPublisherListener: PublisherListener = object : PublisherListener {
+
+    private val publisherListener: PublisherListener = object : PublisherListener {
         override fun onStreamCreated(publisherKit: PublisherKit, stream: Stream) {
             var screenSharing = false
             if (stream.streamVideoType == StreamVideoType.StreamVideoTypeScreen) {
@@ -514,9 +515,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 screenPublisherBuilder?.capturer(capturer)
 
                 screenPublisher = screenPublisherBuilder?.build()?.apply {
-                    setPublisherListener(mPublisherListener)
-                    setAudioLevelListener(mAudioLevelListener)
-                    setCameraListener(mCameraListener)
+                    setPublisherListener(publisherListener)
+                    setAudioLevelListener(audioLevelListener)
+                    setCameraListener(cameraListener)
                     publisherVideoType = PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeScreen
                     setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL)
                 }
@@ -580,10 +581,10 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT)
         otAcceleratorSession = OTAcceleratorSession(context, otConfig.apiKey, otConfig.sessionId)
         otAcceleratorSession?.setConnectionListener(connectionListener)
-        otAcceleratorSession?.setSessionListener(mSessionListener)
+        otAcceleratorSession?.setSessionListener(sessionListener)
         otAcceleratorSession?.signalListener = otAcceleratorSession?.signalListener
-        otAcceleratorSession?.setReconnectionListener(mReconnectionListener)
-        mOlderThanMe = 0
+        otAcceleratorSession?.setReconnectionListener(reconnectionListener)
+        olderThanMe = 0
 
         //check signal protocol
         if (inputSignalProtocol != null) {
@@ -624,7 +625,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * `false`).
      */
     val isTheOldestConnection: Boolean
-        get() = mOlderThanMe <= 0
+        get() = olderThanMe <= 0
 
     /**
      * Compares the connections creation times between the local connection and the argument passing
@@ -652,7 +653,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * @return the remote connectionID
      */
     fun getRemoteConnId(remoteId: String): String {
-        val remoteSub = mSubscribers[remoteId]
+        val remoteSub = subscribers[remoteId]
 
         requireNotNull(remoteSub)
         val connection = remoteSub.stream?.connection
@@ -797,9 +798,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      */
     fun enableReceivedMedia(remoteId: String?, type: MediaType, enabled: Boolean) {
         if (remoteId != null) {
-            enableRemoteMedia(mSubscribers[remoteId], type, enabled)
+            enableRemoteMedia(subscribers[remoteId], type, enabled)
         } else {
-            val subscribers: Collection<Subscriber> = mSubscribers.values
+            val subscribers: Collection<Subscriber> = subscribers.values
 
             subscribers.forEach {
                 enableRemoteMedia(it, type, enabled)
@@ -815,7 +816,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * `false`).
      */
     fun isReceivedMediaEnabled(remoteId: String, type: MediaType): Boolean {
-        val sub = mSubscribers[remoteId] ?: return false
+        val sub = subscribers[remoteId] ?: return false
 
         return if (type == MediaType.VIDEO) sub.subscribeToVideo else sub.subscribeToAudio
     }
@@ -843,14 +844,14 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         LOG.i(LOG_TAG, "private add new remote stream != null")
 
         val sub = Subscriber(context, stream).apply {
-            setVideoListener(mVideoListener)
-            setStreamListener(mStreamListener)
+            setVideoListener(videoListener)
+            setStreamListener(streamListener)
             setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL)
         }
 
         val subId = stream.streamId
-        mSubscribers[subId] = sub
-        sub.setSubscriberListener(mSubscriberListener)
+        subscribers[subId] = sub
+        sub.setSubscriberListener(subscriberListener)
 
         if (stream.streamVideoType == StreamVideoType.StreamVideoTypeCamera && videoRemoteRenderer != null) {
             sub.renderer = videoRemoteRenderer
@@ -872,11 +873,11 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     fun removeRemote(remoteId: String) {
         LOG.i(LOG_TAG, "Remove remote with ID: ", remoteId)
         addLogEvent(ClientLog.LOG_ACTION_REMOVE_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT)
-        val subscriber = mSubscribers[remoteId]
+        val subscriber = subscribers[remoteId]
 
         requireNotNull(subscriber) { "No subscriber found for remoteId $remoteId" }
 
-        mSubscribers.remove(remoteId)
+        subscribers.remove(remoteId)
         streams[remoteId] = subscriber.stream
         otAcceleratorSession?.unsubscribe(subscriber)
     }
@@ -1079,7 +1080,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * video
      */
     fun getRemoteStreamStatus(id: String): StreamStatus? {
-        val sub = mSubscribers[id]
+        val sub = subscribers[id]
         if (sub != null) {
             val subSt = sub.stream
             return StreamStatus(
@@ -1098,7 +1099,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * @param style    VideoScale value: FILL or FIT
      */
     fun setRemoteStyle(remoteId: String, style: VideoScale) {
-        val sub = mSubscribers[remoteId]
+        val sub = subscribers[remoteId]
         if (sub != null) {
             if (style == VideoScale.FILL) {
                 sub.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL)
@@ -1221,8 +1222,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
         if (otAcceleratorSession != null) {
             otAcceleratorSession?.cleanUpSignals()
-            if (mSubscribers.size > 0) {
-                for (subscriber in mSubscribers.values) {
+            if (subscribers.size > 0) {
+                for (subscriber in subscribers.values) {
                     otAcceleratorSession?.unsubscribe(subscriber)
                 }
             }
@@ -1234,7 +1235,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
         publisher = null
         otAcceleratorSession = null
-        mSubscribers = HashMap()
+        subscribers = HashMap()
         streams = ConcurrentHashMap()
         sessionConnection = null
         isPreviewing = false
@@ -1336,8 +1337,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
 
         publisher = builder.build().apply {
-            setPublisherListener(mPublisherListener)
-            setCameraListener(mCameraListener)
+            setPublisherListener(publisherListener)
+            setCameraListener(cameraListener)
             //byDefault
             setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL)
         }
@@ -1386,9 +1387,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
         screenPublisher = screenPublisherBuilder?.build()?.apply {
             if (!isScreenSharingByDefault) {
-                setPublisherListener(mPublisherListener)
-                setAudioLevelListener(mAudioLevelListener)
-                setCameraListener(mCameraListener)
+                setPublisherListener(publisherListener)
+                setAudioLevelListener(audioLevelListener)
+                setCameraListener(cameraListener)
                 publisherVideoType = PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeScreen
                 //byDefault
                 setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL)
@@ -1463,7 +1464,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     }
 
     private fun notifyRemoteViewReady(listener: RetriableBasicListener<OTWrapper>) {
-        mSubscribers.values.forEach {
+        subscribers.values.forEach {
             val stream = it.stream
 
             listener.onRemoteViewReady(SELF, it.view, stream.streamId, stream.connection.data)
