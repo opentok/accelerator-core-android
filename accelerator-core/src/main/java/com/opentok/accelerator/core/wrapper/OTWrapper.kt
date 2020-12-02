@@ -1481,9 +1481,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    //Analytics
     private fun initAnalytics() {
-        //Init the analytics logging
         val source = context.packageName
         val prefs = context.getSharedPreferences("opentok", Context.MODE_PRIVATE)
         var guidVSol = prefs?.getString("guidVSol", null)
