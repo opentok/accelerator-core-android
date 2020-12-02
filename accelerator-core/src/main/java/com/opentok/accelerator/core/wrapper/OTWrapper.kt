@@ -67,7 +67,6 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     }
 
     private val SELF = this
-    private var mContext: Context? = null
 
     /**
      * Get the OTAcceleratorSession
@@ -579,7 +578,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      */
     fun connect() {
         addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT)
-        otAcceleratorSession = OTAcceleratorSession(mContext, otConfig.apiKey, otConfig.sessionId)
+        otAcceleratorSession = OTAcceleratorSession(context, otConfig.apiKey, otConfig.sessionId)
         otAcceleratorSession?.setConnectionListener(mConnectionListener)
         otAcceleratorSession?.setSessionListener(mSessionListener)
         otAcceleratorSession?.signalListener = otAcceleratorSession?.signalListener
@@ -843,13 +842,13 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     private fun addRemote(stream: Stream) {
         LOG.i(LOG_TAG, "private add new remote stream != null")
 
-        val sub = Subscriber(mContext, stream).apply {
+        val sub = Subscriber(context, stream).apply {
             setVideoListener(mVideoListener)
             setStreamListener(mStreamListener)
             setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL)
         }
 
-        val subId = stream?.streamId
+        val subId = stream.streamId
         mSubscribers[subId] = sub
         sub.setSubscriberListener(mSubscriberListener)
 
@@ -1303,7 +1302,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     private fun createPublisher() {
         //TODO: add more cases
         LOG.d(LOG_TAG, "createPublisher: ", mPreviewConfig)
-        val builder = Publisher.Builder(mContext)
+        val builder = Publisher.Builder(context)
 
         if (mPreviewConfig != null) {
             builder.name(mPreviewConfig?.name)
@@ -1346,7 +1345,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
     private fun createScreenPublisher(config: PreviewConfig?) {
         LOG.d(LOG_TAG, "createScreenPublisher: ", config)
-        mScreenPublisherBuilder = Publisher.Builder(mContext)
+        mScreenPublisherBuilder = Publisher.Builder(context)
         if (config != null) {
             mScreenPublisherBuilder?.name(config.name)
 
@@ -1370,7 +1369,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 //create screenSharing by default
                 isScreenSharingByDefault = true
                 mScreenSharingFragment = ScreenSharingFragment.newInstance().also {
-                    (mContext as FragmentActivity?)?.supportFragmentManager?.beginTransaction()
+                    (context as FragmentActivity?)?.supportFragmentManager?.beginTransaction()
                         ?.add(it, "screenSharingFragment")
                         ?.commit()
 
@@ -1484,8 +1483,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     //Analytics
     private fun initAnalytics() {
         //Init the analytics logging
-        val source = mContext?.packageName
-        val prefs = mContext?.getSharedPreferences("opentok", Context.MODE_PRIVATE)
+        val source = context.packageName
+        val prefs = context.getSharedPreferences("opentok", Context.MODE_PRIVATE)
         var guidVSol = prefs?.getString("guidVSol", null)
         if (null == guidVSol) {
             guidVSol = UUID.randomUUID().toString()
