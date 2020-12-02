@@ -139,7 +139,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     private var analyticsData: OTKAnalyticsData? = null
     private var analytics: OTKAnalytics? = null
 
-    private val connectionListener: ConnectionListener = object : ConnectionListener {
+    private val connectionListener = object : ConnectionListener {
         override fun onConnectionCreated(session: Session, connection: Connection) {
             LOG.d(LOG_TAG, "onConnectionCreated: ", connection.data)
 
@@ -172,7 +172,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             }
         }
     }
-    private val subscriberListener: SubscriberListener = object : SubscriberListener {
+    private val subscriberListener = object : SubscriberListener {
         override fun onConnected(sub: SubscriberKit) {
             LOG.i(LOG_TAG, "Subscriber is connected")
             addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_SUCCESS)
@@ -242,8 +242,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    //Implements Advanced listeners
-    private val reconnectionListener: ReconnectionListener = object : ReconnectionListener {
+    private val reconnectionListener = object : ReconnectionListener {
         override fun onReconnecting(session: Session) {
             advancedListeners.forEach {
                 it.onReconnecting(SELF)
@@ -257,7 +256,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    private val videoListener: VideoListener = object : VideoListener {
+    private val videoListener = object : VideoListener {
         override fun onVideoDataReceived(subscriberKit: SubscriberKit) {
             //todo: review: a new listener to indicate the first frame received
         }
@@ -296,7 +295,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    private val cameraListener: CameraListener = object : CameraListener {
+    private val cameraListener = object : CameraListener {
         override fun onCameraChanged(publisher: Publisher, i: Int) {
             advancedListeners.forEach {
                 it.onCameraChanged(SELF)
@@ -312,7 +311,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    private val streamListener: StreamListener = object : StreamListener {
+    private val streamListener = object : StreamListener {
         override fun onReconnected(subscriber: SubscriberKit) {
             advancedListeners.forEach {
                 it.onReconnected(SELF, subscriber.stream.streamId)
@@ -340,7 +339,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
     //Implements Basic listeners: Session.SessionListener, Session.ConnectionListener,
     // Session.SignalListener, Publisher.PublisherListener
-    private val sessionListener: SessionListener = object : SessionListener {
+    private val sessionListener = object : SessionListener {
 
         override fun onConnected(session: Session) {
             val connection = session.connection
@@ -430,7 +429,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
 
-    private val publisherListener: PublisherListener = object : PublisherListener {
+    private val publisherListener = object : PublisherListener {
         override fun onStreamCreated(publisherKit: PublisherKit, stream: Stream) {
             var screenSharing = false
             if (stream.streamVideoType == StreamVideoType.StreamVideoTypeScreen) {
@@ -506,7 +505,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             }
         }
     }
-    private var screenListener: ScreenSharingListener = object : ScreenSharingListener {
+    private var screenListener = object : ScreenSharingListener {
         override fun onScreenCapturerReady() {
             val capturer = screenSharingFragment?.screenCapturer
 
