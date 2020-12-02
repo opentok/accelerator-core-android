@@ -35,7 +35,7 @@ data class OTConfig(
 
     companion object {
         private const val LOCAL_LOG_LEVEL: Short = 0xFF
-        private val LOG = LogWrapper(GlobalLogLevel.sMaxLogLevel and LOCAL_LOG_LEVEL)
+        private val LOG = LogWrapper(GlobalLogLevel.maxLogLevel and LOCAL_LOG_LEVEL)
 
         fun setLogLevel(logLevel: Short) {
             LOG.setLogLevel(logLevel)

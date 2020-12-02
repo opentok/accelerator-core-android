@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OTAcceleratorSession extends Session {
     private static final short LOCAL_LOG_LEVEL = 0xFF;
     private static final LogWrapper LOG =
-            new LogWrapper((short) (GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+            new LogWrapper((short) (GlobalLogLevel.INSTANCE.getMaxLogLevel() & LOCAL_LOG_LEVEL));
     private final String LOG_TAG = this.getClass().getSimpleName();
 
     private final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();

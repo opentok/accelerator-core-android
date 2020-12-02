@@ -13,7 +13,7 @@ public class PreviewConfig {
     private static final String LOG_TAG = PreviewConfig.class.getSimpleName();
     private static final short LOCAL_LOG_LEVEL = 0xFF;
     private static final LogWrapper LOG =
-      new LogWrapper((short)(GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
+            new LogWrapper((short) (GlobalLogLevel.INSTANCE.getMaxLogLevel() & LOCAL_LOG_LEVEL));
 
     public static void setLogLevel(short logLevel) {
         LOG.setLogLevel(logLevel);
