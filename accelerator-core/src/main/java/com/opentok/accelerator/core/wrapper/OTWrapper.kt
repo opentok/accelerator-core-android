@@ -75,19 +75,19 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      */
     var otAcceleratorSession: OTAcceleratorSession? = null
         private set
-    private var mSessionConnection: Connection? = null
-    private var mPublisher: Publisher? = null
-    private var mScreenPublisher: Publisher? = null
+    private var sessionConnection: Connection? = null
+    private var publisher: Publisher? = null
+    private var screenPublisher: Publisher? = null
 
     //indexed by streamId, *not* per subscriber Id
     private var mSubscribers = HashMap<String, Subscriber>()
-    private var mStreams = ConcurrentHashMap<String, Stream>()
+    private var streams = ConcurrentHashMap<String, Stream>()
 
     //listeners
-    private val mBasicListeners = HashSet<RetriableBasicListener<OTWrapper>>()
-    private val mAdvancedListeners = HashSet<RetriableAdvancedListener<OTWrapper>>()
-    private val mRetriableBasicListeners = HashMap<BasicListener<*>, RetriableBasicListener<*>>()
-    private val mRetriableAdvancedListeners = HashMap<AdvancedListener<*>, RetriableAdvancedListener<*>>()
+    private val basicListeners = HashSet<RetriableBasicListener<OTWrapper>>()
+    private val advancedListeners = HashSet<RetriableAdvancedListener<OTWrapper>>()
+    private val retriableBasicListeners = HashMap<BasicListener<*>, RetriableBasicListener<*>>()
+    private val retriableAdvancedListeners = HashMap<AdvancedListener<*>, RetriableAdvancedListener<*>>()
 
     /**
      * Returns the number of active connections for the current session
@@ -120,37 +120,37 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      *
      * @return current OpenTok Configuration
      */
-    private var mPreviewConfig: PreviewConfig? = null
+    private var previewConfig: PreviewConfig? = null
 
     //Screen Sharing by default
-    private var mScreenSharingFragment: ScreenSharingFragment? = null
+    private var screenSharingFragment: ScreenSharingFragment? = null
     private var isScreenSharingByDefault = false
-    private var mScreenPublisherBuilder: Publisher.Builder? = null
+    private var screenPublisherBuilder: Publisher.Builder? = null
 
     //Custom renderer
-    private var mVideoRemoteRenderer: BaseVideoRenderer? = null
-    private var mScreenRemoteRenderer: BaseVideoRenderer? = null
+    private var videoRemoteRenderer: BaseVideoRenderer? = null
+    private var screenRemoteRenderer: BaseVideoRenderer? = null
 
     //Signal protocol
-    private var mInputSignalProtocol: SignalProtocol<*, *>? = null
-    private var mOutputSignalProtocol: SignalProtocol<*, *>? = null
+    private var inputSignalProtocol: SignalProtocol<*, *>? = null
+    private var outputSignalProtocol: SignalProtocol<*, *>? = null
 
     //Analytics for internal use
-    private var mAnalyticsData: OTKAnalyticsData? = null
-    private var mAnalytics: OTKAnalytics? = null
+    private var analyticsData: OTKAnalyticsData? = null
+    private var analytics: OTKAnalytics? = null
 
-    private val mConnectionListener: ConnectionListener = object : ConnectionListener {
+    private val connectionListener: ConnectionListener = object : ConnectionListener {
         override fun onConnectionCreated(session: Session, connection: Connection) {
             LOG.d(LOG_TAG, "onConnectionCreated: ", connection.data)
 
             // ToDo: This should added/removed inside otAcceleratorSession
             otAcceleratorSession?.addConnection(connection.connectionId, connection)
 
-            if (connection.creationTime <= mSessionConnection?.creationTime) {
+            if (connection.creationTime <= sessionConnection?.creationTime) {
                 mOlderThanMe++
             }
 
-            for (listener in mBasicListeners) {
+            for (listener in basicListeners) {
                 listener.onConnected(
                     SELF, connectionCount,
                     connection.connectionId,
@@ -163,11 +163,11 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             LOG.d(LOG_TAG, "onConnectionDestroyed: ", connection.data)
             otAcceleratorSession?.removeConnection(connection.connectionId)
 
-            if (connection.creationTime <= mSessionConnection?.creationTime) {
+            if (connection.creationTime <= sessionConnection?.creationTime) {
                 mOlderThanMe--
             }
 
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onDisconnected(SELF, connectionCount, connection.connectionId, connection.data)
             }
         }
@@ -177,7 +177,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             LOG.i(LOG_TAG, "Subscriber is connected")
             addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_SUCCESS)
 
-            for (listener in mBasicListeners) {
+            for (listener in basicListeners) {
                 val stream = sub.stream
                 listener.onRemoteViewReady(
                     SELF, sub.view, stream.streamId,
@@ -189,7 +189,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         override fun onDisconnected(sub: SubscriberKit) {
             addLogEvent(ClientLog.LOG_ACTION_REMOVE_REMOTE, ClientLog.LOG_VARIATION_SUCCESS)
 
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onRemoteViewDestroyed(SELF, sub.stream.streamId)
             }
         }
@@ -225,11 +225,11 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                     LOG.e(LOG_TAG, "Subscriber error: default ")
                     mSubscribers.remove(id)
 
-                    if (!mStreams.containsKey(id)) {
-                        mStreams[id] = subscriberKit.stream
+                    if (!streams.containsKey(id)) {
+                        streams[id] = subscriberKit.stream
                     }
 
-                    mBasicListeners.forEach {
+                    basicListeners.forEach {
                         it.onError(SELF, opentokError)
                     }
                 }
@@ -237,7 +237,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
     }
     private val mAudioLevelListener = PublisherKit.AudioLevelListener { publisherKit, audioLevel ->
-        mAdvancedListeners.forEach {
+        advancedListeners.forEach {
             it.onAudioLevelUpdated(audioLevel)
         }
     }
@@ -245,13 +245,13 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     //Implements Advanced listeners
     private val mReconnectionListener: ReconnectionListener = object : ReconnectionListener {
         override fun onReconnecting(session: Session) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onReconnecting(SELF)
             }
         }
 
         override fun onReconnected(session: Session) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onReconnected(SELF)
             }
         }
@@ -263,7 +263,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
 
         override fun onVideoDisabled(subscriber: SubscriberKit, reason: String) {
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onRemoteVideoChanged(
                     SELF, subscriber.stream.streamId, reason, false,
                     subscriber.subscribeToVideo
@@ -272,7 +272,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
 
         override fun onVideoEnabled(subscriber: SubscriberKit, reason: String) {
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onRemoteVideoChanged(
                     SELF, subscriber.stream.streamId, reason, true,
                     subscriber.subscribeToVideo
@@ -281,13 +281,13 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
 
         override fun onVideoDisableWarning(subscriber: SubscriberKit) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onVideoQualityWarning(SELF, subscriber.stream.streamId)
             }
         }
 
         override fun onVideoDisableWarningLifted(subscriber: SubscriberKit) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onVideoQualityWarningLifted(
                     SELF,
                     subscriber.stream.streamId
@@ -298,7 +298,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
     private val mCameraListener: CameraListener = object : CameraListener {
         override fun onCameraChanged(publisher: Publisher, i: Int) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onCameraChanged(SELF)
             }
         }
@@ -306,7 +306,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         override fun onCameraError(publisher: Publisher, opentokError: OpentokError) {
             LOG.d(LOG_TAG, "onCameraError: onError ", opentokError.message)
 
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onError(SELF, opentokError)
             }
         }
@@ -314,25 +314,25 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
     private val mStreamListener: StreamListener = object : StreamListener {
         override fun onReconnected(subscriber: SubscriberKit) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onReconnected(SELF, subscriber.stream.streamId)
             }
         }
 
         override fun onDisconnected(subscriber: SubscriberKit) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onDisconnected(SELF, subscriber.stream.streamId)
             }
         }
 
         override fun onAudioEnabled(subscriber: SubscriberKit) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onAudioEnabled(SELF, subscriber.stream.streamId)
             }
         }
 
         override fun onAudioDisabled(subscriber: SubscriberKit) {
-            mAdvancedListeners.forEach {
+            advancedListeners.forEach {
                 it.onAudioDisabled(SELF, subscriber.stream.streamId)
             }
         }
@@ -344,37 +344,37 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
         override fun onConnected(session: Session) {
             val connection = session.connection
-            mSessionConnection = connection
+            sessionConnection = connection
             otAcceleratorSession?.addConnection(connection.connectionId, connection)
 
             //update internal client logs with connectionId
-            mAnalyticsData?.connectionId = connection.connectionId
-            mAnalytics?.data = mAnalyticsData
+            analyticsData?.connectionId = connection.connectionId
+            analytics?.data = analyticsData
 
-            LOG.d(LOG_TAG, "onConnected: ", connection.data, ". listeners: ", mBasicListeners)
+            LOG.d(LOG_TAG, "onConnected: ", connection.data, ". listeners: ", basicListeners)
             addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_SUCCESS)
 
             publishIfReady()
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onConnected(SELF, connectionCount, connection.connectionId, connection.data)
             }
         }
 
         override fun onDisconnected(session: Session) {
             addLogEvent(ClientLog.LOG_ACTION_DISCONNECT, ClientLog.LOG_VARIATION_SUCCESS)
-            if (otAcceleratorSession == null || mSessionConnection == null) {
+            if (otAcceleratorSession == null || sessionConnection == null) {
                 // This can happen if somehow onError was called before onDisconnected or if we somehow
                 // call onDisconnected twice (so cleanup has been done already)
 
                 LOG.w(LOG_TAG, "OnDisconnected called on a stale object")
-                mSessionConnection = session.connection
+                sessionConnection = session.connection
             }
-            if (mSessionConnection != null) {
-                mBasicListeners.forEach {
+            if (sessionConnection != null) {
+                basicListeners.forEach {
                     it.onDisconnected(
                         SELF, 0,
-                        mSessionConnection?.connectionId,
-                        mSessionConnection?.data
+                        sessionConnection?.connectionId,
+                        sessionConnection?.data
                     )
                 }
             }
@@ -384,13 +384,13 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         override fun onStreamReceived(session: Session, stream: Stream) {
             LOG.d(LOG_TAG, "OnStreamReceived: ", stream.connection.data)
 
-            mStreams[stream.streamId] = stream
+            streams[stream.streamId] = stream
 
             if (otConfig.subscribeAutomatically) {
                 addRemote(stream)
             }
 
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onRemoteJoined(SELF, stream.streamId)
             }
         }
@@ -399,15 +399,15 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             LOG.d(LOG_TAG, "OnStreamDropped: ", stream.connection.data)
             val subId = stream.streamId
 
-            if (mStreams.containsKey(subId)) {
-                mStreams.remove(stream.streamId)
+            if (streams.containsKey(subId)) {
+                streams.remove(stream.streamId)
             }
 
             if (mSubscribers.containsKey(subId)) {
                 mSubscribers.remove(stream.streamId)
             }
 
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onRemoteLeft(SELF, subId)
                 it.onRemoteViewDestroyed(SELF, subId)
             }
@@ -424,7 +424,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
             cleanup()
 
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onError(SELF, opentokError)
             }
         }
@@ -440,7 +440,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 isPublishing = true
             }
 
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onStartedPublishingMedia(SELF, screenSharing)
             }
 
@@ -459,7 +459,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 addLogEvent(ClientLog.LOG_ACTION_END_COMM, ClientLog.LOG_VARIATION_SUCCESS)
                 isPublishing = false
             }
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.onStoppedPublishingMedia(SELF, screenSharing)
             }
         }
@@ -479,7 +479,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 ErrorCode.PublisherInternalError -> {
                     //TODO: Add client logs for the different publisher errors
                     LOG.e(LOG_TAG, "Publisher error: PublisherInternalError")
-                    mPublisher = null
+                    publisher = null
                 }
                 ErrorCode.PublisherTimeout ->                     //re-try publishing
                     if (otAcceleratorSession != null) {
@@ -492,13 +492,13 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                     }
                 ErrorCode.PublisherWebRTCError -> {
                     LOG.e(LOG_TAG, "Publisher error: PublisherWebRTCError")
-                    mPublisher = null
+                    publisher = null
                 }
                 else -> {
                     LOG.e(LOG_TAG, "Publisher error: default")
-                    mPublisher = null
+                    publisher = null
 
-                    mBasicListeners.forEach {
+                    basicListeners.forEach {
                         it.onError(SELF, opentokError)
                     }
                 }
@@ -507,13 +507,13 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     }
     private var screenListener: ScreenSharingListener = object : ScreenSharingListener {
         override fun onScreenCapturerReady() {
-            val capturer = mScreenSharingFragment?.screenCapturer
+            val capturer = screenSharingFragment?.screenCapturer
 
             if (capturer != null) {
 
-                mScreenPublisherBuilder?.capturer(capturer)
+                screenPublisherBuilder?.capturer(capturer)
 
-                mScreenPublisher = mScreenPublisherBuilder?.build()?.apply {
+                screenPublisher = screenPublisherBuilder?.build()?.apply {
                     setPublisherListener(mPublisherListener)
                     setAudioLevelListener(mAudioLevelListener)
                     setCameraListener(mCameraListener)
@@ -522,14 +522,14 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 }
 
                 attachPublisherScreenView()
-                otAcceleratorSession?.publish(mScreenPublisher)
+                otAcceleratorSession?.publish(screenPublisher)
             }
         }
 
         override fun onError(errorMsg: String) {
             LOG.i(LOG_TAG, "Error in Screen Sharing by default")
 
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 val error = OpentokError(
                     OpentokError.Domain.PublisherErrorDomain,
                     ErrorCode.PublisherInternalError.errorCode,
@@ -563,7 +563,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         }
 
         if (resumeEvents) {
-            mBasicListeners.forEach {
+            basicListeners.forEach {
                 it.resume()
             }
         }
@@ -579,18 +579,18 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     fun connect() {
         addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT)
         otAcceleratorSession = OTAcceleratorSession(context, otConfig.apiKey, otConfig.sessionId)
-        otAcceleratorSession?.setConnectionListener(mConnectionListener)
+        otAcceleratorSession?.setConnectionListener(connectionListener)
         otAcceleratorSession?.setSessionListener(mSessionListener)
         otAcceleratorSession?.signalListener = otAcceleratorSession?.signalListener
         otAcceleratorSession?.setReconnectionListener(mReconnectionListener)
         mOlderThanMe = 0
 
         //check signal protocol
-        if (mInputSignalProtocol != null) {
-            otAcceleratorSession?.setInputSignalProtocol(mInputSignalProtocol)
+        if (inputSignalProtocol != null) {
+            otAcceleratorSession?.setInputSignalProtocol(inputSignalProtocol)
         }
-        if (mOutputSignalProtocol != null) {
-            otAcceleratorSession?.setOutputSignalProtocol(mOutputSignalProtocol)
+        if (outputSignalProtocol != null) {
+            otAcceleratorSession?.setOutputSignalProtocol(outputSignalProtocol)
         }
         otAcceleratorSession?.connect(otConfig.token)
     }
@@ -615,7 +615,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * @return the own connectionID
      */
     val ownConnId: String?
-        get() = if (mSessionConnection != null) mSessionConnection?.connectionId else null
+        get() = if (sessionConnection != null) sessionConnection?.connectionId else null
 
     /**
      * Checks if the own connection is the oldest in the current session
@@ -668,8 +668,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * @param config The configuration of the preview
      */
     fun startPreview(config: PreviewConfig?) {
-        mPreviewConfig = config
-        if (mPublisher == null && !isPreviewing) {
+        previewConfig = config
+        if (publisher == null && !isPreviewing) {
             createPublisher()
             attachPublisherView()
             isPreviewing = true
@@ -680,9 +680,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * Call to stop the camera's video in the Preview's view.
      */
     fun stopPreview() {
-        if (mPublisher != null && isPreviewing) {
+        if (publisher != null && isPreviewing) {
             detachPublisherView()
-            mPublisher = null
+            publisher = null
             isPreviewing = false
             startPublishing = false
         }
@@ -697,15 +697,15 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     fun startPublishingMedia(config: PreviewConfig?, screenSharing: Boolean) {
         addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT)
         if (!screenSharing) {
-            mPreviewConfig = config
+            previewConfig = config
             startPublishing = true
-            if (mPublisher == null) {
+            if (publisher == null) {
                 createPublisher()
             }
             publishIfReady()
         } else {
             startSharingScreen = true
-            if (mScreenPublisher == null) {
+            if (screenPublisher == null) {
                 createScreenPublisher(config)
             }
             publishIfScreenReady()
@@ -720,28 +720,28 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     fun stopPublishingMedia(screenSharing: Boolean) {
         if (!screenSharing) {
             addLogEvent(ClientLog.LOG_ACTION_END_COMM, ClientLog.LOG_VARIATION_ATTEMPT)
-            if (mPublisher != null && startPublishing) {
-                otAcceleratorSession?.unpublish(mPublisher)
+            if (publisher != null && startPublishing) {
+                otAcceleratorSession?.unpublish(publisher)
             }
             isPublishing = false
             startPublishing = false
             if (!isPreviewing) {
                 detachPublisherView()
-                mPublisher = null
+                publisher = null
             }
         } else {
             addLogEvent(ClientLog.LOG_ACTION_END_SCREEN_COMM, ClientLog.LOG_VARIATION_ATTEMPT)
-            if (mScreenSharingFragment != null) {
-                mScreenSharingFragment?.stopScreenCapture()
+            if (screenSharingFragment != null) {
+                screenSharingFragment?.stopScreenCapture()
                 isScreenSharingByDefault = false
             }
             detachPublisherScreenView()
-            if (mScreenPublisher != null && startSharingScreen) {
-                otAcceleratorSession?.unpublish(mScreenPublisher)
+            if (screenPublisher != null && startSharingScreen) {
+                otAcceleratorSession?.unpublish(screenPublisher)
             }
             isSharingScreen = false
             startSharingScreen = false
-            mScreenPublisher = null
+            screenPublisher = null
         }
     }
 
@@ -753,10 +753,10 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * `false`)
      */
     fun isLocalMediaEnabled(type: MediaType): Boolean {
-        if (mPublisher == null) return false
+        if (publisher == null) return false
 
-        val publishVideo = mPublisher?.publishVideo ?: false
-        val publishAudio = mPublisher?.publishAudio ?: false
+        val publishVideo = publisher?.publishVideo ?: false
+        val publishAudio = publisher?.publishAudio ?: false
 
         return if (type == MediaType.VIDEO) publishVideo else publishAudio
     }
@@ -769,17 +769,17 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * `false`).
      */
     fun enableLocalMedia(type: MediaType?, enabled: Boolean) {
-        if (mPublisher != null) {
+        if (publisher != null) {
             when (type) {
-                MediaType.AUDIO -> mPublisher?.publishAudio = enabled
+                MediaType.AUDIO -> publisher?.publishAudio = enabled
 
                 MediaType.VIDEO -> {
-                    mPublisher?.publishVideo = enabled
+                    publisher?.publishVideo = enabled
 
                     if (enabled) {
-                        mPublisher?.view?.visibility = View.VISIBLE
+                        publisher?.view?.visibility = View.VISIBLE
                     } else {
-                        mPublisher?.view?.visibility = View.GONE
+                        publisher?.view?.visibility = View.GONE
                     }
                 }
                 else -> {
@@ -829,7 +829,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         LOG.i(LOG_TAG, "Add remote with ID: ", remoteId)
         addLogEvent(ClientLog.LOG_ACTION_ADD_REMOTE, ClientLog.LOG_VARIATION_ATTEMPT)
 
-        val stream = mStreams[remoteId]
+        val stream = streams[remoteId]
         requireNotNull(stream) { "No stream found for remoteId $remoteId" }
         addRemote(stream)
     }
@@ -852,15 +852,15 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         mSubscribers[subId] = sub
         sub.setSubscriberListener(mSubscriberListener)
 
-        if (stream.streamVideoType == StreamVideoType.StreamVideoTypeCamera && mVideoRemoteRenderer != null) {
-            sub.renderer = mVideoRemoteRenderer
+        if (stream.streamVideoType == StreamVideoType.StreamVideoTypeCamera && videoRemoteRenderer != null) {
+            sub.renderer = videoRemoteRenderer
         } else {
-            if (stream.streamVideoType == StreamVideoType.StreamVideoTypeScreen && mScreenRemoteRenderer != null) {
-                sub.renderer = mScreenRemoteRenderer
+            if (stream.streamVideoType == StreamVideoType.StreamVideoTypeScreen && screenRemoteRenderer != null) {
+                sub.renderer = screenRemoteRenderer
             }
         }
         //remove the sub's stream from the streams list to avoid subscribe twice to the same stream
-        mStreams.remove(sub.stream.streamId)
+        streams.remove(sub.stream.streamId)
         otAcceleratorSession?.subscribe(sub)
     }
 
@@ -877,7 +877,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         requireNotNull(subscriber) { "No subscriber found for remoteId $remoteId" }
 
         mSubscribers.remove(remoteId)
-        mStreams[remoteId] = subscriber.stream
+        streams[remoteId] = subscriber.stream
         otAcceleratorSession?.unsubscribe(subscriber)
     }
 
@@ -885,8 +885,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * Call to cycle between cameras, if there are multiple cameras on the device.
      */
     fun cycleCamera() {
-        if (mPublisher != null) {
-            mPublisher?.cycleCamera()
+        if (publisher != null) {
+            publisher?.cycleCamera()
         }
     }
 
@@ -906,7 +906,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
         LOG.d(LOG_TAG, "Adding BasicListener")
 
         val isWrapped = listener is RetriableOTListener<*>
-        var realListener = mRetriableBasicListeners[listener]
+        var realListener = retriableBasicListeners[listener]
 
         if (realListener == null) {
             realListener = if (isWrapped) {
@@ -915,8 +915,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 getUnfailingFromBaseListener(listener) as RetriableBasicListener<OTWrapper>
             }
 
-            mRetriableBasicListeners[listener] = if (isWrapped) listener as RetriableBasicListener<*> else realListener
-            mBasicListeners.add(realListener)
+            retriableBasicListeners[listener] = if (isWrapped) listener as RetriableBasicListener<*> else realListener
+            basicListeners.add(realListener)
             refreshPeerList()
         }
 
@@ -929,7 +929,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * @param listener
      */
     fun removeBasicListener(listener: BasicListener<*>?) {
-        removeOTListener(listener, mRetriableBasicListeners, mBasicListeners)
+        removeOTListener(listener, retriableBasicListeners, basicListeners)
     }
 
     /**
@@ -946,7 +946,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     ): BaseOTListener {
 
         val isWrapped = listener is RetriableOTListener<*>
-        var realListener = mRetriableAdvancedListeners[listener]
+        var realListener = retriableAdvancedListeners[listener]
 
         if (realListener == null) {
             realListener = if (isWrapped) {
@@ -955,9 +955,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 getUnfailingFromBaseListener(listener) as RetriableAdvancedListener<OTWrapper>
             }
 
-            mRetriableAdvancedListeners[listener] =
+            retriableAdvancedListeners[listener] =
                 if (isWrapped) listener as RetriableAdvancedListener<*> else realListener
-            mAdvancedListeners.add(realListener)
+            advancedListeners.add(realListener)
             refreshPeerList()
         }
 
@@ -970,7 +970,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * @param listener
      */
     fun removeAdvancedListener(listener: AdvancedListener<*>?) {
-        removeOTListener(listener, mRetriableAdvancedListeners, mAdvancedListeners)
+        removeOTListener(listener, retriableAdvancedListeners, advancedListeners)
     }
 
     /**
@@ -1036,8 +1036,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      */
     val localStreamStatus: StreamStatus?
         get() {
-            if (mPublisher != null) {
-                val stream = mPublisher?.stream
+            if (publisher != null) {
+                val stream = publisher?.stream
 
                 var hasAudio = true
                 var hasVideo = true
@@ -1055,11 +1055,11 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                     videoWidth = stream.videoWidth
                 }
 
-                val publishAudio = mPublisher?.publishAudio ?: false
-                val publishVideo = mPublisher?.publishVideo ?: false
+                val publishAudio = publisher?.publishAudio ?: false
+                val publishVideo = publisher?.publishVideo ?: false
 
                 return StreamStatus(
-                    mPublisher?.view,
+                    publisher?.view,
                     publishAudio,
                     publishVideo,
                     hasAudio,
@@ -1114,11 +1114,11 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * @param style VideoScale value: FILL or FIT
      */
     fun setLocalStyle(style: VideoScale) {
-        if (mPublisher != null) {
+        if (publisher != null) {
             if (style == VideoScale.FILL) {
-                mPublisher?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL)
+                publisher?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL)
             } else {
-                mPublisher?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
+                publisher?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
             }
         }
     }
@@ -1132,9 +1132,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     fun setRemoteVideoRenderer(renderer: BaseVideoRenderer?, remoteScreen: Boolean) {
         //todo: now, it will apply to all the subscribers
         if (remoteScreen) {
-            mScreenRemoteRenderer = renderer
+            screenRemoteRenderer = renderer
         } else {
-            mVideoRemoteRenderer = renderer
+            videoRemoteRenderer = renderer
         }
     }
 
@@ -1145,18 +1145,18 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      * @param framesPerSecond
      */
     fun setPublishingFPS(framesPerSecond: Int) {
-        LOG.d(LOG_TAG, "setSharingFPS: ", mPublisher)
+        LOG.d(LOG_TAG, "setSharingFPS: ", publisher)
         val frameRate = getFPS(framesPerSecond)
-        if (mPublisher != null) {
-            val currentCamera = mPublisher?.cameraId
+        if (publisher != null) {
+            val currentCamera = publisher?.cameraId
 
-            if (mPreviewConfig != null) {
-                mPreviewConfig?.frameRate = frameRate
+            if (previewConfig != null) {
+                previewConfig?.frameRate = frameRate
             } else {
-                mPreviewConfig = PreviewConfigBuilder().framerate(frameRate).build()
+                previewConfig = PreviewConfigBuilder().framerate(frameRate).build()
             }
 
-            val newPreview: PreviewConfig? = mPreviewConfig
+            val newPreview: PreviewConfig? = previewConfig
 
             val isPublishingCurrent = isPublishing
             val isPreviewingCurrent = isPreviewing
@@ -1168,7 +1168,7 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             if (isPreviewingCurrent) {
                 stopPreview()
             }
-            mPublisher = null
+            publisher = null
 
             if (isPreviewingCurrent) {
                 startPreview(newPreview)
@@ -1178,8 +1178,8 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                 startPublishingMedia(newPreview, false)
             }
 
-            if (mPublisher != null && currentCamera != null) {
-                mPublisher?.cameraId = currentCamera
+            if (publisher != null && currentCamera != null) {
+                publisher?.cameraId = currentCamera
             }
         }
     }
@@ -1194,9 +1194,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      */
     @Synchronized
     fun setInputSignalProtocol(inputProtocol: SignalProtocol<*, *>?) {
-        mInputSignalProtocol = inputProtocol
+        inputSignalProtocol = inputProtocol
         if (otAcceleratorSession != null) {
-            otAcceleratorSession?.setInputSignalProtocol(mInputSignalProtocol)
+            otAcceleratorSession?.setInputSignalProtocol(inputSignalProtocol)
         }
     }
 
@@ -1210,9 +1210,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
      */
     @Synchronized
     fun setOutputSignalProtocol(outputProtocol: SignalProtocol<*, *>?) {
-        mOutputSignalProtocol = outputProtocol
+        outputSignalProtocol = outputProtocol
         if (otAcceleratorSession != null) {
-            otAcceleratorSession?.setOutputSignalProtocol(mOutputSignalProtocol)
+            otAcceleratorSession?.setOutputSignalProtocol(outputSignalProtocol)
         }
     }
 
@@ -1226,22 +1226,22 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                     otAcceleratorSession?.unsubscribe(subscriber)
                 }
             }
-            if (mPublisher != null) {
-                otAcceleratorSession?.unpublish(mPublisher)
+            if (publisher != null) {
+                otAcceleratorSession?.unpublish(publisher)
             }
             otAcceleratorSession?.disconnect()
         }
 
-        mPublisher = null
+        publisher = null
         otAcceleratorSession = null
         mSubscribers = HashMap()
-        mStreams = ConcurrentHashMap()
-        mSessionConnection = null
+        streams = ConcurrentHashMap()
+        sessionConnection = null
         isPreviewing = false
         isPublishing = false
         isSharingScreen = false
         isScreenSharingByDefault = false
-        mScreenSharingFragment = null
+        screenSharingFragment = null
     }
 
     private fun removeOTListener(
@@ -1265,16 +1265,16 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     @Synchronized
     private fun publishIfReady() {
         LOG.d(
-            LOG_TAG, "publishIfReady: ", mSessionConnection, ", ", mPublisher, ", ",
+            LOG_TAG, "publishIfReady: ", sessionConnection, ", ", publisher, ", ",
             startPublishing, ", ", isPreviewing
         )
-        if (otAcceleratorSession != null && mSessionConnection != null && mPublisher != null && startPublishing) {
+        if (otAcceleratorSession != null && sessionConnection != null && publisher != null && startPublishing) {
             addLogEvent(ClientLog.LOG_ACTION_START_COMM, ClientLog.LOG_VARIATION_ATTEMPT)
             if (!isPreviewing) {
                 attachPublisherView()
             }
             if (!isPublishing) {
-                otAcceleratorSession?.publish(mPublisher)
+                otAcceleratorSession?.publish(publisher)
                 // Do this as soon as possible to avoid race conditions...
                 isPublishing = true
             }
@@ -1284,15 +1284,15 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     @Synchronized
     private fun publishIfScreenReady() {
         LOG.d(
-            LOG_TAG, "publishIfScreenReady: ", mSessionConnection, ", ", mScreenPublisher, ", ",
+            LOG_TAG, "publishIfScreenReady: ", sessionConnection, ", ", screenPublisher, ", ",
             startSharingScreen
         )
-        if (otAcceleratorSession != null && mSessionConnection != null && mScreenPublisher != null && startSharingScreen && !isScreenSharingByDefault) {
+        if (otAcceleratorSession != null && sessionConnection != null && screenPublisher != null && startSharingScreen && !isScreenSharingByDefault) {
             if (!isPreviewing) {
                 attachPublisherScreenView()
             }
             if (!isSharingScreen) {
-                otAcceleratorSession?.publish(mScreenPublisher)
+                otAcceleratorSession?.publish(screenPublisher)
                 // Do this as soon as possible to avoid race conditions...
                 isSharingScreen = true
             }
@@ -1301,41 +1301,41 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
     private fun createPublisher() {
         //TODO: add more cases
-        LOG.d(LOG_TAG, "createPublisher: ", mPreviewConfig)
+        LOG.d(LOG_TAG, "createPublisher: ", previewConfig)
         val builder = Publisher.Builder(context)
 
-        if (mPreviewConfig != null) {
-            builder.name(mPreviewConfig?.name)
+        if (previewConfig != null) {
+            builder.name(previewConfig?.name)
 
-            if (mPreviewConfig?.resolution != Publisher.CameraCaptureResolution.MEDIUM ||
-                mPreviewConfig?.frameRate != CameraCaptureFrameRate.FPS_15
+            if (previewConfig?.resolution != Publisher.CameraCaptureResolution.MEDIUM ||
+                previewConfig?.frameRate != CameraCaptureFrameRate.FPS_15
             ) {
                 LOG.d(
                     LOG_TAG, "createPublisher: Creating publisher with: ",
-                    mPreviewConfig?.resolution, ", ", mPreviewConfig?.frameRate
+                    previewConfig?.resolution, ", ", previewConfig?.frameRate
                 )
 
-                builder.resolution(mPreviewConfig?.resolution)
-                builder.frameRate(mPreviewConfig?.frameRate)
+                builder.resolution(previewConfig?.resolution)
+                builder.frameRate(previewConfig?.frameRate)
             } else {
                 LOG.d(LOG_TAG, "createPublisher: Creating Publisher with audio and video specified")
 
                 builder
-                    .audioTrack(mPreviewConfig?.isAudioTrack ?: false)
-                    .videoTrack(mPreviewConfig?.isVideoTrack ?: false)
+                    .audioTrack(previewConfig?.isAudioTrack ?: false)
+                    .videoTrack(previewConfig?.isVideoTrack ?: false)
             }
-            if (mPreviewConfig?.capturer != null) {
+            if (previewConfig?.capturer != null) {
                 //custom video capturer
-                builder.capturer(mPreviewConfig?.capturer)
+                builder.capturer(previewConfig?.capturer)
             }
-            if (mPreviewConfig?.renderer != null) {
-                builder.renderer(mPreviewConfig?.renderer)
+            if (previewConfig?.renderer != null) {
+                builder.renderer(previewConfig?.renderer)
             }
         } else {
             LOG.d(LOG_TAG, "createPublisher: Creating DefaultPublisher")
         }
 
-        mPublisher = builder.build().apply {
+        publisher = builder.build().apply {
             setPublisherListener(mPublisherListener)
             setCameraListener(mCameraListener)
             //byDefault
@@ -1345,9 +1345,9 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
 
     private fun createScreenPublisher(config: PreviewConfig?) {
         LOG.d(LOG_TAG, "createScreenPublisher: ", config)
-        mScreenPublisherBuilder = Publisher.Builder(context)
+        screenPublisherBuilder = Publisher.Builder(context)
         if (config != null) {
-            mScreenPublisherBuilder?.name(config.name)
+            screenPublisherBuilder?.name(config.name)
 
             if (config.resolution != Publisher.CameraCaptureResolution.MEDIUM ||
                 config.frameRate != CameraCaptureFrameRate.FPS_15
@@ -1356,19 +1356,19 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
                     LOG_TAG, "createPublisher: Creating publisher with: ", config.resolution,
                     ", ", config.frameRate
                 )
-                mScreenPublisherBuilder?.resolution(config.resolution)?.frameRate(config.frameRate)
+                screenPublisherBuilder?.resolution(config.resolution)?.frameRate(config.frameRate)
             } else {
                 LOG.d(LOG_TAG, "createPublisher: Creating Publisher with audio and video specified")
-                mScreenPublisherBuilder?.audioTrack(config.isAudioTrack)?.videoTrack(config.isVideoTrack)
+                screenPublisherBuilder?.audioTrack(config.isAudioTrack)?.videoTrack(config.isVideoTrack)
             }
 
             if (config.capturer != null) {
                 //custom video capturer
-                mScreenPublisherBuilder?.capturer(config.capturer)
+                screenPublisherBuilder?.capturer(config.capturer)
             } else {
                 //create screenSharing by default
                 isScreenSharingByDefault = true
-                mScreenSharingFragment = ScreenSharingFragment.newInstance().also {
+                screenSharingFragment = ScreenSharingFragment.newInstance().also {
                     (context as FragmentActivity?)?.supportFragmentManager?.beginTransaction()
                         ?.add(it, "screenSharingFragment")
                         ?.commit()
@@ -1378,13 +1378,13 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             }
 
             if (config.renderer != null) {
-                mScreenPublisherBuilder?.renderer(config.renderer)
+                screenPublisherBuilder?.renderer(config.renderer)
             }
         } else {
             LOG.d(LOG_TAG, "createPublisher: Creating DefaultPublisher")
         }
 
-        mScreenPublisher = mScreenPublisherBuilder?.build()?.apply {
+        screenPublisher = screenPublisherBuilder?.build()?.apply {
             if (!isScreenSharingByDefault) {
                 setPublisherListener(mPublisherListener)
                 setAudioLevelListener(mAudioLevelListener)
@@ -1409,51 +1409,51 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
     }
 
     private fun attachPublisherView() {
-        val view = mPublisher?.view ?: return
+        val view = publisher?.view ?: return
 
-        mBasicListeners.forEach {
+        basicListeners.forEach {
             it.onPreviewViewReady(SELF, view)
         }
     }
 
     private fun attachPublisherScreenView() {
-        mPublisher ?: return
+        publisher ?: return
 
-        mBasicListeners.forEach {
+        basicListeners.forEach {
             if (isScreenSharingByDefault) {
-                it.onPreviewViewReady(SELF, mScreenSharingFragment?.screen)
+                it.onPreviewViewReady(SELF, screenSharingFragment?.screen)
             } else {
-                it.onPreviewViewReady(SELF, mScreenPublisher?.view)
+                it.onPreviewViewReady(SELF, screenPublisher?.view)
             }
         }
     }
 
     private fun detachPublisherView() {
-        mPublisher ?: return
+        publisher ?: return
 
-        mPublisher?.onStop()
+        publisher?.onStop()
 
-        mBasicListeners.forEach {
+        basicListeners.forEach {
             it.onPreviewViewDestroyed(SELF)
         }
     }
 
     private fun detachPublisherScreenView() {
-        mPublisher ?: return
+        publisher ?: return
 
-        mScreenPublisher?.onStop()
+        screenPublisher?.onStop()
 
-        mBasicListeners.forEach {
+        basicListeners.forEach {
             it.onPreviewViewDestroyed(SELF)
         }
     }
 
     private fun refreshPeerList() {
-        mBasicListeners
+        basicListeners
             .filter { it.internalListener != null }
             .forEach { listener ->
 
-                listOf(mPublisher, mScreenPublisher)
+                listOf(publisher, screenPublisher)
                     .mapNotNull { it?.view }
                     .first()
                     .also { listener.onPreviewViewReady(SELF, it) }
@@ -1490,18 +1490,23 @@ class OTWrapper(private val context: Context, private val otConfig: OTConfig) {
             guidVSol = UUID.randomUUID().toString()
             prefs?.edit()?.putString("guidVSol", guidVSol)?.apply()
         }
-        mAnalyticsData =
-            OTKAnalyticsData.Builder(ClientLog.LOG_CLIENT_VERSION, source, ClientLog.LOG_COMPONENTID, guidVSol).build()
-        mAnalytics = OTKAnalytics(mAnalyticsData)
-        mAnalytics?.enableConsoleLog(false)
-        mAnalyticsData?.sessionId = otConfig.sessionId
-        mAnalyticsData?.partnerId = otConfig.apiKey
-        mAnalytics?.data = mAnalyticsData
+        analyticsData = OTKAnalyticsData.Builder(
+            ClientLog.LOG_CLIENT_VERSION,
+            source,
+            ClientLog.LOG_COMPONENTID,
+            guidVSol
+        ).build()
+
+        analytics = OTKAnalytics(analyticsData)
+        analytics?.enableConsoleLog(false)
+        analyticsData?.sessionId = otConfig.sessionId
+        analyticsData?.partnerId = otConfig.apiKey
+        analytics?.data = analyticsData
     }
 
     private fun addLogEvent(action: String, variation: String) {
-        if (mAnalytics != null) {
-            mAnalytics?.logEvent(action, variation)
+        if (analytics != null) {
+            analytics?.logEvent(action, variation)
         }
     }
 
