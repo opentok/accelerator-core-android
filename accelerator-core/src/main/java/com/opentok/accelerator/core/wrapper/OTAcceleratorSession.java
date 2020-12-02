@@ -27,7 +27,8 @@ public class OTAcceleratorSession extends Session {
     private static final LogWrapper LOG =
             new LogWrapper((short) (GlobalLogLevel.sMaxLogLevel & LOCAL_LOG_LEVEL));
     private final String LOG_TAG = this.getClass().getSimpleName();
-    ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+
+    private final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
     private HashSet<SessionListener> mSessionListeners = new HashSet<>();
     private HashSet<ConnectionListener> mConnectionsListeners = new HashSet<>();
     private HashSet<ArchiveListener> mArchiveListeners = new HashSet<>();
@@ -42,6 +43,7 @@ public class OTAcceleratorSession extends Session {
     private SignalProcessorThread mInputSignalProcessor;
     private SignalProcessorThread mOutputSignalProcessor;
     private ThreadPool mSignalThreadPool;
+
     private Callback<SignalInfo> mInternalSendSignal = new Callback<SignalInfo>() {
         @Override
         public void run(SignalInfo signalInfo) {
@@ -71,6 +73,18 @@ public class OTAcceleratorSession extends Session {
             }
         }
     };
+
+    public void addConnection(String connectionId, Connection connection) {
+        connections.put(connectionId, connection);
+    }
+
+    public void removeConnection(String connectionId) {
+        connections.remove(connectionId);
+    }
+
+    public Connection getConnection(String connectionId) {
+        return connections.get(connectionId);
+    }
 
     /**
      * Creates an OTAcceleratorSession instance
@@ -396,5 +410,15 @@ public class OTAcceleratorSession extends Session {
         for (ArchiveListener l : mArchiveListeners) {
             l.onArchiveStopped(this, id);
         }
+    }
+
+    @Override
+    public void disconnect() {
+        connections.clear();
+        super.disconnect();
+    }
+
+    public int getConnectionCount() {
+        return connections.size();
     }
 }
