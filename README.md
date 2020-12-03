@@ -43,11 +43,11 @@ b) Modify build.gradle for your module and add the following code snippet to the
 implementation 'com.opentok.android:opentok-accelerator-core:x.y.z’
 ```
 
-## Exploring the Code
+## Accelerator Core
+
+### Exploring the Code
 
 For detail about the APIs used to develop this library, see the [OpenTok Android SDK Reference](https://tokbox.com/developer/sdks/android/reference/) and [Android API Reference](http://developer.android.com/reference/packages.html).
-
-### Main Class Design
 
 | Class                   | Description                                                                                                                                                                    |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -57,14 +57,14 @@ For detail about the APIs used to develop this library, see the [OpenTok Android
 | `PreviewConfig`         | Defines the configuration of the local preview.                                                                                                                                |
 | `BasicListener`         | Monitors basic state changes in the OpenTok communication.                                                                                                                     |
 | `AdvancedListener`      | Monitors advanced state changes in the OpenTok communication.                                                                                                                  |
-| `SignalListener`        | Monitors a signal received in the OpenTok communication.                                                                                                                   |
+| `SignalListener`        | Monitors a signal received in the OpenTok communication.                                                                                                                       |
 | `MediaType`             | Defines the Audio and Video media type.                                                                                                                                        |
 | `StreamStatus`          | Defines the current status of the Stream properties.                                                                                                                           |
 | `VideoScale`            | Defines the FIT and FILL modes setting for the renderer.                                                                                                                       |
 | `ScreenSharingCapturer` | Custom screen sharing capturer. In the absence of a custom or default camera capturer, `Core Android` will generate one using the full screen as the capturer.                 |
 | `ScreenSharingFragment` | Headless fragment used to implement the screensharing feature by default.                                                                                                      |
 
-## Using Accelerator Core Android
+### Using Accelerator Core Android
 
 You can start testing a basic multiparty application using the Accelerator Core with best-practices for Android.
  - [OpenTok Accelerator Sample Application](https://github.com/opentok/accelerator-sample-apps-android).
@@ -83,7 +83,7 @@ OTConfig config = OTConfig.OTConfigBuilder(SESSION_ID, TOKEN, API_KEY)
 OTWrapper wrapper = OTWrapper(this, config);
 ```
 
-#### Obtaining OpenTok Credentials
+### Obtaining OpenTok Credentials
 
 To use OpenTok's framework you need a Session ID, Token, and API Key you can get these values at the [OpenTok Developer Dashboard](https://dashboard.tokbox.com/). For production deployment, you must generate the Session ID and Token values using one of the [OpenTok Server SDKs](https://tokbox.com/developer/sdks/server/).
 
@@ -412,6 +412,222 @@ To get the OTAcceleratorSession instance used in the audio/video communication, 
 ```kotlin
 OTAcceleratorSession session = wrapper.session;
 ```
+
+## Accelerator TextChat
+
+![screenshot](misc/text-chat-screenshot.png)
+
+###  Exploring the code
+
+The `TextChatFragment` class is the backbone of the text chat communication feature.
+
+This class, which inherits from the [`androidx.fragment.app.Fragment`](https://developer.android.com/reference/androidx/fragment/app/Fragment) class, sets up the text chat UI views and events, sets up session listeners, and defines a listener interface to monitor the changes.
+
+```java
+public class TextChatFragment extends Fragment implements SignalListener {
+    . . .
+}
+```
+
+The `TextChatListener` interface monitors state changes in the `TextChatFragment`, and defines the following methods:
+
+```java
+public interface TextChatListener {
+  void onNewSentMessage(ChatMessage message);
+  void onNewReceivedMessage(ChatMessage message);
+  void onTextChatError(String error);
+  void onClose();
+}
+
+### Initialization methods
+
+The following `TextChatFragment` methods are used to initialize the app and provide basic information determining the behavior of the text chat functionality.
+
+| Feature                                           | Methods              |
+| ------------------------------------------------- | -------------------- |
+| Set the maximum chat text length.                 | `setMaxTextLength()` |
+| Set the sender alias of the outgoing messages.    | `setSenderAlias()`   |
+| Set the listener object to monitor state changes. | `setListener()`      |
+
+
+For example, the following private method instantiates a `TextChatFragment` object:
+
+```java
+  OTAcceleratorSession mSession = new OTAcceleratorSession (context, apikey, sessionId);
+  mSession.connect(token);
+
+  //...
+
+  private void initTextChatFragment() {
+    mTextChatFragment = TextChatFragment.newInstance(mSession, apikey);
+    getSupportFragmentManager().beginTransaction()
+                .add(R.id.textchat_fragment_container, mTextChatFragment).commit();
+    getSupportFragmentManager().executePendingTransactions();    
+  }
+```
+
+This lines of code illustrates how to set the maximum message length to 1050 characters and set a new sender alias:
+
+```java
+  try {
+    mTextChatFragment.setSenderAlias("Tokboxer");
+    mTextChatFragment.setMaxTextLength(140);
+    mTextChatFragment.setListener(this);
+  } catch (Exception e) {
+    e.printStackTrace();
+  }
+```
+
+### Sending and receiving messages
+
+By implementing the `TextChatFragment.TextChatListener` interface, the app can monitor both receiving and sending activity. For example, a message is successfully sent, or a message is sent with a code in the event of an error.
+
+The method implementations shown below use the `ChatMessage` object to send and receive messages.
+
+The `onNewSentMessage()` event is fired when a new individual `ChatMessage` is sent to other client connected to the OpenTok session. To send a `ChatMessage`, the `TextChatFragment` uses the [OpenTok signaling API](https://tokbox.com/developer/sdks/android/reference/com/opentok/android/Session.html#sendSignal(java.lang.String,%20java.lang.String)).
+
+The `onNewReceivedMessage()` event is fired when a new `ChatMessage` is received from the other client.
+
+```java
+    @Override
+    public void onNewSentMessage(ChatMessage message) {
+        Log.i(LOG_TAG, "New sent message");
+    }
+
+    @Override
+    public void onNewReceivedMessage(ChatMessage message) {
+        Log.i(LOG_TAG, "New received message");
+    }
+```
+
+## Accelerator Annotations
+
+![screenshot](misc/annotations-screenshot.png)
+
+### Exploring the code
+
+For detail about the APIs used to develop this accelerator pack, see the [OpenTok Android SDK Reference](https://tokbox.com/developer/sdks/android/reference/) and [Android API Reference](http://developer.android.com/reference/packages.html).
+
+_**NOTE:** The project contains logic used for logging. This is used to submit anonymous usage data for internal TokBox purposes only. We request that you do not modify or remove any logging code in your use of this accelerator pack._
+
+### Class design
+
+| Class                      | Description                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AnnotationsToolbar`       | Provides the initializers and methods for the annotation toolbar view, and initializes functionality such as text annotations, a screen capture button, an erase button that removes the last annotation that was added, a color selector for drawing strokes and text annotations, and controls scrolling. You can customize this toolbar. |
+| `AnnotationsView`          | Provides the rectangular area on the screen which is responsible for drawing annotations and event handling.                                                                                                                                                                                                                                |
+| `AnnotationsListener`      | Monitors state changes in the Annotations component. For example, a new event would occur when a screen capture is ready or there is an error.                                                                                                                                                                                              |
+| `AnnotationsPath`          | Extends the [Android Path class](https://developer.android.com/reference/android/graphics/Path.html), and defines the various geometric paths to be drawn in the `AnnotationView` canvas.                                                                                                                                                   |
+| `AnnotationText`           | Defines the text labels to be drawn in the `AnnotationViewCanvas`.                                                                                                                                                                                                                                                                          |
+| `Annotatable`              | Each `AnnotationText` or `AnnotationPath` is defined as an annotatable object.                                                                                                                                                                                                                                                              |
+| `AnnotationsManager`       | Manages the set of the annotations in the annotations view.                                                                                                                                                                                                                                                                                 |
+| `AnnotationsVideoRenderer` | Extends the [BaseVideoRenderer](https://tokbox.com/developer/sdks/android/reference/com/opentok/android/BaseVideoRenderer.html) class in the OpenTok Android SDK, and includes screenshot functionality.                                                                                                                                    |
+
+**NOTE:** Scrolling is frozen while the user adds annotations. Scrolling is re-enabled after the user clicks **Done**, and the annotations are removed at that point.
+
+### Using the Accelerator Annotation
+
+#### Add the annotation toolbar
+
+Add the `AnnotationsToolbar` to your layout:</p>
+
+```java
+<com.tokbox.android.annotations.AnnotationsToolbar
+    android:id="@+id/annotations_bar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"/>
+```
+
+The `AnnotationsToolbar` offers the following actions:
+
+- _Freehand Annotation_: Handwritten annotation
+- _Text Annotation_: Text label annotations.
+- _Color Picker_: Select a color for the annotation.
+- _Erase_: Delete the most recent annotation.
+- _Screen Capture_: Take a screenshot of the annotations.
+- _Done_: Clear all annotations and re-enabling scrolling.
+
+#### Add a custom annotation renderer
+
+If you would like to create a new instance of the `AnnotationsVideoRenderer` class or a new custom video renderer, for example, to manage the screen capture option in the annotations toolbar, start with this line of code:
+
+```java
+AnnotationsVideoRenderer mRenderer = new AnnotationsVideoRenderer(this);
+```
+
+#### Attach the annotation canvas to a view
+
+You can attach an annotation canvas to a publisher view, for example, to the screen sharing view:
+
+```java
+try {
+  AnnotationsView mScreenAnnotationsView = new AnnotationsView(this, mWrapper.getSession(), OpenTokConfig.API_KEY, true);
+
+  mScreenAnnotationsView.attachToolbar(mAnnotationsToolbar);
+  mScreenAnnotationsView.setVideoRenderer(mScreensharingRenderer);
+  mScreenAnnotationsView.setAnnotationsListener(this);
+  ((ViewGroup) mScreenSharingView).addView(mScreenAnnotationsView);
+} catch (Exception e) {
+  Log.i(LOG_TAG, "Exception - add annotations view " + e);
+}
+```
+
+Or to a subscriber view:
+
+```java
+try {
+  AnnotationsView mRemoteAnnotationsView = new AnnotationsView(this, mWrapper.getSession(), OpenTokConfig.API_KEY, mRemoteConnId);
+  mRemoteAnnotationsView.setVideoRenderer(mRemoteRenderer);
+  mRemoteAnnotationsView.attachToolbar(mAnnotationsToolbar);
+  mRemoteAnnotationsView.setAnnotationsListener(this);
+  ((ViewGroup) mRemoteViewContainer).addView(mRemoteAnnotationsView);
+} catch (Exception e) {
+  Log.i(LOG_TAG, "Exception - add annotations view " + e);
+}
+```
+
+#### Implement an annotations listener class
+
+To listen for annotation events, implement an `AnnotationsListener`:
+
+```java
+public  interface AnnotationsListener {
+  void onScreencaptureReady(Bitmap bmp);
+  void onAnnotationsSelected(AnnotationsView.Mode mode);
+  void onAnnotationsDone();
+  void onError(String error);
+}
+```
+
+```java
+public class MainActivity
+    extends AppCompatActivity
+    implements AnnotationsView.AnnotationsListener {
+
+    @Override
+    public void onScreencaptureReady(Bitmap bmp) {
+        //A new screencapture is ready
+    }
+
+    @Override
+    public void onAnnotationsSelected(AnnotationsView.Mode mode) {
+        //An annotations item in the toolbar is selected
+    }
+
+    @Override
+    public void onAnnotationsDone() {
+        //The DONE button annotations item in the toolbar is selected. Scrolling is re-enabled.
+    }
+
+    @Override
+    public void onError(String error) {
+       //An error happens in the annotations
+    }
+  ...
+}
+```
+
 
 ## Development and Contributing
 
